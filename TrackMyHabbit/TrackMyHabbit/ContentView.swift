@@ -13,6 +13,7 @@ struct ContentView: View {
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
     
     @State private var activeHabitId: UUID?
+    @State private var selectedTab: AppTab = .habits
     
     @State private var showCreateSheet = false
     @State private var showPickerSheet = false
@@ -23,36 +24,32 @@ struct ContentView: View {
     }
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            AppTheme.Colors.emptyStateBackground
-                .ignoresSafeArea()
-            
-            VStack(spacing: 0) {
-                if habits.isEmpty {
-                    EmptyState {
-                        showCreateSheet = true
-                    }
-                } else if let habit = activeHabit {
-                    HabitSwitcher(
-                        habitName: habit.name,
-                        habitCount: habits.count,
-                        onSwitchPress: { showPickerSheet = true }
-                    )
-                    .padding(.top, 8)
-                    
-                    Spacer()
-                    
-                    HabitCarousel(habit: habit)
-                    
-                    Spacer()
-                }
+        TabView(selection: $selectedTab) {
+            Tab(value: AppTab.habits) {
+                homeScreen
+            } label: {
+                Label(AppTab.habits.title, systemImage: AppTab.habits.icon)
             }
-            .padding(.bottom, habits.isEmpty ? 0 : 100)
-            
-            if !habits.isEmpty {
-                CustomTabBar {
-                    showCreateSheet = true
-                }
+
+            Tab(value: AppTab.calendar) {
+                CalendarPlaceholderView()
+            } label: {
+                Label(AppTab.calendar.title, systemImage: AppTab.calendar.icon)
+            }
+
+            Tab(value: AppTab.add, role: .search) {
+                Color.clear
+                    .ignoresSafeArea()
+            } label: {
+                Label(AppTab.add.title, systemImage: AppTab.add.icon)
+            }
+        }
+        .tint(AppTheme.Colors.emptyStateCTAMid)
+        .tabBarMinimizeBehavior(.onScrollDown)
+        .onChange(of: selectedTab) { previousTab, newTab in
+            if newTab == .add {
+                showCreateSheet = true
+                selectedTab = previousTab
             }
         }
         .onAppear {
@@ -61,9 +58,8 @@ struct ContentView: View {
             }
         }
         .onChange(of: habits) { _, newHabits in
-            // If the active habit was deleted, or newly added
             if activeHabitId == nil || !newHabits.contains(where: { $0.id == activeHabitId }) {
-                activeHabitId = newHabits.last?.id // default to newest
+                activeHabitId = newHabits.last?.id
             }
         }
         .sheet(isPresented: $showCreateSheet) {
@@ -78,122 +74,87 @@ struct ContentView: View {
             )
         }
     }
-}
-
-// MARK: - Custom Tab Bar
-struct CustomTabBar: View {
-    let onAddPress: () -> Void
-
-    var body: some View {
-        HStack(spacing: 0) {
-            tabItem(
-                title: "Habits",
-                systemImage: "checklist",
-                isSelected: true,
-                action: nil
-            )
-
-            tabItem(
-                title: "Calendar",
-                systemImage: "calendar",
-                isSelected: false,
-                action: nil
-            )
-
-            tabItem(
-                title: "Add",
-                systemImage: "plus",
-                isSelected: false,
-                action: onAddPress
-            )
-        }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 8)
-        .background(
-            ZStack {
-                Capsule(style: .continuous)
-                    .fill(.ultraThinMaterial)
-
-                Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.42),
-                                Color.white.opacity(0.16)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-
-                Capsule(style: .continuous)
-                    .stroke(Color.white.opacity(0.78), lineWidth: 1)
-
-                Capsule(style: .continuous)
-                    .fill(
-                        LinearGradient(
-                            colors: [
-                                Color.white.opacity(0.48),
-                                Color.white.opacity(0.02)
-                            ],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        )
-                    )
-                    .padding(1.5)
-                    .mask(
-                        Capsule(style: .continuous)
-                            .padding(1.5)
-                    )
-            }
-            .shadow(color: Color.black.opacity(0.12), radius: 30, x: 0, y: 16)
-            .shadow(color: Color.white.opacity(0.45), radius: 12, x: 0, y: -2)
-        )
-        .padding(.horizontal, 25)
-        .padding(.bottom, 25)
-    }
 
     @ViewBuilder
-    private func tabItem(title: String, systemImage: String, isSelected: Bool, action: (() -> Void)?) -> some View {
-        let content = VStack(spacing: title == "Habits" ? 1 : 0.5) {
-            Image(systemName: systemImage)
-                .font(.system(size: title == "Add" ? 18 : 18, weight: .semibold))
-            Text(title)
-                .customFont(.medium, size: 12, lineHeight: 14.4, tracking: -0.12)
-        }
-        .foregroundColor(isSelected ? AppTheme.Colors.emptyStateCTAMid : AppTheme.Colors.textPrimary)
-        .frame(width: 102)
-        .padding(.vertical, 8)
-        .background(
-            ZStack {
-                if isSelected {
-                    Capsule(style: .continuous)
-                        .fill(Color.white.opacity(0.55))
-                    Capsule(style: .continuous)
-                        .fill(
-                            LinearGradient(
-                                colors: [
-                                    Color.white.opacity(0.44),
-                                    Color.white.opacity(0.08)
-                                ],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                    Capsule(style: .continuous)
-                        .stroke(Color.white.opacity(0.85), lineWidth: 1)
+    private var homeScreen: some View {
+        ZStack {
+            AppTheme.Colors.emptyStateBackground
+                .ignoresSafeArea()
+
+            VStack(spacing: 0) {
+                if habits.isEmpty {
+                    EmptyState {
+                        showCreateSheet = true
+                    }
+                } else if let habit = activeHabit {
+                    HabitSwitcher(
+                        habitName: habit.name,
+                        habitCount: habits.count,
+                        onSwitchPress: { showPickerSheet = true }
+                    )
+                    .padding(.top, 8)
+
+                    Spacer()
+
+                    HabitCarousel(habit: habit)
+
+                    Spacer()
                 }
             }
-        )
-        .shadow(color: Color.white.opacity(isSelected ? 0.4 : 0), radius: 8, x: 0, y: -1)
+            .padding(.bottom, habits.isEmpty ? 0 : 20)
+        }
+    }
+}
 
-        if let action {
-            Button(action: action) {
-                content
+private enum AppTab: Hashable, CaseIterable {
+    case habits
+    case calendar
+    case add
+
+    var title: String {
+        switch self {
+        case .habits:
+            return "Habits"
+        case .calendar:
+            return "Calendar"
+        case .add:
+            return "Add"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .habits:
+            return "checklist"
+        case .calendar:
+            return "calendar"
+        case .add:
+            return "plus"
+        }
+    }
+}
+
+private struct CalendarPlaceholderView: View {
+    var body: some View {
+        ZStack {
+            AppTheme.Colors.emptyStateBackground
+                .ignoresSafeArea()
+
+            VStack(spacing: 12) {
+                Image(systemName: "calendar")
+                    .font(.system(size: 40, weight: .semibold))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+
+                Text("Calendar view coming next")
+                    .customFont(.semibold, size: 20, lineHeight: 24, tracking: -0.4)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+
+                Text("The new system tab bar is in place, so we can plug the calendar screen into this tab next.")
+                    .customFont(.medium, size: 14, lineHeight: 20, tracking: -0.14)
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal, 36)
             }
-            .buttonStyle(.plain)
-        } else {
-            content
         }
     }
 }
