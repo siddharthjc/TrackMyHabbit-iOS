@@ -73,11 +73,11 @@ struct CreateHabitSheet: View {
                         // Input Section
                         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
                             Text("I want to")
-                                .customFont(.bold, size: 24, lineHeight: 29, tracking: -0.48)
+                                .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             
                             TextField("", text: $habitName, prompt: Text("Enter your habit").foregroundColor(AppTheme.Colors.textDisabled))
-                                .customFont(.bold, size: 24, lineHeight: 29, tracking: -0.48)
+                                .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .tint(AppTheme.Colors.primary) // cursor color
                                 .focused($isInputFocused)
@@ -91,7 +91,7 @@ struct CreateHabitSheet: View {
                             if !habitName.trimmingCharacters(in: .whitespaces).isEmpty {
                                 Button(action: presentFrequencySheet) {
                                     Text(selectedFrequency.inlineLabel)
-                                        .customFont(.bold, size: 24, lineHeight: 29, tracking: -0.48)
+                                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
                                         .foregroundColor(AppTheme.Colors.textPrimary)
                                         .underline()
                                 }
@@ -109,7 +109,7 @@ struct CreateHabitSheet: View {
                         // Suggestions Section
                         VStack(alignment: .leading, spacing: 0) {
                             Text("Trying to build a habit? Start small")
-                                .customFont(.bold, size: 16, tracking: -0.32)
+                                .customFont(.semibold, size: 16, tracking: -0.32)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .padding(.bottom, AppTheme.Spacing.xs)
                             

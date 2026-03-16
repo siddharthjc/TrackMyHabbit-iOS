@@ -42,7 +42,7 @@ struct FrequencyBottomSheet: View {
                             closeSheet()
                         }) {
                             Text(option.label)
-                                .customFont(.bold, size: AppTheme.Spacing.md, tracking: -0.32)
+                                .customFont(.semibold, size: AppTheme.Spacing.md, tracking: -0.32)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         }

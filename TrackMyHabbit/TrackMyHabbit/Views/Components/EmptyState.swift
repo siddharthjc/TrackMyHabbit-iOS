@@ -8,6 +8,7 @@ struct EmptyState: View {
             let safeBottom = geometry.safeAreaInsets.bottom
             let availableWidth = geometry.size.width
             let heroSize = min(availableWidth, 402)
+            let illustrationHeight = heroSize * (456.0 / 402.0)
 
             ZStack {
                 AppTheme.Colors.emptyStateBackground
@@ -21,14 +22,18 @@ struct EmptyState: View {
                 VStack(spacing: 0) {
                     Spacer(minLength: geometry.size.height * 0.06)
 
-                    EmptyStateHeroIllustration(size: min(geometry.size.width, geometry.size.height) * 0.55)
+                    Image("EmptyStateHero")
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: heroSize, height: illustrationHeight, alignment: .top)
+                        .clipped()
                         .frame(maxWidth: .infinity)
 
                     Spacer(minLength: geometry.size.height * 0.02)
 
                     VStack(alignment: .leading, spacing: 12) {
                         Text("TrackMyHabbit.")
-                            .customFont(.regular, size: 24, lineHeight: 28.8, tracking: -0.48)
+                            .customFont(.medium, size: 24, lineHeight: 28.8, tracking: -0.48)
                             .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
 
                         VStack(alignment: .leading, spacing: 4) {
@@ -147,173 +152,6 @@ private struct EmptyStateBackgroundPattern: View {
                 )
             )
         }
-    }
-}
-
-private struct EmptyStateHeroIllustration: View {
-    let size: CGFloat
-
-    var body: some View {
-        ZStack {
-            EmptyStateHeroLine()
-                .stroke(AppTheme.Neutral._500.opacity(0.20), style: StrokeStyle(lineWidth: 1, lineCap: .round, lineJoin: .round))
-                .frame(width: size * 0.95, height: size * 0.35)
-                .offset(y: size * 0.22)
-
-            EmptyStateIconBubble(
-                size: size * 0.26,
-                fill: Color(hex: "#fecfc7"),
-                overlay: Color(hex: "#ff9b8a"),
-                symbol: "dumbbell.fill",
-                symbolColor: Color(hex: "#ff7d6a")
-            )
-            .rotationEffect(.degrees(-10.95))
-            .offset(x: -size * 0.28, y: -size * 0.18)
-
-            EmptyStateIconBubble(
-                size: size * 0.24,
-                fill: Color(hex: "#a6cfbc"),
-                overlay: Color(hex: "#a6cfbc"),
-                symbol: "leaf.fill",
-                symbolColor: Color(hex: "#0bbf6a")
-            )
-            .rotationEffect(.degrees(3.06))
-            .offset(x: size * 0.28, y: -size * 0.20)
-
-            EmptyStateIconBubble(
-                size: size * 0.30,
-                fill: Color(hex: "#749bcf"),
-                overlay: Color(hex: "#b5d5ff"),
-                symbol: "bicycle",
-                symbolColor: Color(hex: "#2f6fd6")
-            )
-            .rotationEffect(.degrees(1.64))
-            .offset(y: -size * 0.05)
-
-            EmptyStateOpenBox(size: size * 0.78)
-                .offset(y: size * 0.22)
-        }
-        .frame(width: size, height: size)
-    }
-}
-
-private struct EmptyStateHeroLine: Shape {
-    func path(in rect: CGRect) -> Path {
-        var p = Path()
-        let start = CGPoint(x: rect.minX + rect.width * 0.08, y: rect.midY + rect.height * 0.15)
-        let end = CGPoint(x: rect.maxX - rect.width * 0.08, y: rect.midY - rect.height * 0.05)
-        let c1 = CGPoint(x: rect.minX + rect.width * 0.35, y: rect.minY + rect.height * 0.85)
-        let c2 = CGPoint(x: rect.minX + rect.width * 0.65, y: rect.minY + rect.height * 0.05)
-        p.move(to: start)
-        p.addCurve(to: end, control1: c1, control2: c2)
-        return p
-    }
-}
-
-private struct EmptyStateIconBubble: View {
-    let size: CGFloat
-    let fill: Color
-    let overlay: Color
-    let symbol: String
-    let symbolColor: Color
-
-    var body: some View {
-        ZStack {
-            Circle()
-                .fill(fill)
-                .overlay(
-                    Circle()
-                        .inset(by: 0.1)
-                        .stroke(Color(hex: "#8A8A9F").opacity(0.23), lineWidth: 0.2)
-                )
-                .overlay(
-                    Circle()
-                        .inset(by: size * 0.02)
-                        .fill(overlay.opacity(0.25))
-                        .blendMode(.overlay)
-                )
-                .shadow(color: AppTheme.Neutral._700.opacity(0.30), radius: 1.6, x: 0, y: 1.2)
-                .overlay {
-                    Circle()
-                        .stroke(Color.black.opacity(0.12), lineWidth: 0.6)
-                        .blur(radius: 0.2)
-                        .opacity(0.6)
-                        .blendMode(.overlay)
-                }
-                .overlay {
-                    Circle()
-                        .fill(Color.clear)
-                        .shadow(color: Color.black.opacity(0.18), radius: 0, x: 0, y: size * 0.03)
-                        .clipShape(Circle())
-                        .allowsHitTesting(false)
-                }
-
-            Image(systemName: symbol)
-                .font(.system(size: size * 0.34, weight: .semibold))
-                .foregroundColor(symbolColor)
-                .opacity(0.92)
-        }
-        .frame(width: size, height: size)
-    }
-}
-
-private struct EmptyStateOpenBox: View {
-    let size: CGFloat
-
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: size * 0.04, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        colors: [Color(hex: "#f3f4f6"), Color(hex: "#e9eaee")],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .frame(width: size * 0.92, height: size * 0.42)
-                .shadow(color: AppTheme.Neutral._700.opacity(0.18), radius: 14, x: 0, y: 10)
-
-            RoundedRectangle(cornerRadius: size * 0.04, style: .continuous)
-                .fill(Color.white.opacity(0.65))
-                .frame(width: size * 0.92, height: size * 0.42)
-                .mask(
-                    LinearGradient(colors: [Color.black.opacity(0.0), Color.black.opacity(1.0)], startPoint: .top, endPoint: .bottom)
-                )
-                .offset(y: size * 0.06)
-
-            EmptyStateBoxFlap(side: .left)
-                .frame(width: size * 0.42, height: size * 0.16)
-                .offset(x: -size * 0.36, y: -size * 0.12)
-
-            EmptyStateBoxFlap(side: .right)
-                .frame(width: size * 0.42, height: size * 0.16)
-                .offset(x: size * 0.36, y: -size * 0.12)
-
-            RoundedRectangle(cornerRadius: size * 0.035, style: .continuous)
-                .fill(Color(hex: "#f7f7fa"))
-                .frame(width: size * 0.88, height: size * 0.13)
-                .offset(y: -size * 0.14)
-                .shadow(color: AppTheme.Neutral._700.opacity(0.10), radius: 10, x: 0, y: 6)
-        }
-        .frame(width: size, height: size * 0.55)
-    }
-}
-
-private struct EmptyStateBoxFlap: View {
-    enum Side { case left, right }
-    let side: Side
-
-    var body: some View {
-        RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .fill(
-                LinearGradient(
-                    colors: [Color(hex: "#ffffff"), Color(hex: "#eceef2")],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .rotationEffect(.degrees(side == .left ? -18 : 18))
-            .shadow(color: AppTheme.Neutral._700.opacity(0.16), radius: 10, x: 0, y: 8)
     }
 }
 

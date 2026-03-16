@@ -10,6 +10,10 @@ import SwiftData
 
 @main
 struct TrackMyHabbitApp: App {
+    init() {
+        FontRegistration.registerBundledFonts()
+    }
+
     var sharedModelContainer: ModelContainer = {
         let schema = Schema([
             Habit.self,

@@ -10,7 +10,7 @@ struct HabitPickerModal: View {
     var body: some View {
         VStack(spacing: 0) {
             Text("Your Habits")
-                .customFont(.bold, size: AppTheme.Spacing.lg)
+                .customFont(.semibold, size: AppTheme.Spacing.lg)
                 .foregroundColor(AppTheme.Colors.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.horizontal, AppTheme.Spacing.xl)
@@ -25,7 +25,7 @@ struct HabitPickerModal: View {
                     } label: {
                         HStack {
                             Text(habit.name)
-                                .customFont(habit.id == activeHabitId ? .bold : .medium, size: AppTheme.Spacing.md)
+                                .customFont(habit.id == activeHabitId ? .semibold : .medium, size: AppTheme.Spacing.md)
                                 .foregroundColor(habit.id == activeHabitId ? AppTheme.Colors.primary : AppTheme.Colors.textPrimary)
                             
                             Spacer()
