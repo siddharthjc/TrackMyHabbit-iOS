@@ -4,40 +4,54 @@ import SwiftData
 struct HabitCarousel: View {
     let habit: Habit
     let days: [String] = DateUtils.generateDays(count: 7)
-    
-    let cardWidth = UIScreen.main.bounds.width * 0.72
-    var cardHeight: CGFloat { cardWidth * 1.38 }
-    
+
+    private let cardWidth: CGFloat = 288
+    private let cardHeight: CGFloat = 397
+    private let cardSpacing: CGFloat = 20
+
+    @State private var scrollTarget: String?
+
     var body: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            LazyHStack(spacing: 20) {
-                ForEach(days.reversed(), id: \.self) { dateStr in
-                    let entry = habit.entries.first(where: { $0.dateString == dateStr })
-                    
-                    GeometryReader { proxy in
-                        let midX = proxy.frame(in: .global).midX
-                        let screenMidX = UIScreen.main.bounds.midX
-                        let distance = abs(midX - screenMidX)
-                        let isActive = distance < (cardWidth / 2 + 10)
-                        
+        GeometryReader { geometry in
+            let horizontalInset = max((geometry.size.width - cardWidth) / 2, 20)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                LazyHStack(spacing: cardSpacing) {
+                    ForEach(days.reversed(), id: \.self) { dateStr in
+                        let isActive = (scrollTarget == dateStr)
+                        let entry = habit.entries.first(where: { $0.dateString == dateStr })
+
                         DayCard(
                             dateStr: dateStr,
                             entry: entry,
                             isActive: isActive,
+                            cardWidth: cardWidth,
+                            cardHeight: cardHeight,
                             tapAction: {
-                                // Image picking logic to be implemented here
                                 print("Tapped on \(dateStr)")
+                                withAnimation {
+                                    scrollTarget = dateStr
+                                }
                             }
                         )
                         .scaleEffect(isActive ? 1.0 : 0.9)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.8), value: isActive)
+                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
+                        .frame(width: cardWidth, height: cardHeight)
+                        .zIndex(isActive ? 1 : 0)
                     }
-                    .frame(width: cardWidth, height: cardHeight)
+                }
+                .padding(.vertical, 80)
+                .scrollTargetLayout()
+            }
+            .scrollPosition(id: $scrollTarget, anchor: .center)
+            .scrollTargetBehavior(.viewAligned)
+            .contentMargins(.horizontal, horizontalInset, for: .scrollContent)
+            .onAppear {
+                if scrollTarget == nil {
+                    scrollTarget = days.reversed().first
                 }
             }
-            .scrollTargetLayout()
         }
-        .scrollTargetBehavior(.viewAligned)
-        .contentMargins(.horizontal, (UIScreen.main.bounds.width - cardWidth) / 2, for: .scrollContent)
+        .frame(height: cardHeight + 160)
     }
 }

@@ -24,7 +24,7 @@ struct ContentView: View {
 
     var body: some View {
         ZStack(alignment: .bottom) {
-            (habits.isEmpty ? AppTheme.Colors.emptyStateBackground : AppTheme.Colors.bgPrimary)
+            AppTheme.Colors.emptyStateBackground
                 .ignoresSafeArea()
             
             VStack(spacing: 0) {
@@ -38,13 +38,13 @@ struct ContentView: View {
                         habitCount: habits.count,
                         onSwitchPress: { showPickerSheet = true }
                     )
-                    .padding(.top, 24)
+                    .padding(.top, 8)
                     
                     Spacer()
                     
                     HabitCarousel(habit: habit)
                     
-                    Spacer(minLength: 40)
+                    Spacer()
                 }
             }
             .padding(.bottom, habits.isEmpty ? 0 : 100)
@@ -83,50 +83,69 @@ struct ContentView: View {
 // MARK: - Custom Tab Bar
 struct CustomTabBar: View {
     let onAddPress: () -> Void
+
     var body: some View {
         HStack(spacing: 0) {
-            // Habits Tab
-            VStack(spacing: 4) {
-                Image(systemName: "checklist")
-                    .font(.system(size: 20, weight: .semibold))
-                Text("Habits")
-                    .customFont(.medium, size: 12)
-            }
-            .foregroundColor(AppTheme.Colors.systemBlue)
-            .frame(maxWidth: .infinity)
-            
-            // Calendar Tab
-            VStack(spacing: 4) {
-                Image(systemName: "calendar")
-                    .font(.system(size: 20, weight: .semibold))
-                Text("Calendar")
-                    .customFont(.medium, size: 12)
-            }
-            .foregroundColor(AppTheme.Colors.textPrimary)
-            .frame(maxWidth: .infinity)
-            
-            // Add Tab
-            Button(action: onAddPress) {
-                VStack(spacing: 4) {
-                    Image(systemName: "plus")
-                        .font(.system(size: 24, weight: .semibold))
-                    Text("Add")
-                        .customFont(.medium, size: 12)
-                }
-                .foregroundColor(AppTheme.Colors.textPrimary)
-                .frame(maxWidth: .infinity)
-            }
+            tabItem(
+                title: "Habits",
+                systemImage: "checklist",
+                isSelected: true,
+                action: nil
+            )
+
+            tabItem(
+                title: "Calendar",
+                systemImage: "calendar",
+                isSelected: false,
+                action: nil
+            )
+
+            tabItem(
+                title: "Add",
+                systemImage: "plus",
+                isSelected: false,
+                action: onAddPress
+            )
         }
-        .padding(.top, 16)
-        .padding(.bottom, 25)
-        .padding(.horizontal, 24)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
         .background(
-            RoundedRectangle(cornerRadius: 100)
-                .fill(AppTheme.Neutral._0.opacity(0.85))
+            Capsule(style: .continuous)
+                .fill(Color.white.opacity(0.78))
+                .overlay(
+                    Capsule(style: .continuous)
+                        .stroke(Color.white.opacity(0.9), lineWidth: 1)
+                )
                 .shadow(color: Color.black.opacity(0.12), radius: 40, x: 0, y: 8)
         )
-        .padding(.horizontal, 24)
-        .padding(.bottom, 12)
+        .padding(.horizontal, 25)
+        .padding(.bottom, 25)
+    }
+
+    @ViewBuilder
+    private func tabItem(title: String, systemImage: String, isSelected: Bool, action: (() -> Void)?) -> some View {
+        let content = VStack(spacing: title == "Habits" ? 1 : 0.5) {
+            Image(systemName: systemImage)
+                .font(.system(size: title == "Add" ? 18 : 18, weight: .semibold))
+            Text(title)
+                .customFont(.medium, size: 12, lineHeight: 14.4, tracking: -0.12)
+        }
+        .foregroundColor(isSelected ? AppTheme.Colors.emptyStateCTAMid : AppTheme.Colors.textPrimary)
+        .frame(width: 102)
+        .padding(.vertical, 6)
+        .background(
+            Capsule(style: .continuous)
+                .fill(isSelected ? AppTheme.Neutral._300.opacity(0.9) : Color.clear)
+        )
+
+        if let action {
+            Button(action: action) {
+                content
+            }
+            .buttonStyle(.plain)
+        } else {
+            content
+        }
     }
 }
 

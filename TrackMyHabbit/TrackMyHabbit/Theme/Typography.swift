@@ -36,7 +36,6 @@ struct CustomFontModifier: ViewModifier {
         
         content
             .font(baseFont)
-            .fontWeight(font.weight)
             .lineSpacing(lineHeight.map { $0 - size } ?? 0)
             // SwiftUI tracking is in points, React Native letterSpacing is also in points but often slightly differently interpreted. It maps well enough directly passing it.
             .tracking(tracking ?? 0)
@@ -57,7 +56,7 @@ extension View {
     
     /// Title prefix (e.g. "I want to")
     func titlePrefixStyle() -> some View {
-        self.customFont(.bold, size: 24, lineHeight: 29, tracking: -0.48)
+        self.customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
             .foregroundColor(AppTheme.Colors.textPrimary)
     }
     

@@ -76,7 +76,7 @@ struct CreateHabitSheet: View {
                                 .customFont(.bold, size: 24, lineHeight: 29, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             
-                            TextField("Enter your habit", text: $habitName)
+                            TextField("", text: $habitName, prompt: Text("Enter your habit").foregroundColor(AppTheme.Colors.textDisabled))
                                 .customFont(.bold, size: 24, lineHeight: 29, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .tint(AppTheme.Colors.primary) // cursor color
