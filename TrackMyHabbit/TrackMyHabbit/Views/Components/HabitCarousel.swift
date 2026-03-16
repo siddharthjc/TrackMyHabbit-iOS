@@ -1,7 +1,10 @@
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct HabitCarousel: View {
+    @Environment(\.modelContext) private var modelContext
+
     let habit: Habit
     let days: [String] = DateUtils.generateDays(count: 7)
 
@@ -28,10 +31,12 @@ struct HabitCarousel: View {
                             cardWidth: cardWidth,
                             cardHeight: cardHeight,
                             tapAction: {
-                                print("Tapped on \(dateStr)")
                                 withAnimation {
                                     scrollTarget = dateStr
                                 }
+                            },
+                            onImagePicked: { data in
+                                saveImage(data, for: dateStr, existingEntry: entry)
                             }
                         )
                         .scaleEffect(isActive ? 1.0 : 0.9)
@@ -53,5 +58,54 @@ struct HabitCarousel: View {
             }
         }
         .frame(height: cardHeight + 160)
+    }
+
+    private func saveImage(_ data: Data, for dateString: String, existingEntry: HabitEntry?) {
+        do {
+            let fileURL = try storeImage(data, for: dateString)
+
+            if let existingEntry {
+                existingEntry.imageUri = fileURL.absoluteString
+            } else {
+                let newEntry = HabitEntry(
+                    dateString: dateString,
+                    imageUri: fileURL.absoluteString,
+                    habit: habit
+                )
+                modelContext.insert(newEntry)
+            }
+
+            try modelContext.save()
+        } catch {
+            print("Failed to save image for \(dateString): \(error.localizedDescription)")
+        }
+    }
+
+    private func storeImage(_ data: Data, for dateString: String) throws -> URL {
+        let fileManager = FileManager.default
+        let appSupportURL = try fileManager.url(
+            for: .applicationSupportDirectory,
+            in: .userDomainMask,
+            appropriateFor: nil,
+            create: true
+        )
+        let photoDirectory = appSupportURL
+            .appendingPathComponent("HabitPhotos", isDirectory: true)
+            .appendingPathComponent(habit.id.uuidString, isDirectory: true)
+
+        try fileManager.createDirectory(at: photoDirectory, withIntermediateDirectories: true)
+
+        let fileURL = photoDirectory.appendingPathComponent("\(dateString).jpg")
+        let encodedData = normalizedJPEGData(from: data) ?? data
+        try encodedData.write(to: fileURL, options: .atomic)
+        return fileURL
+    }
+
+    private func normalizedJPEGData(from data: Data) -> Data? {
+        guard let image = UIImage(data: data) else {
+            return nil
+        }
+
+        return image.jpegData(compressionQuality: 0.9)
     }
 }

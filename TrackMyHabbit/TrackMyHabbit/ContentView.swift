@@ -107,16 +107,47 @@ struct CustomTabBar: View {
                 action: onAddPress
             )
         }
-        .padding(.horizontal, 10)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 12)
+        .padding(.vertical, 8)
         .background(
-            Capsule(style: .continuous)
-                .fill(Color.white.opacity(0.78))
-                .overlay(
-                    Capsule(style: .continuous)
-                        .stroke(Color.white.opacity(0.9), lineWidth: 1)
-                )
-                .shadow(color: Color.black.opacity(0.12), radius: 40, x: 0, y: 8)
+            ZStack {
+                Capsule(style: .continuous)
+                    .fill(.ultraThinMaterial)
+
+                Capsule(style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.42),
+                                Color.white.opacity(0.16)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+
+                Capsule(style: .continuous)
+                    .stroke(Color.white.opacity(0.78), lineWidth: 1)
+
+                Capsule(style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color.white.opacity(0.48),
+                                Color.white.opacity(0.02)
+                            ],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+                    .padding(1.5)
+                    .mask(
+                        Capsule(style: .continuous)
+                            .padding(1.5)
+                    )
+            }
+            .shadow(color: Color.black.opacity(0.12), radius: 30, x: 0, y: 16)
+            .shadow(color: Color.white.opacity(0.45), radius: 12, x: 0, y: -2)
         )
         .padding(.horizontal, 25)
         .padding(.bottom, 25)
@@ -132,11 +163,29 @@ struct CustomTabBar: View {
         }
         .foregroundColor(isSelected ? AppTheme.Colors.emptyStateCTAMid : AppTheme.Colors.textPrimary)
         .frame(width: 102)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
         .background(
-            Capsule(style: .continuous)
-                .fill(isSelected ? AppTheme.Neutral._300.opacity(0.9) : Color.clear)
+            ZStack {
+                if isSelected {
+                    Capsule(style: .continuous)
+                        .fill(Color.white.opacity(0.55))
+                    Capsule(style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [
+                                    Color.white.opacity(0.44),
+                                    Color.white.opacity(0.08)
+                                ],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                    Capsule(style: .continuous)
+                        .stroke(Color.white.opacity(0.85), lineWidth: 1)
+                }
+            }
         )
+        .shadow(color: Color.white.opacity(isSelected ? 0.4 : 0), radius: 8, x: 0, y: -1)
 
         if let action {
             Button(action: action) {

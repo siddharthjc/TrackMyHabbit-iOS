@@ -8,10 +8,10 @@ enum CustomFont {
     
     var name: String {
         switch self {
-        case .regular: return "Geist-Regular"
-        case .medium: return "Geist-Medium"
-        case .semibold: return "Geist-SemiBold"
-        case .bold: return "Geist-Bold"
+        case .regular: return "Geist-Medium"
+        case .medium: return "Geist-SemiBold"
+        case .semibold: return "Geist-Bold"
+        case .bold: return "Geist-ExtraBold"
         }
     }
 
