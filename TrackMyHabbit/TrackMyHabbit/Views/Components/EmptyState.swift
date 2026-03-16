@@ -38,11 +38,11 @@ struct EmptyState: View {
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Meet your better self.")
-                                .customFont(.semibold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.bold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
 
                             Text("Small habits. Big change.")
-                                .customFont(.semibold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.bold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
@@ -78,45 +78,26 @@ private struct EmptyStateCTA: View {
                 .foregroundColor(AppTheme.Neutral._0)
         }
         .padding(.horizontal, 8)
-        .padding(.vertical, 18)
+        .padding(.vertical, 20)
         .frame(maxWidth: .infinity, alignment: .center)
-        .background {
-            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        stops: [
-                            .init(color: AppTheme.Colors.emptyStateCTAStart, location: 0),
-                            .init(color: AppTheme.Colors.emptyStateCTAMid, location: 0.55),
-                            .init(color: AppTheme.Colors.emptyStateCTAEnd, location: 1)
-                        ],
-                        startPoint: UnitPoint(x: 0.5, y: 0),
-                        endPoint: UnitPoint(x: 0.5, y: 1.56)
-                    )
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .inset(by: 0.1)
-                        .stroke(Color(hex: "#8A8A9F").opacity(0.23), lineWidth: 0.2)
-                )
-                .overlay(alignment: .bottom) {
-                    Capsule()
-                        .fill(Color.black.opacity(0.16))
-                        .frame(height: 6)
-                        .blur(radius: 0.9)
-                        .padding(.horizontal, 6)
-                        .offset(y: 1.4)
-                }
-                .overlay(alignment: .bottom) {
-                    Capsule()
-                        .fill(Color.black.opacity(0.1))
-                        .frame(height: 3.2)
-                        .blur(radius: 0.3)
-                        .padding(.horizontal, 8)
-                        .offset(y: 0.4)
-                }
-                .clipShape(RoundedRectangle(cornerRadius: cornerRadius, style: .continuous))
-        }
-        .shadow(color: AppTheme.Neutral._700.opacity(0.3), radius: 1, x: 0, y: 1)
+        .background(
+            LinearGradient(
+                stops: [
+                    Gradient.Stop(color: Color(red: 0.43, green: 0.56, blue: 1), location: 0.00),
+                    Gradient.Stop(color: Color(red: 0.3, green: 0.43, blue: 0.92), location: 0.55),
+                    Gradient.Stop(color: Color(red: 0.34, green: 0.47, blue: 0.95), location: 1.00)
+                ],
+                startPoint: UnitPoint(x: 0.5, y: 0),
+                endPoint: UnitPoint(x: 0.5, y: 1.56)
+            )
+        )
+        .cornerRadius(cornerRadius)
+        .shadow(color: Color(red: 0.37, green: 0.37, blue: 0).opacity(0.3), radius: 1, x: 0, y: 1)
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .inset(by: 0.1)
+                .stroke(Color(red: 0.54, green: 0.54, blue: 0.62).opacity(0.23), lineWidth: 0.2)
+        )
     }
 }
 

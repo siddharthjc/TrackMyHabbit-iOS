@@ -1,26 +1,54 @@
 import SwiftUI
 
-enum CustomFont {
-    case regular
-    case medium
-    case semibold
-    case bold
-    
-    var name: String {
+enum CustomFont: String {
+    case regular = "Geist-Regular"
+    case medium = "Geist-Medium"
+    case semibold = "Geist-SemiBold"
+    case bold = "Geist-Bold"
+}
+
+enum TypographyStyle {
+    case titlePrefix
+    case body
+    case subtitle
+
+    var font: CustomFont {
         switch self {
-        case .regular: return "Geist-Regular"
-        case .medium: return "Geist-Medium"
-        case .semibold: return "Geist-SemiBold"
-        case .bold: return "Geist-Bold"
+        case .titlePrefix: return .semibold
+        case .body: return .regular
+        case .subtitle: return .medium
         }
     }
 
-    var weight: Font.Weight? {
+    var size: CGFloat {
         switch self {
-        case .semibold:
-            return .semibold
-        default:
-            return nil
+        case .titlePrefix: return 24
+        case .body: return AppTheme.Spacing.md
+        case .subtitle: return AppTheme.Spacing.md
+        }
+    }
+
+    var lineHeight: CGFloat? {
+        switch self {
+        case .titlePrefix: return 29
+        case .body: return nil
+        case .subtitle: return nil
+        }
+    }
+
+    var tracking: CGFloat? {
+        switch self {
+        case .titlePrefix: return -0.48
+        case .body: return nil
+        case .subtitle: return -0.08
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .titlePrefix: return AppTheme.Colors.textPrimary
+        case .body: return AppTheme.Colors.textPrimary
+        case .subtitle: return AppTheme.Colors.textDisabled
         }
     }
 }
@@ -32,7 +60,7 @@ struct CustomFontModifier: ViewModifier {
     let tracking: CGFloat?
     
     func body(content: Content) -> some View {
-        let baseFont = Font.custom(font.name, size: size)
+        let baseFont = Font.custom(font.rawValue, size: size)
         
         content
             .font(baseFont)
@@ -52,23 +80,9 @@ extension View {
         self.modifier(CustomFontModifier(font: font, size: size, lineHeight: lineHeight, tracking: tracking))
     }
     
-    // Semantic Typography Helpers (Mapping from React Native's styles)
-    
-    /// Title prefix (e.g. "I want to")
-    func titlePrefixStyle() -> some View {
-        self.customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
-            .foregroundColor(AppTheme.Colors.textPrimary)
-    }
-    
-    /// Regular body text
-    func bodyStyle() -> some View {
-        self.customFont(.regular, size: AppTheme.Spacing.md)
-            .foregroundColor(AppTheme.Colors.textPrimary)
-    }
-    
-    /// Subtitle / hint text
-    func subtitleStyle() -> some View {
-        self.customFont(.medium, size: AppTheme.Spacing.md, tracking: -0.08)
-            .foregroundColor(AppTheme.Colors.textDisabled)
+    func textStyle(_ style: TypographyStyle) -> some View {
+        self
+            .customFont(style.font, size: style.size, lineHeight: style.lineHeight, tracking: style.tracking)
+            .foregroundColor(style.color)
     }
 }

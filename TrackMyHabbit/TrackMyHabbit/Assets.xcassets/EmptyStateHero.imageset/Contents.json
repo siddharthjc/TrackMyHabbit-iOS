@@ -6,10 +6,12 @@
       "scale" : "1x"
     },
     {
+      "filename" : "empty-state-hero@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
+      "filename" : "empty-state-hero@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
