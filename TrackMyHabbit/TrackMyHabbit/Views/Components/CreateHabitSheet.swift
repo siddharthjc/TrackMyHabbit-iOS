@@ -40,10 +40,12 @@ struct CreateHabitSheet: View {
                             .font(.system(size: 20, weight: .medium))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .frame(width: 48, height: 48)
-                            .background(AppTheme.Colors.bgPrimary)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(AppTheme.Colors.bgTertiary, lineWidth: 1))
-                            .shadow(color: Color(hex: "#5E5E72").opacity(0.2), radius: 56, x: 0, y: 4.41)
+                            .background(
+                                Circle()
+                                    .fill(AppTheme.Colors.bgPrimary)
+                                    .overlay(Circle().stroke(AppTheme.Colors.bgPrimary, lineWidth: 1))
+                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.2), radius: 56, x: 0, y: 4.416)
+                            )
                     }
                     
                     Spacer()
@@ -56,10 +58,11 @@ struct CreateHabitSheet: View {
                             .font(.system(size: 20, weight: .semibold))
                             .foregroundColor(hasName ? AppTheme.Colors.systemBlue : AppTheme.Colors.textDisabled)
                             .frame(width: 48, height: 48)
-                            .background(AppTheme.Colors.bgPrimary)
-                            .clipShape(Circle())
-                            .overlay(Circle().stroke(AppTheme.Colors.bgTertiary, lineWidth: 1))
-                            .shadow(color: Color(hex: "#5E5E72").opacity(hasName ? 0.2 : 0.1), radius: 56, x: 0, y: 4.41)
+                            .background(
+                                Circle()
+                                    .fill(AppTheme.Colors.bgPrimary)
+                                    .shadow(color: Color(hex: "#5E5E72").opacity(hasName ? 0.2 : 0.1), radius: 56, x: 0, y: 4.416)
+                            )
                     }
                     .disabled(!hasName)
                 }
@@ -129,10 +132,15 @@ struct CreateHabitSheet: View {
                                             .foregroundColor(AppTheme.Colors.textPrimary)
                                             .padding(.horizontal, 12)
                                             .padding(.vertical, 8)
-                                            .background(AppTheme.Colors.bgPrimary)
-                                            .cornerRadius(24)
-                                            .overlay(RoundedRectangle(cornerRadius: 24).stroke(AppTheme.Colors.bgTertiary, lineWidth: 1))
-                                            .shadow(color: AppTheme.Neutral._700.opacity(0.2), radius: 56, x: 0, y: 4)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                                    .fill(AppTheme.Colors.bgPrimary)
+                                                    .overlay(
+                                                        RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                                            .stroke(AppTheme.Colors.bgTertiary, lineWidth: 1)
+                                                    )
+                                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.2), radius: 56, x: 0, y: 4.416)
+                                            )
                                     }
                                 }
                             }
