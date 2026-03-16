@@ -81,28 +81,82 @@ private struct EmptyStateCTA: View {
         .padding(.vertical, 20)
         .frame(maxWidth: .infinity, alignment: .center)
         .background(
-            LinearGradient(
-                stops: [
-                    Gradient.Stop(color: Color(red: 0.43, green: 0.56, blue: 1), location: 0.00),
-                    Gradient.Stop(color: Color(red: 0.3, green: 0.43, blue: 0.92), location: 0.55),
-                    Gradient.Stop(color: Color(red: 0.34, green: 0.47, blue: 0.95), location: 1.00)
-                ],
-                startPoint: UnitPoint(x: 0.5, y: 0),
-                endPoint: UnitPoint(x: 0.5, y: 1.56)
-            )
-        )
-        .cornerRadius(cornerRadius)
-        .shadow(color: Color(red: 0.37, green: 0.37, blue: 0.45).opacity(0.3), radius: 1, x: 0, y: 1)
-        .overlay(
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .inset(by: 0.1)
-                .stroke(Color(red: 0.54, green: 0.54, blue: 0.62).opacity(0.23), lineWidth: 0.2)
-            
-            
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .fill(
+                    LinearGradient(
+                        stops: [
+                            Gradient.Stop(color: Color(red: 0.43, green: 0.56, blue: 1), location: 0.00),
+                            Gradient.Stop(color: Color(red: 0.3, green: 0.43, blue: 0.92), location: 0.55),
+                            Gradient.Stop(color: Color(red: 0.34, green: 0.47, blue: 0.95), location: 1.00)
+                        ],
+                        startPoint: UnitPoint(x: 0.5, y: 0),
+                        endPoint: UnitPoint(x: 0.5, y: 1.56)
+                    )
+                )
+                .innerShadow(
+                    color: Color(hex: "060606").opacity(0.2),
+                    radius: 0.58,
+                    x: 0,
+                    y: -3,
+                    cornerRadius: cornerRadius
+                )
+                .innerShadow(
+                    color: .black.opacity(0.2),
+                    radius: 0.58,
+                    x: 0,
+                    y: -0.42,
+                    cornerRadius: cornerRadius
+                )
         )
     }
 }
 
+private struct InnerShadowModifier: ViewModifier {
+    var color: Color
+    var radius: CGFloat
+    var x: CGFloat
+    var y: CGFloat
+    var cornerRadius: CGFloat
+
+    func body(content: Content) -> some View {
+        content.overlay(
+            RoundedRectangle(cornerRadius: cornerRadius)
+                .stroke(color, lineWidth: 1)
+                .blur(radius: radius)
+                .offset(x: x, y: y)
+                .mask(
+                    RoundedRectangle(cornerRadius: cornerRadius)
+                        .fill(
+                            LinearGradient(
+                                colors: [.black, .clear],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                )
+        )
+    }
+}
+
+private extension View {
+    func innerShadow(
+        color: Color,
+        radius: CGFloat,
+        x: CGFloat,
+        y: CGFloat,
+        cornerRadius: CGFloat
+    ) -> some View {
+        modifier(
+            InnerShadowModifier(
+                color: color,
+                radius: radius,
+                x: x,
+                y: y,
+                cornerRadius: cornerRadius
+            )
+        )
+    }
+}
 
 private struct EmptyStateBackgroundPattern: View {
     var body: some View {
