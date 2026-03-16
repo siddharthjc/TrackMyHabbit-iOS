@@ -10,7 +10,7 @@ enum CustomFont {
         switch self {
         case .regular: return "Geist-Regular"
         case .medium: return "Geist-Medium"
-        case .semibold: return "Geist-Medium"
+        case .semibold: return "Geist-SemiBold"
         case .bold: return "Geist-Bold"
         }
     }

@@ -18,7 +18,7 @@ struct EmptyState: View {
 
                 VStack(spacing: 24) {
                     Text("Create my first habit")
-                        .customFont(.bold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                        .customFont(.semibold, size: 24, lineHeight: 28.8, tracking: -0.48)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .multilineTextAlignment(.center)
 
