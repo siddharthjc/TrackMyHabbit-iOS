@@ -5,6 +5,8 @@ enum CustomFont: String {
     case medium = "Geist-Medium"
     case semibold = "Geist-SemiBold"
     case bold = "Geist-Bold"
+    case extra_bold = "Extra-Bold"
+    case black = "Geist-Black"
 }
 
 enum TypographyStyle {

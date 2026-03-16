@@ -32,17 +32,17 @@ struct EmptyState: View {
                     Spacer(minLength: geometry.size.height * 0.02)
 
                     VStack(alignment: .leading, spacing: 12) {
-                        Text("TrackMyHabbit.")
+                        Text("")
                             .customFont(.medium, size: 24, lineHeight: 28.8, tracking: -0.48)
                             .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Meet your better self.")
-                                .customFont(.bold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.extra_bold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
 
                             Text("Small habits. Big change.")
-                                .customFont(.bold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.extra_bold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
