@@ -62,7 +62,7 @@ struct CustomFontModifier: ViewModifier {
     let tracking: CGFloat?
     
     func body(content: Content) -> some View {
-        let baseFont = Font.custom(font.rawValue, size: size)
+        let baseFont = Font.custom("Geist-SemiBold", size: size)
         
         content
             .font(baseFont)

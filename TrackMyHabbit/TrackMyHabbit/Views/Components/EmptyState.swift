@@ -38,11 +38,11 @@ struct EmptyState: View {
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Meet your better self.")
-                                .customFont(.extra_bold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.semibold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
 
                             Text("Small habits. Big change.")
-                                .customFont(.extra_bold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.semibold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
@@ -92,14 +92,17 @@ private struct EmptyStateCTA: View {
             )
         )
         .cornerRadius(cornerRadius)
-        .shadow(color: Color(red: 0.37, green: 0.37, blue: 0).opacity(0.3), radius: 1, x: 0, y: 1)
+        .shadow(color: Color(red: 0.37, green: 0.37, blue: 0.45).opacity(0.3), radius: 1, x: 0, y: 1)
         .overlay(
             RoundedRectangle(cornerRadius: cornerRadius)
                 .inset(by: 0.1)
                 .stroke(Color(red: 0.54, green: 0.54, blue: 0.62).opacity(0.23), lineWidth: 0.2)
+            
+            
         )
     }
 }
+
 
 private struct EmptyStateBackgroundPattern: View {
     var body: some View {

@@ -44,7 +44,7 @@ struct CreateHabitSheet: View {
                                 Circle()
                                     .fill(AppTheme.Colors.bgPrimary)
                                     .overlay(Circle().stroke(AppTheme.Colors.bgPrimary, lineWidth: 1))
-                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.2), radius: 56, x: 0, y: 4.416)
+                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
                             )
                     }
                     
@@ -61,7 +61,7 @@ struct CreateHabitSheet: View {
                             .background(
                                 Circle()
                                     .fill(AppTheme.Colors.bgPrimary)
-                                    .shadow(color: Color(hex: "#5E5E72").opacity(hasName ? 0.2 : 0.1), radius: 56, x: 0, y: 4.416)
+                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
                             )
                     }
                     .disabled(!hasName)
