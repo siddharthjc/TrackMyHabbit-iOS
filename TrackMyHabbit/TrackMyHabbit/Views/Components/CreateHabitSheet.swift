@@ -253,71 +253,72 @@ struct CreateHabitSheet: View {
             .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
             
         case "every_week":
-            // "every week, on" (tappable to change frequency)
-            // "wednesday" (tappable to change day)
-            HStack(spacing: 0) {
-                Button(action: presentFrequencySheet) {
-                    Text("every week")
+            // "every week, on  wednesday" — single line
+            HStack(spacing: 8) {
+                HStack(spacing: 0) {
+                    Button(action: presentFrequencySheet) {
+                        Text("every week,")
+                            .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .underline()
+                    }
+                    Text(" on")
+                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                }
+                .scaleEffect(frequencyScale)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+                
+                Button(action: presentDayOfWeekSheet) {
+                    Text(selectedDayOfWeek.name.lowercased())
                         .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .underline()
                 }
-                Text(", on")
-                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-            }
-            .scaleEffect(frequencyScale)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
-            
-            Button(action: presentDayOfWeekSheet) {
-                Text(selectedDayOfWeek.name.lowercased())
-                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                    .underline()
             }
             
         case "every_month":
-            // "every month, on the" (tappable to change frequency)
-            // "23rd" (tappable to change date)
-            HStack(spacing: 0) {
-                Button(action: presentFrequencySheet) {
-                    Text("every month")
+            // "every month, on the  23rd" — single line
+            HStack(spacing: 8) {
+                HStack(spacing: 0) {
+                    Button(action: presentFrequencySheet) {
+                        Text("every month,")
+                            .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .underline()
+                    }
+                    Text(" on the")
+                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                }
+                .scaleEffect(frequencyScale)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+                
+                Button(action: presentDayOfMonthSheet) {
+                    Text(ordinalSuffix(for: selectedDayOfMonth))
                         .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .underline()
                 }
-                Text(", on the")
-                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-            }
-            .scaleEffect(frequencyScale)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
-            
-            Button(action: presentDayOfMonthSheet) {
-                Text(ordinalSuffix(for: selectedDayOfMonth))
-                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                    .underline()
             }
             
         case "every_year":
-            // "every year, on" (tappable to change frequency)
-            // "March" (tappable to change month) + "23rd" (tappable to change date)
-            HStack(spacing: 0) {
-                Button(action: presentFrequencySheet) {
-                    Text("every year")
+            // "every year, on  March  23rd" — single line
+            HStack(spacing: 8) {
+                HStack(spacing: 0) {
+                    Button(action: presentFrequencySheet) {
+                        Text("every year,")
+                            .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .underline()
+                    }
+                    Text(" on")
                         .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
                         .foregroundColor(AppTheme.Colors.textPrimary)
-                        .underline()
                 }
-                Text(", on")
-                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-            }
-            .scaleEffect(frequencyScale)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
-            
-            HStack(spacing: 4) {
+                .scaleEffect(frequencyScale)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+                
                 Button(action: presentMonthSheet) {
                     Text(selectedMonth.name)
                         .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
