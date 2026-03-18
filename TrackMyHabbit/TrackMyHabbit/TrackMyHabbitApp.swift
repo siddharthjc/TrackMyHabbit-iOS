@@ -10,6 +10,8 @@ import SwiftData
 
 @main
 struct TrackMyHabbitApp: App {
+    @State private var showSplash = true
+
     init() {
         FontRegistration.registerBundledFonts()
     }
@@ -30,7 +32,14 @@ struct TrackMyHabbitApp: App {
 
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            if showSplash {
+                SplashScreenView {
+                    showSplash = false
+                }
+            } else {
+                ContentView()
+                    .transition(.opacity)
+            }
         }
         .modelContainer(sharedModelContainer)
     }
