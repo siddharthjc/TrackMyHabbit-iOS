@@ -248,7 +248,6 @@ struct SplashScreenView: View {
     @State private var logoOpacity: Double = 0.0
     @State private var logoRotation: Double = -90
     @State private var showTagline = false
-    @State private var showAttribution = false
     @State private var dismissing = false
 
     var body: some View {
@@ -269,26 +268,12 @@ struct SplashScreenView: View {
                 // Tagline — fades/slides in after logo
                 if showTagline {
                     Text("Better habits start here.")
-                        .customFont(.semibold, size: 20, lineHeight: 24, tracking: -0.4)
+                        .customFont(.serifsemibold, size: 24, lineHeight: 24, tracking: -0.4)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
 
                 Spacer()
-
-                // Attribution — fades in last
-                if showAttribution {
-                    VStack(spacing: 0) {
-                        Text("from")
-                            .customFont(.medium, size: 13, lineHeight: 17, tracking: -0.08)
-                            .foregroundColor(AppTheme.Colors.textDisabled)
-                        Text("SiddharthJC")
-                            .customFont(.semibold, size: 17, lineHeight: 28, tracking: -0.34)
-                            .foregroundColor(AppTheme.Colors.textSecondary)
-                    }
-                    .transition(.opacity)
-                    .padding(.bottom, 40)
-                }
             }
         }
         .opacity(dismissing ? 0 : 1)
@@ -315,15 +300,8 @@ struct SplashScreenView: View {
             }
         }
 
-        // Step 3: Show attribution
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-            withAnimation(.easeOut(duration: 0.4)) {
-                showAttribution = true
-            }
-        }
-
-        // Step 4: Dismiss splash and transition to main app
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2.2) {
+        // Step 3: Dismiss splash and transition to main app
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
             withAnimation(.easeInOut(duration: 0.4)) {
                 dismissing = true
             }

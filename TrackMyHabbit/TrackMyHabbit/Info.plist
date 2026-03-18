@@ -4,8 +4,8 @@
 <dict>
 	<key>UIAppFonts</key>
 	<array>
-		<string>SeasonMix-TRIAL-SemiBold.ttf</string>
-		<string>SeasonMix-TRIAL-SemiBoldItalic.ttf</string>
+		<string>SeasonMix-SemiBold-TRIAL.ttf</string>
+		<string>SeasonMix-SemiBoldItalic-TRIAL.ttf</string>
 		<string>Geist-SemiBold.ttf</string>
 		<string>Geist-Medium.ttf</string>
 		<string>Geist-Regular.ttf</string>

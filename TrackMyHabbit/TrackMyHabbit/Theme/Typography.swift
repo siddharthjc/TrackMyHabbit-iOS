@@ -7,8 +7,8 @@ enum CustomFont: String {
     case bold = "Geist-Bold"
     case extra_bold = "Extra-Bold"
     case black = "Geist-Black"
-    case serifsemibold = "SeasonMix-TRIAL-SemiBold"
-    case serifsemibolditalic = "SeasonMix-TRIAL-SemiBoldItalic"
+    case serifsemibold = "SeasonMix-SemiBold-TRIAL"
+    case serifsemibolditalic = "SeasonMix-SemiBoldItalic-TRIAL"
 }
 
 enum TypographyStyle {
@@ -64,7 +64,7 @@ struct CustomFontModifier: ViewModifier {
     let tracking: CGFloat?
     
     func body(content: Content) -> some View {
-        let baseFont = Font.custom("Geist-SemiBold", size: size)
+        let baseFont = Font.custom(font.rawValue, size: size)
         
         content
             .font(baseFont)
