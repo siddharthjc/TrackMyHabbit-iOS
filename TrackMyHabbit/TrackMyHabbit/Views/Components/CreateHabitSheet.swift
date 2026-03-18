@@ -13,6 +13,16 @@ struct CreateHabitSheet: View {
     @State private var selectedFrequency = FrequencyOption.options.first!
     @State private var showFrequencySheet = false
     
+    // Sub-selection states
+    @State private var selectedDayOfWeek: DayOfWeek = .wednesday
+    @State private var selectedDayOfMonth: Int = 23
+    @State private var selectedMonth: MonthOfYear = .march
+    
+    // Sub-selection sheet visibility
+    @State private var showDayOfWeekSheet = false
+    @State private var showDayOfMonthSheet = false
+    @State private var showMonthSheet = false
+    
     // Animation scale for frequency trigger button
     @State private var frequencyScale: CGFloat = 1.0
     
@@ -92,14 +102,7 @@ struct CreateHabitSheet: View {
                                 }
                             
                             if !habitName.trimmingCharacters(in: .whitespaces).isEmpty {
-                                Button(action: presentFrequencySheet) {
-                                    Text(selectedFrequency.inlineLabel)
-                                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
-                                        .foregroundColor(AppTheme.Colors.textPrimary)
-                                        .underline()
-                                }
-                                .scaleEffect(frequencyScale)
-                                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+                                frequencyInlineView
                             }
                         }
                         .padding(.top, 40)
@@ -147,17 +150,43 @@ struct CreateHabitSheet: View {
                         }
                         
                         // Bottom Padding for scroll
-                        Spacer().frame(height: showFrequencySheet ? 380 : AppTheme.Spacing.xxxl)
+                        Spacer().frame(height: anySheetVisible ? 380 : AppTheme.Spacing.xxxl)
                     }
                     .padding(.horizontal, AppTheme.Spacing.lg)
                 }
             }
             
-            // Custom Frequency Bottom SheetOverlay
+            // MARK: - Bottom Sheet Overlays
+            
+            // Main frequency selector
             if showFrequencySheet {
                 FrequencyBottomSheet(
                     isPresented: $showFrequencySheet,
                     selectedOption: $selectedFrequency
+                )
+            }
+            
+            // Day of week picker (for "every week")
+            if showDayOfWeekSheet {
+                DayOfWeekBottomSheet(
+                    isPresented: $showDayOfWeekSheet,
+                    selectedDay: $selectedDayOfWeek
+                )
+            }
+            
+            // Day of month picker (for "every month" and "every year")
+            if showDayOfMonthSheet {
+                DayOfMonthBottomSheet(
+                    isPresented: $showDayOfMonthSheet,
+                    selectedDay: $selectedDayOfMonth
+                )
+            }
+            
+            // Month picker (for "every year")
+            if showMonthSheet {
+                MonthPickerBottomSheet(
+                    isPresented: $showMonthSheet,
+                    selectedMonth: $selectedMonth
                 )
             }
         }
@@ -166,11 +195,143 @@ struct CreateHabitSheet: View {
         }
     }
     
+    // MARK: - Frequency Inline View
+    
+    /// Builds the inline text below the habit name based on the selected frequency.
+    /// Uses attributed-style layout with tappable underlined text for sub-selections.
+    @ViewBuilder
+    private var frequencyInlineView: some View {
+        let freq = selectedFrequency
+        
+        switch freq.id {
+        case "everyday", "every_weekday", "every_weekend":
+            // Simple: just "everyday." / "every weekday." / "every weekend."
+            Button(action: presentFrequencySheet) {
+                Text(freq.simpleInlineLabel)
+                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .underline()
+            }
+            .scaleEffect(frequencyScale)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+            
+        case "every_week":
+            // "every week, on" (tappable to change frequency)
+            // "wednesday" (tappable to change day)
+            HStack(spacing: 0) {
+                Button(action: presentFrequencySheet) {
+                    Text("every week")
+                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .underline()
+                }
+                Text(", on")
+                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+            }
+            .scaleEffect(frequencyScale)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+            
+            Button(action: presentDayOfWeekSheet) {
+                Text(selectedDayOfWeek.name.lowercased())
+                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .underline()
+            }
+            
+        case "every_month":
+            // "every month, on the" (tappable to change frequency)
+            // "23rd" (tappable to change date)
+            HStack(spacing: 0) {
+                Button(action: presentFrequencySheet) {
+                    Text("every month")
+                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .underline()
+                }
+                Text(", on the")
+                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+            }
+            .scaleEffect(frequencyScale)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+            
+            Button(action: presentDayOfMonthSheet) {
+                Text(ordinalSuffix(for: selectedDayOfMonth))
+                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .underline()
+            }
+            
+        case "every_year":
+            // "every year, on" (tappable to change frequency)
+            // "March" (tappable to change month) + "23rd" (tappable to change date)
+            HStack(spacing: 0) {
+                Button(action: presentFrequencySheet) {
+                    Text("every year")
+                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .underline()
+                }
+                Text(", on")
+                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+            }
+            .scaleEffect(frequencyScale)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+            
+            HStack(spacing: 4) {
+                Button(action: presentMonthSheet) {
+                    Text(selectedMonth.name)
+                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .underline()
+                }
+                
+                Button(action: presentDayOfMonthSheet) {
+                    Text(ordinalSuffix(for: selectedDayOfMonth))
+                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .underline()
+                }
+            }
+            
+        default:
+            Button(action: presentFrequencySheet) {
+                Text(freq.simpleInlineLabel)
+                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .underline()
+            }
+            .scaleEffect(frequencyScale)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+        }
+    }
+    
+    // MARK: - Computed Properties
+    
+    private var anySheetVisible: Bool {
+        showFrequencySheet || showDayOfWeekSheet || showDayOfMonthSheet || showMonthSheet
+    }
+    
+    /// Builds the full frequency string for saving
+    private var frequencyString: String {
+        switch selectedFrequency.id {
+        case "everyday": return "everyday"
+        case "every_week": return "every_week:\(selectedDayOfWeek.rawValue)"
+        case "every_weekday": return "every_weekday"
+        case "every_weekend": return "every_weekend"
+        case "every_month": return "every_month:\(selectedDayOfMonth)"
+        case "every_year": return "every_year:\(selectedMonth.rawValue):\(selectedDayOfMonth)"
+        default: return selectedFrequency.label
+        }
+    }
+    
+    // MARK: - Actions
+    
     private func presentFrequencySheet() {
-        // Dismiss keyboard
         isInputFocused = false
         
-        // Button press animation
         withAnimation(.easeOut(duration: 0.1)) {
             frequencyScale = 0.96
         }
@@ -180,15 +341,28 @@ struct CreateHabitSheet: View {
         }
     }
     
+    private func presentDayOfWeekSheet() {
+        isInputFocused = false
+        showDayOfWeekSheet = true
+    }
+    
+    private func presentDayOfMonthSheet() {
+        isInputFocused = false
+        showDayOfMonthSheet = true
+    }
+    
+    private func presentMonthSheet() {
+        isInputFocused = false
+        showMonthSheet = true
+    }
+    
     private func saveHabit() {
         let cleanName = habitName.trimmingCharacters(in: .whitespaces)
         guard !cleanName.isEmpty else { return }
         
-        // Create SwiftData model object
-        let newHabit = Habit(name: cleanName, frequency: selectedFrequency.label)
+        let newHabit = Habit(name: cleanName, frequency: frequencyString)
         modelContext.insert(newHabit)
         
-        // Save Context (SwiftData autosaves, but we force it here to be safe before dismissing)
         try? modelContext.save()
         
         dismiss()
