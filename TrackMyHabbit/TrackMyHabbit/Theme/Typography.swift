@@ -7,6 +7,8 @@ enum CustomFont: String {
     case bold = "Geist-Bold"
     case extra_bold = "Extra-Bold"
     case black = "Geist-Black"
+    case serifsemibold = "SeasonMix-TRIAL-SemiBold"
+    case serifsemibolditalic = "SeasonMix-TRIAL-SemiBoldItalic"
 }
 
 enum TypographyStyle {
