@@ -13,10 +13,11 @@ struct ContentView: View {
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
     
     @State private var activeHabitId: UUID?
-    @State private var selectedTab: AppTab = .habits
+    @State private var selectedTab: AppTab = .home
     
     @State private var showCreateSheet = false
-    @State private var showPickerSheet = false
+    @State private var showEditSheet = false
+    @State private var showHabitDropdown = false
     
     var activeHabit: Habit? {
         // Fallback to the first habit if active is not set or not found
@@ -24,55 +25,94 @@ struct ContentView: View {
     }
 
     var body: some View {
-        TabView(selection: $selectedTab) {
-            Tab(value: AppTab.habits) {
-                homeScreen
-            } label: {
-                Label(AppTab.habits.title, systemImage: AppTab.habits.icon)
-            }
-
-            Tab(value: AppTab.calendar) {
-                CalendarPlaceholderView()
-            } label: {
-                Label(AppTab.calendar.title, systemImage: AppTab.calendar.icon)
-            }
-
-            Tab(value: AppTab.add, role: .search) {
-                Color.clear
-                    .ignoresSafeArea()
-            } label: {
-                Label(AppTab.add.title, systemImage: AppTab.add.icon)
-            }
-        }
-        .tint(AppTheme.Colors.emptyStateCTAMid)
-        .tabBarMinimizeBehavior(.onScrollDown)
-        .onChange(of: selectedTab) { previousTab, newTab in
-            if newTab == .add {
-                showCreateSheet = true
-                selectedTab = previousTab
-            }
-        }
-        .onAppear {
-            if activeHabitId == nil, let first = habits.first {
-                activeHabitId = first.id
-            }
-        }
-        .onChange(of: habits) { _, newHabits in
-            if activeHabitId == nil || !newHabits.contains(where: { $0.id == activeHabitId }) {
-                activeHabitId = newHabits.last?.id
-            }
-        }
-        .sheet(isPresented: $showCreateSheet) {
-            CreateHabitSheet()
-        }
-        .sheet(isPresented: $showPickerSheet) {
-            HabitPickerModal(
-                activeHabitId: activeHabitId,
-                onSelect: { id in
-                    activeHabitId = id
+        ZStack {
+            TabView(selection: tabSelection) {
+                Tab(value: AppTab.home) {
+                    homeScreen
+                } label: {
+                    Label(AppTab.home.title, systemImage: AppTab.home.icon)
                 }
-            )
+
+                Tab(value: AppTab.calendar) {
+                    CalendarPlaceholderView()
+                } label: {
+                    Label(AppTab.calendar.title, systemImage: AppTab.calendar.icon)
+                }
+
+                Tab(value: AppTab.habits) {
+                    // Placeholder — the tab action opens the edit sheet instead
+                    Color.clear.ignoresSafeArea()
+                } label: {
+                    Label(AppTab.habits.title, systemImage: AppTab.habits.icon)
+                }
+
+                Tab(value: AppTab.add, role: .search) {
+                    Color.clear
+                        .ignoresSafeArea()
+                } label: {
+                    Label(AppTab.add.title, systemImage: AppTab.add.icon)
+                }
+            }
+            .tint(AppTheme.Colors.emptyStateCTAMid)
+            .tabBarMinimizeBehavior(.onScrollDown)
+            .onAppear {
+                if activeHabitId == nil, let first = habits.first {
+                    activeHabitId = first.id
+                }
+            }
+            .onChange(of: habits) { _, newHabits in
+                if activeHabitId == nil || !newHabits.contains(where: { $0.id == activeHabitId }) {
+                    activeHabitId = newHabits.last?.id
+                }
+            }
+            .sheet(isPresented: $showCreateSheet) {
+                CreateHabitSheet()
+            }
+            .sheet(isPresented: $showEditSheet) {
+                if let habit = activeHabit {
+                    CreateHabitSheet(editingHabit: habit)
+                }
+            }
+
+            // MARK: - Habit Dropdown Overlay (on top of everything)
+            if showHabitDropdown {
+                HabitDropdownOverlay(
+                    habits: habits,
+                    activeHabitId: activeHabitId,
+                    onSelect: { id in
+                        activeHabitId = id
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showHabitDropdown = false
+                        }
+                    },
+                    onDismiss: {
+                        withAnimation(.easeInOut(duration: 0.25)) {
+                            showHabitDropdown = false
+                        }
+                    }
+                )
+                .transition(.opacity)
+            }
         }
+    }
+
+    /// Custom binding that intercepts tab selection so "Habits" and "Add" never
+    /// actually switch away from the current screen.
+    private var tabSelection: Binding<AppTab> {
+        Binding<AppTab>(
+            get: { selectedTab },
+            set: { newTab in
+                if newTab == .add {
+                    showCreateSheet = true
+                } else if newTab == .habits {
+                    if activeHabit != nil {
+                        showEditSheet = true
+                    }
+                } else {
+                    selectedTab = newTab
+                }
+            }
+        )
     }
 
     @ViewBuilder
@@ -90,7 +130,11 @@ struct ContentView: View {
                     HabitSwitcher(
                         habitName: habit.name,
                         habitCount: habits.count,
-                        onSwitchPress: { showPickerSheet = true }
+                        onSwitchPress: {
+                            withAnimation(.easeInOut(duration: 0.25)) {
+                                showHabitDropdown.toggle()
+                            }
+                        }
                     )
                     .padding(.top, 8)
 
@@ -106,17 +150,22 @@ struct ContentView: View {
     }
 }
 
+// MARK: - App Tab Enum
+
 private enum AppTab: Hashable, CaseIterable {
-    case habits
+    case home
     case calendar
+    case habits
     case add
 
     var title: String {
         switch self {
-        case .habits:
-            return "Habits"
+        case .home:
+            return "Home"
         case .calendar:
             return "Calendar"
+        case .habits:
+            return "Habits"
         case .add:
             return "Add"
         }
@@ -124,15 +173,86 @@ private enum AppTab: Hashable, CaseIterable {
 
     var icon: String {
         switch self {
-        case .habits:
-            return "checklist"
+        case .home:
+            return "house.fill"
         case .calendar:
             return "calendar"
+        case .habits:
+            return "line.3.horizontal.decrease"
         case .add:
             return "plus"
         }
     }
 }
+
+// MARK: - Habit Dropdown Overlay
+
+private struct HabitDropdownOverlay: View {
+    let habits: [Habit]
+    let activeHabitId: UUID?
+    let onSelect: (UUID) -> Void
+    let onDismiss: () -> Void
+
+    var body: some View {
+        ZStack(alignment: .top) {
+            // Dimmed background
+            Color.black.opacity(0.25)
+                .ignoresSafeArea()
+                .onTapGesture { onDismiss() }
+
+            // Dropdown card
+            VStack(spacing: 0) {
+                ForEach(habits) { habit in
+                    let isActive = habit.id == activeHabitId
+
+                    Button {
+                        onSelect(habit.id)
+                    } label: {
+                        HStack {
+                            Text(habit.name)
+                                .customFont(
+                                    isActive ? .semibold : .medium,
+                                    size: 16,
+                                    tracking: isActive ? -0.32 : -0.08
+                                )
+                                .foregroundColor(
+                                    isActive
+                                        ? AppTheme.Colors.textPrimary
+                                        : AppTheme.Colors.textDisabled
+                                )
+
+                            Spacer()
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 16)
+                        .background(
+                            isActive
+                                ? RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .fill(AppTheme.Neutral._300)
+                                : nil
+                        )
+                    }
+                }
+            }
+            .padding(20)
+            .background(
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(AppTheme.Colors.bgPrimary)
+                    .shadow(
+                        color: Color(hex: "#5E5E72").opacity(0.2),
+                        radius: 56,
+                        x: 0,
+                        y: 4.416
+                    )
+            )
+            .padding(.horizontal, 20)
+            .padding(.top, 6)
+            .transition(.move(edge: .top).combined(with: .opacity))
+        }
+    }
+}
+
+// MARK: - Calendar Placeholder
 
 private struct CalendarPlaceholderView: View {
     var body: some View {
@@ -140,7 +260,7 @@ private struct CalendarPlaceholderView: View {
             AppTheme.Colors.emptyStateBackground
                 .ignoresSafeArea()
 
-            VStack(spacing: 12) {
+            VStack(spacing: 8) {
                 Image(systemName: "calendar")
                     .font(.system(size: 40, weight: .semibold))
                     .foregroundColor(AppTheme.Colors.textSecondary)

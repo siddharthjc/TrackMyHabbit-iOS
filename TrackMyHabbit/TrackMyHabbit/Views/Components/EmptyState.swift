@@ -62,8 +62,6 @@ struct EmptyState: View {
                 }
             }
         }
-        .toolbar(.hidden, for: .navigationBar)
-        .navigationBarHidden(true)
     }
 }
 

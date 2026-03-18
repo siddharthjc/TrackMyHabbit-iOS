@@ -5,6 +5,11 @@ struct CreateHabitSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
     
+    // Optional: when non-nil, the sheet is in "edit" mode
+    var editingHabit: Habit? = nil
+    
+    private var isEditMode: Bool { editingHabit != nil }
+    
     // Form state
     @State private var habitName: String = ""
     @FocusState private var isInputFocused: Bool
@@ -22,6 +27,9 @@ struct CreateHabitSheet: View {
     @State private var showDayOfWeekSheet = false
     @State private var showDayOfMonthSheet = false
     @State private var showMonthSheet = false
+    
+    // Delete confirmation
+    @State private var showDeleteAlert = false
     
     // Animation scale for frequency trigger button
     @State private var frequencyScale: CGFloat = 1.0
@@ -60,21 +68,39 @@ struct CreateHabitSheet: View {
                     
                     Spacer()
                     
-                    // Confirm button
+                    // Action buttons container (Delete + Confirm)
                     let hasName = !habitName.trimmingCharacters(in: .whitespaces).isEmpty
                     
-                    Button(action: saveHabit) {
-                        Image(systemName: "checkmark")
-                            .font(.system(size: 20, weight: .semibold))
-                            .foregroundColor(hasName ? AppTheme.Colors.systemBlue : AppTheme.Colors.textDisabled)
-                            .frame(width: 48, height: 48)
-                            .background(
-                                Circle()
-                                    .fill(AppTheme.Colors.bgPrimary)
-                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
-                            )
+                    HStack(spacing: 12) {
+                        // Delete button — only visible in edit mode
+                        if isEditMode {
+                            Button(action: { showDeleteAlert = true }) {
+                                Image(systemName: "trash")
+                                    .font(.system(size: 20, weight: .medium))
+                                    .foregroundColor(Color(hex: "#E53935"))
+                                    .frame(width: 48, height: 48)
+                                    .background(
+                                        Circle()
+                                            .fill(AppTheme.Colors.bgPrimary)
+                                            .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
+                                    )
+                            }
+                        }
+                        
+                        // Confirm button
+                        Button(action: saveHabit) {
+                            Image(systemName: "checkmark")
+                                .font(.system(size: 20, weight: .semibold))
+                                .foregroundColor(hasName ? AppTheme.Colors.systemBlue : AppTheme.Colors.textDisabled)
+                                .frame(width: 48, height: 48)
+                                .background(
+                                    Circle()
+                                        .fill(AppTheme.Colors.bgPrimary)
+                                        .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
+                                )
+                        }
+                        .disabled(!hasName)
                     }
-                    .disabled(!hasName)
                 }
                 .padding(.horizontal, AppTheme.Spacing.lg)
                 .padding(.top, AppTheme.Spacing.lg)
@@ -191,7 +217,18 @@ struct CreateHabitSheet: View {
             }
         }
         .onAppear {
+            // Pre-populate form when editing
+            if let habit = editingHabit {
+                habitName = habit.name
+                loadFrequencyFrom(habit.frequency)
+            }
             isInputFocused = true
+        }
+        .alert("Delete Habit", isPresented: $showDeleteAlert) {
+            Button("Cancel", role: .cancel) { }
+            Button("Delete", role: .destructive) { deleteHabit() }
+        } message: {
+            Text("Are you sure you want to delete \"\(editingHabit?.name ?? "")\"? This action cannot be undone.")
         }
     }
     
@@ -360,12 +397,57 @@ struct CreateHabitSheet: View {
         let cleanName = habitName.trimmingCharacters(in: .whitespaces)
         guard !cleanName.isEmpty else { return }
         
-        let newHabit = Habit(name: cleanName, frequency: frequencyString)
-        modelContext.insert(newHabit)
+        if let existing = editingHabit {
+            // Update existing habit
+            existing.name = cleanName
+            existing.frequency = frequencyString
+        } else {
+            // Create new habit
+            let newHabit = Habit(name: cleanName, frequency: frequencyString)
+            modelContext.insert(newHabit)
+        }
         
         try? modelContext.save()
-        
         dismiss()
+    }
+    
+    private func deleteHabit() {
+        guard let habit = editingHabit else { return }
+        modelContext.delete(habit)
+        try? modelContext.save()
+        dismiss()
+    }
+    
+    /// Parses a stored frequency string and restores the form state
+    private func loadFrequencyFrom(_ freq: String) {
+        let parts = freq.split(separator: ":").map(String.init)
+        let baseId = parts.first ?? freq
+        
+        if let matched = FrequencyOption.options.first(where: { $0.id == baseId }) {
+            selectedFrequency = matched
+        }
+        
+        switch baseId {
+        case "every_week":
+            if parts.count > 1, let raw = Int(parts[1]),
+               let day = DayOfWeek(rawValue: raw) {
+                selectedDayOfWeek = day
+            }
+        case "every_month":
+            if parts.count > 1, let day = Int(parts[1]) {
+                selectedDayOfMonth = day
+            }
+        case "every_year":
+            if parts.count > 2,
+               let monthRaw = Int(parts[1]),
+               let month = MonthOfYear(rawValue: monthRaw),
+               let day = Int(parts[2]) {
+                selectedMonth = month
+                selectedDayOfMonth = day
+            }
+        default:
+            break
+        }
     }
 }
 
