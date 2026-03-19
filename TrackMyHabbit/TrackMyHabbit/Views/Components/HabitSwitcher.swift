@@ -25,7 +25,7 @@ struct HabitSwitcher: View {
         .buttonStyle(.plain)
         .contentShape(Rectangle())
         .frame(maxWidth: .infinity, minHeight: 44, alignment: .center)
-        .padding(.vertical, 8)
+        .padding(.vertical, 16)
         .opacity(habitCount >= 2 ? 1.0 : 0.6)
     }
 }

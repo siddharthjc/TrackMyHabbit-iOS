@@ -31,7 +31,7 @@ struct HabitCarousel: View {
                             cardWidth: cardWidth,
                             cardHeight: cardHeight,
                             tapAction: {
-                                withAnimation {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.86)) {
                                     scrollTarget = dateStr
                                 }
                             },
@@ -39,8 +39,9 @@ struct HabitCarousel: View {
                                 saveImage(data, for: dateStr, existingEntry: entry)
                             }
                         )
-                        .scaleEffect(isActive ? 1.0 : 0.9)
-                        .animation(.spring(response: 0.3, dampingFraction: 0.7), value: isActive)
+                        .scaleEffect(isActive ? 1.0 : 0.92)
+                        .opacity(isActive ? 1.0 : 0.5)
+                        .animation(.spring(response: 0.35, dampingFraction: 0.86), value: isActive)
                         .frame(width: cardWidth, height: cardHeight)
                         .zIndex(isActive ? 1 : 0)
                     }
@@ -49,8 +50,9 @@ struct HabitCarousel: View {
                 .scrollTargetLayout()
             }
             .scrollPosition(id: $scrollTarget, anchor: .center)
-            .scrollTargetBehavior(.viewAligned)
+            .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
             .contentMargins(.horizontal, horizontalInset, for: .scrollContent)
+            .scrollClipDisabled()
             .onAppear {
                 refreshDaysIfNeeded()
                 if scrollTarget == nil {
