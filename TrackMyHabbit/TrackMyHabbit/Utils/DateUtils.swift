@@ -1,12 +1,32 @@
 import Foundation
 
 struct DateUtils {
+
+    private static var gregorianCalendar: Calendar {
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = .current
+        cal.locale = .current
+        return cal
+    }
+
+    private static func dayKeyFormatter() -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.calendar = Calendar(identifier: .gregorian)
+        formatter.locale = Locale(identifier: "en_US_POSIX")
+        formatter.timeZone = .current
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter
+    }
+
+    private static func parseDayKey(_ dateStr: String) -> Date? {
+        dayKeyFormatter().date(from: dateStr)
+    }
     
     /// Returns a date string in YYYY-MM-DD format for a given Date object.
     static func toDateString(date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        return formatter.string(from: date)
+        // Use start-of-day so the key is stable across time-of-day.
+        let startOfDay = gregorianCalendar.startOfDay(for: date)
+        return dayKeyFormatter().string(from: startOfDay)
     }
     
     /// Returns today's date string in YYYY-MM-DD format.
@@ -19,7 +39,7 @@ struct DateUtils {
     static func generateDays(count: Int = 7) -> [String] {
         var days: [String] = []
         let now = Date()
-        let calendar = Calendar.current
+        let calendar = gregorianCalendar
         
         for i in 0..<count {
             if let date = calendar.date(byAdding: .day, value: -i, to: now) {
@@ -31,11 +51,12 @@ struct DateUtils {
     
     /// Formats a YYYY-MM-DD date string to "4 March" style.
     static func formatDate(_ dateStr: String) -> String {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        guard let date = formatter.date(from: dateStr) else { return dateStr }
+        guard let date = parseDayKey(dateStr) else { return dateStr }
         
         let displayFormatter = DateFormatter()
+        displayFormatter.calendar = Calendar(identifier: .gregorian)
+        displayFormatter.locale = .current
+        displayFormatter.timeZone = .current
         displayFormatter.dateFormat = "d MMMM"
         return displayFormatter.string(from: date)
     }
@@ -45,17 +66,18 @@ struct DateUtils {
         let today = getTodayString()
         if dateStr == today { return "Today" }
         
-        let calendar = Calendar.current
+        let calendar = gregorianCalendar
         if let yesterdayDate = calendar.date(byAdding: .day, value: -1, to: Date()),
            dateStr == toDateString(date: yesterdayDate) {
             return "Yesterday"
         }
         
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy-MM-dd"
-        guard let date = formatter.date(from: dateStr) else { return "" }
+        guard let date = parseDayKey(dateStr) else { return dateStr }
         
         let dayFormatter = DateFormatter()
+        dayFormatter.calendar = Calendar(identifier: .gregorian)
+        dayFormatter.locale = .current
+        dayFormatter.timeZone = .current
         dayFormatter.dateFormat = "EEEE" // Full day name
         return dayFormatter.string(from: date)
     }

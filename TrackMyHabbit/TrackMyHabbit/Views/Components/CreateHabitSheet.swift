@@ -15,7 +15,7 @@ struct CreateHabitSheet: View {
     @FocusState private var isInputFocused: Bool
     
     // Frequency state
-    @State private var selectedFrequency = FrequencyOption.options.first!
+    @State private var selectedFrequency = FrequencyOption.options.first ?? FrequencyOption(id: "everyday", label: "Everyday")
     @State private var showFrequencySheet = false
     
     // Sub-selection states
@@ -30,6 +30,10 @@ struct CreateHabitSheet: View {
     
     // Delete confirmation
     @State private var showDeleteAlert = false
+
+    // Save/delete error handling
+    @State private var showPersistenceErrorAlert = false
+    @State private var persistenceErrorMessage = ""
     
     // Animation scale for frequency trigger button
     @State private var frequencyScale: CGFloat = 1.0
@@ -230,6 +234,11 @@ struct CreateHabitSheet: View {
         } message: {
             Text("Are you sure you want to delete \"\(editingHabit?.name ?? "")\"? This action cannot be undone.")
         }
+        .alert("Couldn’t Save", isPresented: $showPersistenceErrorAlert) {
+            Button("OK", role: .cancel) { }
+        } message: {
+            Text(persistenceErrorMessage)
+        }
     }
     
     // MARK: - Frequency Inline View
@@ -408,15 +417,25 @@ struct CreateHabitSheet: View {
             modelContext.insert(newHabit)
         }
         
-        try? modelContext.save()
-        dismiss()
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            persistenceErrorMessage = error.localizedDescription
+            showPersistenceErrorAlert = true
+        }
     }
     
     private func deleteHabit() {
         guard let habit = editingHabit else { return }
         modelContext.delete(habit)
-        try? modelContext.save()
-        dismiss()
+        do {
+            try modelContext.save()
+            dismiss()
+        } catch {
+            persistenceErrorMessage = error.localizedDescription
+            showPersistenceErrorAlert = true
+        }
     }
     
     /// Parses a stored frequency string and restores the form state
