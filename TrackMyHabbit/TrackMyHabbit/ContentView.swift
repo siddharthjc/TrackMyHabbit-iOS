@@ -196,7 +196,7 @@ private struct HabitDropdownOverlay: View {
     var body: some View {
         ZStack(alignment: .top) {
             // Dimmed background
-            Color.black.opacity(0.25)
+            Color.black.opacity(0.30)
                 .ignoresSafeArea()
                 .onTapGesture { onDismiss() }
 
@@ -228,10 +228,12 @@ private struct HabitDropdownOverlay: View {
                         .background(
                             isActive
                                 ? RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(AppTheme.Neutral._300)
+                                    .fill(Color(hex: "#E1E5EA"))
                                 : nil
                         )
+                        .contentShape(Rectangle())
                     }
+                    .buttonStyle(.plain)
                 }
             }
             .padding(20)
@@ -246,7 +248,7 @@ private struct HabitDropdownOverlay: View {
                     )
             )
             .padding(.horizontal, 20)
-            .padding(.top, 6)
+            .padding(.top, 74)
             .transition(.move(edge: .top).combined(with: .opacity))
         }
     }
