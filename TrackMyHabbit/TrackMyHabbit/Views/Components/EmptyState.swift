@@ -8,6 +8,10 @@ struct EmptyState: View {
             let safeBottom = geometry.safeAreaInsets.bottom
             let availableWidth = geometry.size.width
             let heroSize = min(availableWidth, 402)
+            // Figma: background pattern decorative is ~400px wide on a 402px canvas.
+            let patternSize = heroSize * (400.0 / 402.0)
+            // Figma: background pattern decorative is positioned at top -22px.
+            let patternOffsetY = -22.0 * (heroSize / 402.0)
             let illustrationHeight = heroSize * (456.0 / 402.0)
 
             ZStack {
@@ -15,8 +19,8 @@ struct EmptyState: View {
                     .ignoresSafeArea()
 
                 EmptyStateBackgroundPattern()
-                    .frame(width: heroSize, height: heroSize)
-                    .offset(y: -geometry.size.height * 0.14)
+                    .frame(width: patternSize, height: patternSize)
+                    .offset(y: patternOffsetY)
                     .allowsHitTesting(false)
 
                 VStack(spacing: 0) {
@@ -38,11 +42,11 @@ struct EmptyState: View {
 
                         VStack(alignment: .leading, spacing: 4) {
                             Text("Meet your better self.")
-                                .customFont(.semibold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.serifsemibold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
 
                             Text("Small habits. Big change.")
-                                .customFont(.semibold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.serifsemibold, size: 24, lineHeight: 28.8, tracking: -0.48)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
@@ -84,7 +88,8 @@ private struct EmptyStateCTA: View {
                     LinearGradient(
                         stops: [
                             Gradient.Stop(color: Color(red: 0.43, green: 0.56, blue: 1), location: 0.00),
-                            Gradient.Stop(color: Color(red: 0.3, green: 0.43, blue: 0.92), location: 0.55),
+                            // Figma: via at 85.222%
+                            Gradient.Stop(color: Color(red: 0.3, green: 0.43, blue: 0.92), location: 0.85222),
                             Gradient.Stop(color: Color(red: 0.34, green: 0.47, blue: 0.95), location: 1.00)
                         ],
                         startPoint: UnitPoint(x: 0.5, y: 0),
@@ -93,18 +98,29 @@ private struct EmptyStateCTA: View {
                 )
                 .innerShadow(
                     color: Color(hex: "060606").opacity(0.2),
-                    radius: 0.58,
+                    radius: 0.583,
                     x: 0,
-                    y: -3,
+                    y: -5,
                     cornerRadius: cornerRadius
                 )
                 .innerShadow(
                     color: .black.opacity(0.2),
-                    radius: 0.58,
+                    radius: 0.583,
                     x: 0,
-                    y: -0.42,
+                    // Figma: inset y -0.417
+                    y: -0.417,
                     cornerRadius: cornerRadius
                 )
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+                .stroke(Color(hex: "8A8A9F").opacity(0.23), lineWidth: 0.2)
+        )
+        .shadow(
+            color: Color(hex: "5E5E72").opacity(0.3),
+            radius: 2,
+            x: 0,
+            y: 1
         )
     }
 }
@@ -160,17 +176,20 @@ private struct EmptyStateBackgroundPattern: View {
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
+            // Figma: inner masked dot content is ~336px inside a 400px container.
+            let innerSize = min(size.width, size.height) * (336.0 / 400.0)
+            let inset = (min(size.width, size.height) - innerSize) / 2
             let dotSpacing: CGFloat = 22
             let dotRadius: CGFloat = 1.2
 
             Canvas { context, _ in
-                let cols = Int(ceil(size.width / dotSpacing))
-                let rows = Int(ceil(size.height / dotSpacing))
+                let cols = Int(ceil(innerSize / dotSpacing))
+                let rows = Int(ceil(innerSize / dotSpacing))
 
                 for r in 0...rows {
                     for c in 0...cols {
-                        let x = CGFloat(c) * dotSpacing + dotSpacing * 0.5
-                        let y = CGFloat(r) * dotSpacing + dotSpacing * 0.5
+                        let x = inset + CGFloat(c) * dotSpacing + dotSpacing * 0.5
+                        let y = inset + CGFloat(r) * dotSpacing + dotSpacing * 0.5
                         let rect = CGRect(x: x - dotRadius, y: y - dotRadius, width: dotRadius * 2, height: dotRadius * 2)
                         context.fill(Path(ellipseIn: rect), with: .color(AppTheme.Neutral._500.opacity(0.10)))
                     }
@@ -184,7 +203,7 @@ private struct EmptyStateBackgroundPattern: View {
                     ]),
                     center: .center,
                     startRadius: 0,
-                    endRadius: max(size.width, size.height) * 0.55
+                    endRadius: innerSize * 0.55
                 )
             )
         }

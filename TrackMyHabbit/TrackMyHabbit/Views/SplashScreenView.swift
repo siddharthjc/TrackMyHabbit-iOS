@@ -311,7 +311,7 @@ struct SplashScreenView: View {
         }
 
         // Step 1: Logo entrance — scale up + fade in + rotate into place
-        withAnimation(.spring(response: 0.35, dampingFraction: 0.7, blendDuration: 0)) {
+        withAnimation(.spring(response: 0.6, dampingFraction: 0.7, blendDuration: 0)) {
             logoScale = 1.0
             logoOpacity = 1.0
             logoRotation = 0
@@ -319,18 +319,18 @@ struct SplashScreenView: View {
 
         // Step 2: Show tagline after a short delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            withAnimation(.easeOut(duration: 0.25)) {
+            withAnimation(.easeOut(duration: 0.4)) {
                 showTagline = true
             }
         }
 
         // Step 3: Dismiss splash and transition to main app
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-            withAnimation(.easeOut(duration: 0.2)) {
+            withAnimation(.easeOut(duration: 0.35)) {
                 dismissing = true
             }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
                 onFinished()
             }
         }
