@@ -115,6 +115,16 @@ struct ContentView: View {
         )
     }
 
+    private static let createSheetDelayNanoseconds: UInt64 = 250_000_000
+
+    /// Lets the CTA finish its press animation before the sheet appears.
+    private func presentCreateSheetAfterCTADelay() {
+        Task { @MainActor in
+            try? await Task.sleep(nanoseconds: Self.createSheetDelayNanoseconds)
+            showCreateSheet = true
+        }
+    }
+
     @ViewBuilder
     private var homeScreen: some View {
         ZStack {
@@ -124,7 +134,7 @@ struct ContentView: View {
             VStack(spacing: 0) {
                 if habits.isEmpty {
                     EmptyState {
-                        showCreateSheet = true
+                        presentCreateSheetAfterCTADelay()
                     }
                 } else if let habit = activeHabit {
                     HabitSwitcher(
