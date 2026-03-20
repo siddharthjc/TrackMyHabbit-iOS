@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct EmptyState: View {
     let onCreateHabit: () -> Void
@@ -8,10 +9,6 @@ struct EmptyState: View {
             let safeBottom = geometry.safeAreaInsets.bottom
             let availableWidth = geometry.size.width
             let heroSize = min(availableWidth, 402)
-            // Figma: background pattern decorative is ~400px wide on a 402px canvas.
-            let patternSize = heroSize * (400.0 / 402.0)
-            // Figma: background pattern decorative is positioned at top -22px.
-            let patternOffsetY = -22.0 * (heroSize / 402.0)
             let illustrationHeight = heroSize * (456.0 / 402.0)
 
             ZStack {
@@ -19,8 +16,8 @@ struct EmptyState: View {
                     .ignoresSafeArea()
 
                 EmptyStateBackgroundPattern()
-                    .frame(width: patternSize, height: patternSize)
-                    .offset(y: patternOffsetY)
+                    .frame(width: heroSize, height: heroSize)
+                    .offset(y: -geometry.size.height * 0.14)
                     .allowsHitTesting(false)
 
                 VStack(spacing: 0) {
@@ -57,9 +54,9 @@ struct EmptyState: View {
                     Spacer(minLength: 18)
 
                     Button(action: onCreateHabit) {
-                        EmptyStateCTA(title: "Continue")
+                        Text("Continue")
                     }
-                    .buttonStyle(.plain)
+                    .buttonStyle(EmptyStateCTAButtonStyle())
                     .padding(.horizontal, 20)
 
                     Spacer(minLength: max(20, safeBottom + 8))
@@ -69,9 +66,27 @@ struct EmptyState: View {
     }
 }
 
+/// White bottom rim fixed at rest; navy top rim **Y** decreases while pressed (`offsetY` is **−Y**, so smaller Y → subtler top lip).
 private struct EmptyStateCTA: View {
-    let title: String
+    var title: String
+    var isPressed: Bool
+
     private let cornerRadius: CGFloat = 56
+
+    private var navyRimY: CGFloat { isPressed ? 2.0 : 3.45 }
+    private let navyRimLineWidth: CGFloat = 5.5
+    private var navyRimAccentY: CGFloat { isPressed ? 0.28 : 0.42 }
+    private let navyRimAccentWidth: CGFloat = 2.2
+
+    private let lightRimOffsetY: CGFloat = 2.05
+
+    private let bottomLightRimWidth: CGFloat = 2.4
+    private let bottomLightRimOpacity: Double = 0.36
+
+    /// Figma `0px 1px 2px rgba(94,94,114,0.3)` — fixed; not tied to press.
+    private let outerShadowY: CGFloat = 1
+    private let outerShadowRadius: CGFloat = 1.25
+    private let outerShadowOpacity: Double = 0.3
 
     var body: some View {
         HStack(alignment: .center, spacing: 8) {
@@ -82,93 +97,123 @@ private struct EmptyStateCTA: View {
         .padding(.horizontal, 8)
         .padding(.vertical, 20)
         .frame(maxWidth: .infinity, alignment: .center)
-        .background(
-            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .fill(
-                    LinearGradient(
-                        stops: [
-                            Gradient.Stop(color: Color(red: 0.43, green: 0.56, blue: 1), location: 0.00),
-                            // Figma: via at 85.222%
-                            Gradient.Stop(color: Color(red: 0.3, green: 0.43, blue: 0.92), location: 0.85222),
-                            Gradient.Stop(color: Color(red: 0.34, green: 0.47, blue: 0.95), location: 1.00)
-                        ],
-                        startPoint: UnitPoint(x: 0.5, y: 0),
-                        endPoint: UnitPoint(x: 0.5, y: 1.56)
-                    )
-                )
-                .innerShadow(
-                    color: Color(hex: "060606").opacity(0.2),
-                    radius: 0.583,
-                    x: 0,
-                    y: -5,
-                    cornerRadius: cornerRadius
-                )
-                .innerShadow(
-                    color: .black.opacity(0.2),
-                    radius: 0.583,
-                    x: 0,
-                    // Figma: inset y -0.417
-                    y: -0.417,
-                    cornerRadius: cornerRadius
-                )
-        )
-        .overlay(
-            RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .stroke(Color(hex: "8A8A9F").opacity(0.23), lineWidth: 0.2)
-        )
+        .background(ctaBackground)
+        .compositingGroup()
         .shadow(
-            color: Color(hex: "5E5E72").opacity(0.3),
-            radius: 2,
+            color: Color(red: 94 / 255, green: 94 / 255, blue: 114 / 255).opacity(outerShadowOpacity),
+            radius: outerShadowRadius,
             x: 0,
-            y: 1
+            y: outerShadowY
+        )
+    }
+
+    private var ctaBackground: some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let hairline = 1 / max(UIScreen.main.scale, 2)
+        return shape
+            .fill(figmaGradient)
+            .innerInsetRim(
+                shape: shape,
+                color: Color(red: 0.07, green: 0.11, blue: 0.36).opacity(0.2),
+                lineWidth: navyRimLineWidth,
+                blur: 0,
+                offsetX: 0,
+                offsetY: -navyRimY
+            )
+            .innerInsetRim(
+                shape: shape,
+                color: Color.black.opacity(0.2),
+                lineWidth: navyRimAccentWidth,
+                blur: 0,
+                offsetX: 0,
+                offsetY: -navyRimAccentY
+            )
+            .innerInsetRim(
+                shape: shape,
+                color: Color.white.opacity(bottomLightRimOpacity),
+                lineWidth: bottomLightRimWidth,
+                blur: 0,
+                offsetX: 0,
+                offsetY: lightRimOffsetY
+            )
+            .overlay(
+                shape.stroke(
+                    Color(red: 138 / 255, green: 138 / 255, blue: 159 / 255).opacity(0.23),
+                    lineWidth: hairline
+                )
+            )
+    }
+
+    /// Figma: `to-b` from `#6f8eff`, via `#4d6fea` @ 85.222%, to `#5778f1` with end ~155.56% (`shadow-[...to-[155.56%]...]`).
+    private var figmaGradient: LinearGradient {
+        LinearGradient(
+            stops: [
+                .init(color: AppTheme.Colors.emptyStateCTAStart, location: 0),
+                .init(color: AppTheme.Colors.emptyStateCTAMid, location: 0.85222),
+                .init(color: AppTheme.Colors.emptyStateCTAEnd, location: 1)
+            ],
+            startPoint: UnitPoint(x: 0.5, y: 0),
+            endPoint: UnitPoint(x: 0.5, y: 1.5556)
         )
     }
 }
 
-private struct InnerShadowModifier: ViewModifier {
+/// Stroke + offset + `mask(shape)` — inner rim; optional blur (CTA uses `0` for crisp edges).
+private struct InnerInsetRimModifier<S: Shape>: ViewModifier {
+    let shape: S
     var color: Color
-    var radius: CGFloat
-    var x: CGFloat
-    var y: CGFloat
-    var cornerRadius: CGFloat
+    var lineWidth: CGFloat
+    var blur: CGFloat
+    var offsetX: CGFloat
+    var offsetY: CGFloat
 
     func body(content: Content) -> some View {
-        content.overlay(
-            RoundedRectangle(cornerRadius: cornerRadius)
-                .stroke(color, lineWidth: 1)
-                .blur(radius: radius)
-                .offset(x: x, y: y)
-                .mask(
-                    RoundedRectangle(cornerRadius: cornerRadius)
-                        .fill(
-                            LinearGradient(
-                                colors: [.black, .clear],
-                                startPoint: .top,
-                                endPoint: .bottom
-                            )
-                        )
-                )
-        )
+        content.overlay {
+            Group {
+                if blur > 0.001 {
+                    shape.stroke(color, lineWidth: lineWidth).blur(radius: blur)
+                } else {
+                    shape.stroke(color, lineWidth: lineWidth)
+                }
+            }
+            .offset(x: offsetX, y: offsetY)
+            .mask(shape.fill(Color.black))
+        }
     }
 }
 
 private extension View {
-    func innerShadow(
+    func innerInsetRim<S: Shape>(
+        shape: S,
         color: Color,
-        radius: CGFloat,
-        x: CGFloat,
-        y: CGFloat,
-        cornerRadius: CGFloat
+        lineWidth: CGFloat,
+        blur: CGFloat,
+        offsetX: CGFloat,
+        offsetY: CGFloat
     ) -> some View {
         modifier(
-            InnerShadowModifier(
+            InnerInsetRimModifier(
+                shape: shape,
                 color: color,
-                radius: radius,
-                x: x,
-                y: y,
-                cornerRadius: cornerRadius
+                lineWidth: lineWidth,
+                blur: blur,
+                offsetX: offsetX,
+                offsetY: offsetY
             )
         )
+    }
+}
+
+/// `isPressed` only drives navy rim **Y**; white rim and outer shadow stay fixed.
+private struct EmptyStateCTAButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack {
+            EmptyStateCTA(title: "Continue", isPressed: configuration.isPressed)
+            configuration.label
+                .hidden()
+                .accessibilityHidden(true)
+        }
+        .animation(.spring(response: 0.18, dampingFraction: 0.86), value: configuration.isPressed)
     }
 }
 
@@ -176,20 +221,17 @@ private struct EmptyStateBackgroundPattern: View {
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            // Figma: inner masked dot content is ~336px inside a 400px container.
-            let innerSize = min(size.width, size.height) * (336.0 / 400.0)
-            let inset = (min(size.width, size.height) - innerSize) / 2
             let dotSpacing: CGFloat = 22
             let dotRadius: CGFloat = 1.2
 
             Canvas { context, _ in
-                let cols = Int(ceil(innerSize / dotSpacing))
-                let rows = Int(ceil(innerSize / dotSpacing))
+                let cols = Int(ceil(size.width / dotSpacing))
+                let rows = Int(ceil(size.height / dotSpacing))
 
                 for r in 0...rows {
                     for c in 0...cols {
-                        let x = inset + CGFloat(c) * dotSpacing + dotSpacing * 0.5
-                        let y = inset + CGFloat(r) * dotSpacing + dotSpacing * 0.5
+                        let x = CGFloat(c) * dotSpacing + dotSpacing * 0.5
+                        let y = CGFloat(r) * dotSpacing + dotSpacing * 0.5
                         let rect = CGRect(x: x - dotRadius, y: y - dotRadius, width: dotRadius * 2, height: dotRadius * 2)
                         context.fill(Path(ellipseIn: rect), with: .color(AppTheme.Neutral._500.opacity(0.10)))
                     }
@@ -203,7 +245,7 @@ private struct EmptyStateBackgroundPattern: View {
                     ]),
                     center: .center,
                     startRadius: 0,
-                    endRadius: innerSize * 0.55
+                    endRadius: max(size.width, size.height) * 0.55
                 )
             )
         }

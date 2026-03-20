@@ -10,7 +10,6 @@ import SwiftData
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
     
     @State private var activeHabitId: UUID?
@@ -19,10 +18,6 @@ struct ContentView: View {
     @State private var showCreateSheet = false
     @State private var showEditSheet = false
     @State private var showHabitDropdown = false
-
-    private var dropdownAnimation: Animation? {
-        reduceMotion ? nil : .easeOut(duration: 0.2)
-    }
     
     var activeHabit: Habit? {
         // Fallback to the first habit if active is not set or not found
@@ -86,16 +81,17 @@ struct ContentView: View {
                     activeHabitId: activeHabitId,
                     onSelect: { id in
                         activeHabitId = id
-                        withAnimation(dropdownAnimation) {
+                        withAnimation(.easeInOut(duration: 0.25)) {
                             showHabitDropdown = false
                         }
                     },
                     onDismiss: {
-                        withAnimation(dropdownAnimation) {
+                        withAnimation(.easeInOut(duration: 0.25)) {
                             showHabitDropdown = false
                         }
                     }
                 )
+                .transition(.opacity)
             }
         }
     }
@@ -135,7 +131,7 @@ struct ContentView: View {
                         habitName: habit.name,
                         habitCount: habits.count,
                         onSwitchPress: {
-                            withAnimation(dropdownAnimation) {
+                            withAnimation(.easeInOut(duration: 0.25)) {
                                 showHabitDropdown.toggle()
                             }
                         }

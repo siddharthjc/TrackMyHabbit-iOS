@@ -4,7 +4,6 @@ import UIKit
 
 struct HabitCarousel: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     let habit: Habit
     @State private var days: [String] = DateUtils.generateDays(count: 7)
@@ -14,10 +13,6 @@ struct HabitCarousel: View {
     private let cardSpacing: CGFloat = 20
 
     @State private var scrollTarget: String?
-
-    private var cardSelectionAnimation: Animation? {
-        reduceMotion ? nil : .spring(response: 0.25, dampingFraction: 0.86)
-    }
 
     var body: some View {
         GeometryReader { geometry in
@@ -36,7 +31,7 @@ struct HabitCarousel: View {
                             cardWidth: cardWidth,
                             cardHeight: cardHeight,
                             tapAction: {
-                                withAnimation(cardSelectionAnimation) {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.86)) {
                                     scrollTarget = dateStr
                                 }
                             },
@@ -46,7 +41,7 @@ struct HabitCarousel: View {
                         )
                         .scaleEffect(isActive ? 1.0 : 0.92)
                         .opacity(isActive ? 1.0 : 0.5)
-                        .animation(cardSelectionAnimation, value: isActive)
+                        .animation(.spring(response: 0.35, dampingFraction: 0.86), value: isActive)
                         .frame(width: cardWidth, height: cardHeight)
                         .zIndex(isActive ? 1 : 0)
                     }

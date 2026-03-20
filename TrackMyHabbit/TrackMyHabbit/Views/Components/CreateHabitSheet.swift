@@ -4,7 +4,6 @@ import SwiftData
 struct CreateHabitSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     // Optional: when non-nil, the sheet is in "edit" mode
     var editingHabit: Habit? = nil
@@ -249,7 +248,6 @@ struct CreateHabitSheet: View {
     @ViewBuilder
     private var frequencyInlineView: some View {
         let freq = selectedFrequency
-        let scaleAnimation: Animation? = reduceMotion ? nil : .spring(response: 0.3, dampingFraction: 0.6)
         
         switch freq.id {
         case "everyday", "every_weekday", "every_weekend":
@@ -261,7 +259,7 @@ struct CreateHabitSheet: View {
                     .underline()
             }
             .scaleEffect(frequencyScale)
-            .animation(scaleAnimation, value: frequencyScale)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
             
         case "every_week":
             // "every week, on  wednesday" — single line
@@ -278,7 +276,7 @@ struct CreateHabitSheet: View {
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 .scaleEffect(frequencyScale)
-                .animation(scaleAnimation, value: frequencyScale)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
                 
                 Button(action: presentDayOfWeekSheet) {
                     Text(selectedDayOfWeek.name.lowercased())
@@ -303,7 +301,7 @@ struct CreateHabitSheet: View {
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 .scaleEffect(frequencyScale)
-                .animation(scaleAnimation, value: frequencyScale)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
                 
                 Button(action: presentDayOfMonthSheet) {
                     Text(ordinalSuffix(for: selectedDayOfMonth))
@@ -328,7 +326,7 @@ struct CreateHabitSheet: View {
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 .scaleEffect(frequencyScale)
-                .animation(scaleAnimation, value: frequencyScale)
+                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
                 
                 Button(action: presentMonthSheet) {
                     Text(selectedMonth.name)
@@ -353,7 +351,7 @@ struct CreateHabitSheet: View {
                     .underline()
             }
             .scaleEffect(frequencyScale)
-            .animation(scaleAnimation, value: frequencyScale)
+            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
         }
     }
     
@@ -380,13 +378,7 @@ struct CreateHabitSheet: View {
     
     private func presentFrequencySheet() {
         isInputFocused = false
-
-        if reduceMotion {
-            frequencyScale = 1.0
-            showFrequencySheet = true
-            return
-        }
-
+        
         withAnimation(.easeOut(duration: 0.1)) {
             frequencyScale = 0.96
         }
