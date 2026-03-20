@@ -1,0 +1,23 @@
+{
+  "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Models/HabitDataModels.swift" : {
+    "const-values" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/HabitDataModels.swiftconstvalues",
+    "dependencies" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/HabitDataModels.d",
+    "diagnostics" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/HabitDataModels.dia",
+    "object" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/HabitDataModels.o",
+    "swift-dependencies" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/HabitDataModels.swiftdeps"
+  },
+  "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Theme/AppTheme.swift" : {
+    "const-values" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/AppTheme.swiftconstvalues",
+    "dependencies" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/AppTheme.d",
+    "diagnostics" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/AppTheme.dia",
+    "object" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/AppTheme.o",
+    "swift-dependencies" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/AppTheme.swiftdeps"
+  },
+  "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Theme/FontRegistration.swift" : {
+    "const-values" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/FontRegistration.swiftconstvalues",
+    "dependencies" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/FontRegistration.d",
+    "diagnostics" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/FontRegistration.dia",
+    "object" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/FontRegistration.o",
+    "swift-dependencies" : "/Users/siddharthchhatpar/Documents/TrackMyHabbit-iOS/DerivedData/Build/Intermediates.noindex/TrackMyHabbit.build/Debug-iphoneos/TrackMyHabbit.build/Objects-normal/arm64/FontRegistration.swiftdeps"
+  }
+}
