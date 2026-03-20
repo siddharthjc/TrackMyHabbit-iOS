@@ -124,10 +124,13 @@ func ordinalSuffix(for day: Int) -> String {
 struct FrequencyBottomSheet: View {
     @Binding var isPresented: Bool
     @Binding var selectedOption: FrequencyOption
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     // Animation states
     @State private var sheetOffset: CGFloat = UIWindow.isLandscape ? 100 : 300
     @State private var backdropOpacity: Double = 0
+    
+    private var closedOffset: CGFloat { UIWindow.isLandscape ? 100 : 300 }
     
     var body: some View {
         ZStack {
@@ -163,11 +166,16 @@ struct FrequencyBottomSheet: View {
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    if reduceMotion {
                         backdropOpacity = 1.0
-                    }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
                         sheetOffset = 0
+                    } else {
+                        withAnimation(.easeOut(duration: 0.18)) {
+                            backdropOpacity = 1.0
+                        }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0)) {
+                            sheetOffset = 0
+                        }
                     }
                 }
             }
@@ -175,11 +183,18 @@ struct FrequencyBottomSheet: View {
     }
     
     private func closeSheet() {
+        if reduceMotion {
+            backdropOpacity = 0.0
+            sheetOffset = closedOffset
+            isPresented = false
+            return
+        }
+
         withAnimation(.easeOut(duration: 0.18)) {
             backdropOpacity = 0.0
         }
         withAnimation(.spring(response: 0.3, dampingFraction: 1.0, blendDuration: 0)) {
-            sheetOffset = 300
+            sheetOffset = closedOffset
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
             isPresented = false
@@ -192,6 +207,7 @@ struct FrequencyBottomSheet: View {
 struct DayOfWeekBottomSheet: View {
     @Binding var isPresented: Bool
     @Binding var selectedDay: DayOfWeek
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     @State private var sheetOffset: CGFloat = 300
     @State private var backdropOpacity: Double = 0
@@ -228,11 +244,16 @@ struct DayOfWeekBottomSheet: View {
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    if reduceMotion {
                         backdropOpacity = 1.0
-                    }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
                         sheetOffset = 0
+                    } else {
+                        withAnimation(.easeOut(duration: 0.18)) {
+                            backdropOpacity = 1.0
+                        }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0)) {
+                            sheetOffset = 0
+                        }
                     }
                 }
             }
@@ -240,6 +261,13 @@ struct DayOfWeekBottomSheet: View {
     }
     
     private func closeSheet() {
+        if reduceMotion {
+            backdropOpacity = 0.0
+            sheetOffset = 300
+            isPresented = false
+            return
+        }
+
         withAnimation(.easeOut(duration: 0.18)) {
             backdropOpacity = 0.0
         }
@@ -257,6 +285,7 @@ struct DayOfWeekBottomSheet: View {
 struct DayOfMonthBottomSheet: View {
     @Binding var isPresented: Bool
     @Binding var selectedDay: Int
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     @State private var sheetOffset: CGFloat = 300
     @State private var backdropOpacity: Double = 0
@@ -298,11 +327,16 @@ struct DayOfMonthBottomSheet: View {
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    if reduceMotion {
                         backdropOpacity = 1.0
-                    }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
                         sheetOffset = 0
+                    } else {
+                        withAnimation(.easeOut(duration: 0.18)) {
+                            backdropOpacity = 1.0
+                        }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0)) {
+                            sheetOffset = 0
+                        }
                     }
                 }
             }
@@ -310,6 +344,13 @@ struct DayOfMonthBottomSheet: View {
     }
     
     private func closeSheet() {
+        if reduceMotion {
+            backdropOpacity = 0.0
+            sheetOffset = 300
+            isPresented = false
+            return
+        }
+
         withAnimation(.easeOut(duration: 0.18)) {
             backdropOpacity = 0.0
         }
@@ -327,6 +368,7 @@ struct DayOfMonthBottomSheet: View {
 struct MonthPickerBottomSheet: View {
     @Binding var isPresented: Bool
     @Binding var selectedMonth: MonthOfYear
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     
     @State private var sheetOffset: CGFloat = 300
     @State private var backdropOpacity: Double = 0
@@ -368,11 +410,16 @@ struct MonthPickerBottomSheet: View {
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    if reduceMotion {
                         backdropOpacity = 1.0
-                    }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
                         sheetOffset = 0
+                    } else {
+                        withAnimation(.easeOut(duration: 0.18)) {
+                            backdropOpacity = 1.0
+                        }
+                        withAnimation(.spring(response: 0.3, dampingFraction: 0.7, blendDuration: 0)) {
+                            sheetOffset = 0
+                        }
                     }
                 }
             }
@@ -380,6 +427,13 @@ struct MonthPickerBottomSheet: View {
     }
     
     private func closeSheet() {
+        if reduceMotion {
+            backdropOpacity = 0.0
+            sheetOffset = 300
+            isPresented = false
+            return
+        }
+
         withAnimation(.easeOut(duration: 0.18)) {
             backdropOpacity = 0.0
         }

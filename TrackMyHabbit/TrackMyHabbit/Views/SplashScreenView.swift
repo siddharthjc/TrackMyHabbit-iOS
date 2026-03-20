@@ -242,6 +242,7 @@ struct SplashLogoView: View {
 
 struct SplashScreenView: View {
     let onFinished: () -> Void
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     // MARK: Animation state
     @State private var logoScale: CGFloat = 0.5
@@ -270,14 +271,18 @@ struct SplashScreenView: View {
                     Text("Better habits start here.")
                         .customFont(.serifsemibold, size: 24, lineHeight: 24, tracking: -0.4)
                         .foregroundColor(AppTheme.Colors.textPrimary)
-                        .transition(.opacity.combined(with: .move(edge: .bottom)))
+                        .transition(
+                            reduceMotion
+                            ? .opacity
+                            : .opacity.combined(with: .move(edge: .bottom))
+                        )
                 }
 
                 Spacer()
             }
         }
         .opacity(dismissing ? 0 : 1)
-        .scaleEffect(dismissing ? 1.05 : 1)
+        .scaleEffect(dismissing ? (reduceMotion ? 1.0 : 1.05) : 1)
         .onAppear {
             runAnimationSequence()
         }
@@ -286,8 +291,27 @@ struct SplashScreenView: View {
     // MARK: - Animation Sequence
 
     private func runAnimationSequence() {
+        if reduceMotion {
+            // Reduced motion: avoid entrance/exit movement; keep it quick and readable.
+            logoScale = 1.0
+            logoOpacity = 1.0
+            logoRotation = 0
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                showTagline = true
+            }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.9) {
+                withAnimation(.easeOut(duration: 0.15)) {
+                    dismissing = true
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                    onFinished()
+                }
+            }
+            return
+        }
+
         // Step 1: Logo entrance — scale up + fade in + rotate into place
-        withAnimation(.spring(response: 0.7, dampingFraction: 0.7, blendDuration: 0)) {
+        withAnimation(.spring(response: 0.35, dampingFraction: 0.7, blendDuration: 0)) {
             logoScale = 1.0
             logoOpacity = 1.0
             logoRotation = 0
@@ -295,18 +319,18 @@ struct SplashScreenView: View {
 
         // Step 2: Show tagline after a short delay
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            withAnimation(.easeOut(duration: 0.5)) {
+            withAnimation(.easeOut(duration: 0.25)) {
                 showTagline = true
             }
         }
 
         // Step 3: Dismiss splash and transition to main app
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-            withAnimation(.easeInOut(duration: 0.4)) {
+            withAnimation(.easeOut(duration: 0.2)) {
                 dismissing = true
             }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
                 onFinished()
             }
         }
