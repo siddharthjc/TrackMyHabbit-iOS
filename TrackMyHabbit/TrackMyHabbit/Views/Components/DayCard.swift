@@ -13,10 +13,20 @@ struct DayCard: View {
 
     var isEmpty: Bool { entry?.imageUri == nil }
     @State private var selectedPhoto: PhotosPickerItem?
+    @State private var showPhotoPicker = false
 
     var body: some View {
-        interactiveSurface
+        cardContent
             .frame(width: cardWidth, height: cardHeight)
+            .contentShape(Rectangle())
+            .onTapGesture {
+                if isActive {
+                    showPhotoPicker = true
+                } else {
+                    tapAction()
+                }
+            }
+            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
             .task(id: selectedPhoto) {
                 guard let selectedPhoto else { return }
 
@@ -28,21 +38,6 @@ struct DayCard: View {
                     onImagePicked(data)
                 }
             }
-    }
-
-    @ViewBuilder
-    private var interactiveSurface: some View {
-        if isActive {
-            PhotosPicker(selection: $selectedPhoto, matching: .images) {
-                cardContent
-            }
-            .buttonStyle(.plain)
-        } else {
-            Button(action: tapAction) {
-                cardContent
-            }
-            .buttonStyle(.plain)
-        }
     }
 
     private var cardContent: some View {
@@ -58,10 +53,10 @@ struct DayCard: View {
             RoundedRectangle(cornerRadius: 24)
                 .fill(AppTheme.Neutral._0)
                 .shadow(
-                    color: Color(hex: "#5E5E72").opacity(isActive ? 0.2 : 0),
-                    radius: isActive ? 56 : 0,
+                    color: Color(hex: "#5E5E72").opacity(isActive ? 0.2 : 0.08),
+                    radius: isActive ? 56 : 36,
                     x: 0,
-                    y: isActive ? 2 : 0
+                    y: 2
                 )
         )
     }
@@ -112,7 +107,7 @@ struct DayCard: View {
         .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(AppTheme.Neutral._0, lineWidth: 1)
+                .stroke(isActive ? AppTheme.Neutral._0 : Color(hex: "#EDEFF3"), lineWidth: 1)
         )
     }
 
@@ -133,7 +128,7 @@ struct DayCard: View {
             )
             .overlay(
                 RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(AppTheme.Neutral._0, lineWidth: 1)
+                    .stroke(isActive ? AppTheme.Neutral._0 : Color(hex: "#EDEFF3"), lineWidth: 1)
             )
             .overlay(alignment: .topLeading) {
                 HStack(spacing: isActive ? 8 : 6) {

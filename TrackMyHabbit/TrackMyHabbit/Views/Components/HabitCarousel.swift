@@ -7,68 +7,167 @@ struct HabitCarousel: View {
 
     let habit: Habit
     @State private var days: [String] = DateUtils.generateDays(count: 7)
+    @State private var currentIndex: Int = 0
+    @State private var dragOffset: CGFloat = 0
 
     private let cardWidth: CGFloat = 288
     private let cardHeight: CGFloat = 397
-    private let cardSpacing: CGFloat = 20
+    private let scaleStep: CGFloat = 0.9
+    private let cardStep: CGFloat = 47 // cardWidth + HStack spacing (-241) from Figma
+    private let maxVisibleBehind: Int = 2
+    private let swipeThreshold: CGFloat = 60
+    private let screenWidth: CGFloat = UIScreen.main.bounds.width
+    private let leftPeekFromEdge: CGFloat = 12
 
-    @State private var scrollTarget: String?
+    /// Days ordered from newest (today) to oldest.
+    private var orderedDays: [String] {
+        days.sorted(by: >)
+    }
 
     var body: some View {
-        GeometryReader { geometry in
-            let horizontalInset = max((geometry.size.width - cardWidth) / 2, 20)
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: cardSpacing) {
-                    ForEach(days.reversed(), id: \.self) { dateStr in
-                        let isActive = (scrollTarget == dateStr)
-                        let entry = habit.entries.first(where: { $0.dateString == dateStr })
-
-                        DayCard(
-                            dateStr: dateStr,
-                            entry: entry,
-                            isActive: isActive,
-                            cardWidth: cardWidth,
-                            cardHeight: cardHeight,
-                            tapAction: {
-                                withAnimation(.spring(response: 0.35, dampingFraction: 0.86)) {
-                                    scrollTarget = dateStr
-                                }
-                            },
-                            onImagePicked: { data in
-                                saveImage(data, for: dateStr, existingEntry: entry)
-                            }
-                        )
-                        .scaleEffect(isActive ? 1.0 : 0.92)
-                        .opacity(isActive ? 1.0 : 0.5)
-                        .animation(.spring(response: 0.35, dampingFraction: 0.86), value: isActive)
-                        .frame(width: cardWidth, height: cardHeight)
-                        .zIndex(isActive ? 1 : 0)
-                    }
-                }
-                .padding(.vertical, 80)
-                .scrollTargetLayout()
-            }
-            .scrollPosition(id: $scrollTarget, anchor: .center)
-            .scrollTargetBehavior(.viewAligned(limitBehavior: .alwaysByOne))
-            .contentMargins(.horizontal, horizontalInset, for: .scrollContent)
-            .scrollClipDisabled()
-            .onAppear {
-                refreshDaysIfNeeded()
-                if scrollTarget == nil {
-                    scrollTarget = days.reversed().first
-                }
+        ZStack {
+            ForEach(visibleIndices, id: \.self) { index in
+                let depth = index - currentIndex
+                cardLayer(at: index, depth: depth)
             }
         }
+        .offset(x: centeringOffset)
         .frame(height: cardHeight + 160)
+        .frame(maxWidth: .infinity)
+        .contentShape(Rectangle())
+        .gesture(swipeGesture)
+        .padding(.horizontal, 20)
+        .onAppear {
+            refreshDaysIfNeeded()
+        }
         .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
             refreshDaysIfNeeded()
         }
     }
 
+    // MARK: - Centering
+
+    /// Shifts the stack left to visually center the active card + back cards group,
+    /// clamped so the active card keeps at least 20pt from the screen edge.
+    private var centeringOffset: CGFloat {
+        let behindCount = CGFloat(min(maxVisibleBehind, max(0, orderedDays.count - 1 - currentIndex)))
+        guard behindCount > 0 else { return 0 }
+        let deepestScale = pow(scaleStep, behindCount)
+        let deepestRightEdge = behindCount * cardStep + (cardWidth * deepestScale) / 2
+        let activeRightEdge = cardWidth / 2
+        let idealOffset = -(deepestRightEdge - activeRightEdge) / 2
+        let maxLeftShift = -(screenWidth / 2 - cardWidth / 2 - 20)
+        return max(idealOffset, maxLeftShift)
+    }
+
+    // MARK: - Visible indices
+
+    /// Indices of visible cards, ordered back-to-front for ZStack layering.
+    private var visibleIndices: [Int] {
+        let start = max(0, currentIndex - 1)
+        let end = min(orderedDays.count, currentIndex + maxVisibleBehind + 1)
+        guard start < end else { return [] }
+        return Array((start..<end).reversed())
+    }
+
+    // MARK: - Card layer
+
+    @ViewBuilder
+    private func cardLayer(at index: Int, depth: Int) -> some View {
+        let dateStr = orderedDays[index]
+        let isActive = depth == 0
+        let entry = habit.entries.first(where: { $0.dateString == dateStr })
+
+        let leftProgress: CGFloat = dragOffset < 0
+            ? min(-dragOffset / (cardWidth * 0.5), 1.0)
+            : 0
+        let rightProgress: CGFloat = dragOffset > 0
+            ? min(dragOffset / (cardWidth * 0.5), 1.0)
+            : 0
+
+        let scale = cardScale(depth: depth, leftProgress: leftProgress, rightProgress: rightProgress)
+        let xOffset = cardXOffset(depth: depth, leftProgress: leftProgress, rightProgress: rightProgress)
+
+        DayCard(
+            dateStr: dateStr,
+            entry: entry,
+            isActive: isActive,
+            cardWidth: cardWidth,
+            cardHeight: cardHeight,
+            tapAction: {},
+            onImagePicked: { data in
+                saveImage(data, for: dateStr, existingEntry: entry)
+            }
+        )
+        .scaleEffect(scale, anchor: .center)
+        .offset(x: xOffset)
+        .zIndex(depth < 0 ? 150 : (depth == 0 ? 100 : Double(50 - depth)))
+        .allowsHitTesting(isActive)
+    }
+
+    // MARK: - Card positioning
+
+    private func cardScale(depth: Int, leftProgress: CGFloat, rightProgress: CGFloat) -> CGFloat {
+        if depth <= 0 { return 1.0 }
+        let base = pow(scaleStep, CGFloat(depth))
+        let target = pow(scaleStep, CGFloat(depth - 1))
+        return base + (target - base) * leftProgress
+    }
+
+    private func cardXOffset(depth: Int, leftProgress: CGFloat, rightProgress: CGFloat) -> CGFloat {
+        if depth == 0 {
+            return dragOffset
+        }
+        if depth < 0 {
+            let baseOffset = -(screenWidth / 2) + leftPeekFromEdge - cardWidth / 2
+            return baseOffset + (0 - baseOffset) * rightProgress
+        }
+        let baseOffset = CGFloat(depth) * cardStep
+        let targetOffset = CGFloat(depth - 1) * cardStep
+        return baseOffset + (targetOffset - baseOffset) * leftProgress
+    }
+
+    // MARK: - Swipe gesture
+
+    private var swipeGesture: some Gesture {
+        DragGesture(minimumDistance: 20)
+            .onChanged { value in
+                let t = value.translation.width
+                if t < 0 && currentIndex < orderedDays.count - 1 {
+                    dragOffset = t
+                } else if t > 0 && currentIndex > 0 {
+                    dragOffset = t * 0.4
+                } else {
+                    dragOffset = t * 0.15
+                }
+            }
+            .onEnded { value in
+                let velocity = value.predictedEndTranslation.width
+                let shouldAdvance = (value.translation.width < -swipeThreshold || velocity < -500)
+                    && currentIndex < orderedDays.count - 1
+                let shouldGoBack = (value.translation.width > swipeThreshold || velocity > 500)
+                    && currentIndex > 0
+
+                if shouldAdvance || shouldGoBack {
+                    withAnimation(.spring(duration: 0.45, bounce: 0.12)) {
+                        if shouldAdvance {
+                            currentIndex += 1
+                        } else {
+                            currentIndex -= 1
+                        }
+                        dragOffset = 0
+                    }
+                } else {
+                    withAnimation(.spring(duration: 0.3, bounce: 0)) {
+                        dragOffset = 0
+                    }
+                }
+            }
+    }
+
+    // MARK: - Data helpers
+
     private func saveImage(_ data: Data, for dateString: String, existingEntry: HabitEntry?) {
-        // Re-resolve the entry at save time to avoid inserting duplicates if the caller's
-        // `existingEntry` is stale.
         let resolvedEntry = existingEntry ?? resolveEntry(for: dateString)
 
         do {
@@ -88,7 +187,6 @@ struct HabitCarousel: View {
 
                 try modelContext.save()
             } catch {
-                // Roll back the file write if the database save fails.
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
@@ -98,7 +196,6 @@ struct HabitCarousel: View {
     }
 
     private func resolveEntry(for dateString: String) -> HabitEntry? {
-        // Prefer an explicit fetch so we don't rely on relationship freshness.
         do {
             let habitId = habit.id
             let predicate = #Predicate<HabitEntry> { entry in
@@ -108,7 +205,6 @@ struct HabitCarousel: View {
             descriptor.fetchLimit = 2
             let results = try modelContext.fetch(descriptor)
             if results.count > 1 {
-                // Best-effort de-dupe: keep the first, delete the rest.
                 for dup in results.dropFirst() {
                     modelContext.delete(dup)
                 }
@@ -116,7 +212,6 @@ struct HabitCarousel: View {
             }
             return results.first
         } catch {
-            // Fall back to relationship data if fetch fails for any reason.
             return habit.entries.first(where: { $0.dateString == dateString })
         }
     }
@@ -124,13 +219,13 @@ struct HabitCarousel: View {
     private func refreshDaysIfNeeded() {
         let newDays = DateUtils.generateDays(count: 7)
         guard newDays != days else { return }
+        let currentDateStr = currentIndex < orderedDays.count ? orderedDays[currentIndex] : nil
         days = newDays
-        // If the current target is outside the new window, snap back to newest day.
-        if let target = scrollTarget, !newDays.contains(target) {
-            scrollTarget = newDays.reversed().first
-        }
-        if scrollTarget == nil {
-            scrollTarget = newDays.reversed().first
+        if let dateStr = currentDateStr,
+           let newIndex = days.sorted(by: >).firstIndex(of: dateStr) {
+            currentIndex = newIndex
+        } else {
+            currentIndex = 0
         }
     }
 
