@@ -271,504 +271,504 @@
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/AVFAudio.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AVFAudio-6P7MW67D1PKFAOAN5J4DBY77S.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AVFAudio-6IAMY8ERENN2O5EGF3S3QLEQQ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AVFAudio"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/AVFoundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AVFoundation-6V37EUIZCH1ZBJN8N90Z48XQ6.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AVFoundation-4YKKDH534IVH6T74MBMWWITC4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AVFoundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/AVRouting.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AVRouting-439JE7E3NASPCUJ84R6JLBAVM.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AVRouting-36IE0VPYXMSZN4NYOEU29654O.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AVRouting"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Accessibility.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Accessibility-9MDTUPX1CIUW9SWZUJFGDUCL.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Accessibility-ADNDIO2HY3JJJ8KXT1U1E4MYF.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Accessibility"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/AudioToolbox.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AudioToolbox-214C9CSM8NTYQ869L0G91J3C5.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/AudioToolbox-8CS0P39FVE371JZSOWHURKWUL.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "AudioToolbox"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CFNetwork.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CFNetwork-4S4LIHW6OS350WCDX9N31P6TM.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CFNetwork-CA8MZ9E7ILR2TSZDUG1ZD0HOV.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CFNetwork"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreAudio.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreAudio-ED0S1YAJQQ7D789UA544SMY7T.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreAudio-2IKGRS64AONFSYKA7ISO0USN0.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreAudio"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreAudioTypes.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreAudioTypes-9KZW8TQGU8MO6K2N2H7MGJXQU.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreAudioTypes-4O832ID7S9WQU5IHA4JHVLNBR.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreAudioTypes"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreData.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreData-3XILK0ROKP7BLVJH0XX8V6YLD.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreData-79XSPT87G2K8EX8HW4YUJD3UY.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreData"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreFoundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreFoundation-46JZVRXGNTDPN3OZHYNDDAM8O.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreFoundation-7HBDBU4NRK3ZWGEA51HEOH2JU.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreFoundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreGraphics.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreGraphics-C1NJHOPWV8KCLQ9VK4BT44GIH.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreGraphics-6ZIJ1O0FP0FX9ZXWDQ2RW3ABL.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreGraphics"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreImage.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreImage-EO1FALUQZHNYBBRDYNAEX1RK8.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreImage-ABF3HCX5H7E8HTAZ287XQ7244.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreImage"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreLocation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreLocation-1CF5IAZUQAJ0C06U3JJW2BMNV.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreLocation-BMXVMTQXNRV6KW5BDYWG2O466.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreLocation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreMIDI.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreMIDI-3XS41VLSLAHSMWY3C4K0ECEKN.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreMIDI-9X0ZD2WZSZEHVWM140TI8DQOD.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreMIDI"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreMedia.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreMedia-80G0E3U0HD17SPJSS8I9CELDT.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreMedia-E9TJQXVYJ9V69GFW2RW5GKYXA.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreMedia"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreText.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreText-ACKGY1PGGM7HFO952CDCR4UGF.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreText-13E8PHX9G5AMBIB830485RS2J.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreText"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreTransferable.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreTransferable-B6EULZ4C591GY7BD3C5DQGBZI.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreTransferable-6K19QAFAA1KK5JVI323E03422.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreTransferable"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/CoreVideo.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreVideo-5NWKZSSLNF6PBDJFXWN3VJ1ZC.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/CoreVideo-DW50VTOS1DGTV3RETFXTYB279.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "CoreVideo"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/Darwin.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Darwin-9UE6P9IR730K37S7NT9IPKLIO.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Darwin-7AIBYLZ9XSW9EDZFFNHA3NS2F.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Darwin"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/DataDetection.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/DataDetection-5JMJQGJOBJWLGFHR6AYRXRU8I.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/DataDetection-6MU4RCF8OTTLTVIGSVS694QTO.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "DataDetection"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/DeveloperToolsSupport.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/DeveloperToolsSupport-E7VW5F45WHWT3LRGZKKMWMV4N.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/DeveloperToolsSupport-X2WZDSJO2L0JZ3DIO5J24RNM.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "DeveloperToolsSupport"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/dispatch.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Dispatch-D1TAS95R9FY5DMKX1E1255SPB.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Dispatch-8XF9661VVU950BSBV1DFN66GK.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Dispatch"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/ExtensionFoundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ExtensionFoundation-2EX3TLRBIIB57NA0Q6Y607GD9.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ExtensionFoundation-BRVKU0U6W50QCMZ1Z2XZ2HD1F.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ExtensionFoundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/FileProvider.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/FileProvider-1284Q5MHZYP8N101LLQSYA2CI.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/FileProvider-49TGGIZ9HI50JOXFDQTYD9H97.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "FileProvider"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Foundation.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Foundation-7Q4LKLZS9M26GJTFXPDUQP8VW.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Foundation-9VOQEC2T9P9C9WBMM6D2LX8T4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Foundation"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/IOSurface.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/IOSurface-5ECSXPCSW0Q4XPAUCTVG0YX8M.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/IOSurface-7LXKKT042N89DGUITV8Q9W8GP.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "IOSurface"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/ImageIO.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ImageIO-4QXZ04YD082NM3X36OEKDE74A.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ImageIO-1BNAEGB7LL7BGNMO6B2X1B547.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ImageIO"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinBasic.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/MachO-8TQVFWMRBD90R9XIO9D0CAJ1B.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/MachO-AG079PKU5LXKNYE49A9W7INAS.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "MachO"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/MediaToolbox.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/MediaToolbox-9HDLQ40FCILCN5TK9YRQAN2RR.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/MediaToolbox-5CKBN8A81XRVI9VUYXL9FXUH.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "MediaToolbox"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Metal.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Metal-3VDTL0YBKX77K1011IJFLTWF8.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Metal-EK389JWXOLSLZU1MQ7DH8X81N.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Metal"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Network.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Network-5IS927IP4O601EBIJMRCWLPGI.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Network-7QISTRGFTUX0VWV0EW3RRFK5G.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Network"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/OSLog.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/OSLog-A08JJZL4X415Y0JLN9EERC6GQ.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/OSLog-6G9F3FQXEPJ826PSDHA6YXSW1.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "OSLog"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/ObjectiveC.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ObjectiveC-CQ3BQDDTSF07H6QZYGENSZQNH.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ObjectiveC-8QW7BZUFL3Z82HQZTDP2SV4PK.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ObjectiveC"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/OpenGLES.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/OpenGLES-10PR3G1FFXME7L68F79SJ21SP.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/OpenGLES-7SXSK2PVBUQTNEMVUIWYQ5DN4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "OpenGLES"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Photos.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Photos-2VFDV8JKQPTSG5T8OK3PQ40TG.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Photos-DOFCWDCQPOBFNR28OLJHG0XGE.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Photos"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/PhotosUI.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/PhotosUI-67WNVWU72YUK9TJ0H5IC9UMB5.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/PhotosUI-2OZWPLANRKPHT6JS28MQGY7E4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "PhotosUI"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/QuartzCore.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/QuartzCore-7HPKZ05KKIW4AGYVQK3UK4ANS.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/QuartzCore-DEWENCELJZIDUHFB0BLU1U50J.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "QuartzCore"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Security.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Security-13ECR5FRI06705M2ZYRILHJWB.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Security-C54J9HLW2K5W6DG69U7P8L47X.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Security"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/Spatial\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Spatial-9UTOIL8HLJVUFWY3DP9HSWMH6.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Spatial-4QZZJNI2JI7C9263437MWMKAX.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Spatial"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/SwiftShims-A1QNKPCY1OQ7TJRWB9WDHKARI.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/SwiftShims-6O905K5MMDHZPPFVXEPZAF0WR.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftShims"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/SwiftUI.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/SwiftUI-1DPZZTHSQ7WHCBWXLO6HRA5YP.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/SwiftUI-10929QY5SQYLD97CNUCPVO7T4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftUI"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/SwiftUICore.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/SwiftUICore-5VWP8XID739TAKCYBVJILM2D2.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/SwiftUICore-2H5SV0DM5UGCA4OOTXPKT5NB7.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "SwiftUICore"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/Symbols.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Symbols-A9ETLE21F46OW49FCPSL1N5RS.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/Symbols-2ROEUOAAD866WE9SRSS0XR3MJ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "Symbols"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/UIKit.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UIKit-5GLQ9AG1LNHTPRHTJGAHY5IFU.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UIKit-T6NL9MMYZTPYAGSTRMZG666G.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UIKit"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/SubFrameworks\/UIUtilities.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UIUtilities-3E6WP0104KX7IFBJOBWE8YJG0.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UIUtilities-18ZJGF31Q4O54TDGXDN199YYI.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UIUtilities"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/UniformTypeIdentifiers.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UniformTypeIdentifiers-7IJTRAX8EZLQWGE9CWGMGWEEE.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UniformTypeIdentifiers-4Z5OF9HSKIVFXBO7N7E1AEQSM.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UniformTypeIdentifiers"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/UserNotifications.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UserNotifications-CATRH2A7QVDZOFPXH1J2VWQ1P.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/UserNotifications-2BHW5T64RFDGRFMKI3EH0TNVD.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "UserNotifications"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/xpc.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/XPC-CV3CJPPLWKFXQZSPXO1REQ4HL.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/XPC-O9I2ZBDHMWU1C6XAFOX6LLKY.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "XPC"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation1.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_AvailabilityInternal-8JS8BHN86YZY6P5OX0FKQP7IU.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_AvailabilityInternal-7AG8ZWL15H1P6M1KHGJBFZ2LQ.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_AvailabilityInternal"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_float-E33VX1IEUXZ0E6HD9JI3079EO.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_float-1XM66XZNY5NQ2JGFVXW1961JE.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_float"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_intrinsics-71LB7CADBQAYVGOVY2IHH93R2.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_intrinsics-5F3IBBW28YUPKN5GECN0RIFNO.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_intrinsics"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_inttypes-2NJ5XOZ26NZGTU1UMTMQ4IPUD.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_inttypes-2IY9G7YFGXJVDIICITR1O81OC.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_inttypes"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_limits-9G28FQ8PBG53RSP2W0DM2HZMO.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_limits-E0YCTE8W4AL482CQDM28TDV3U.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_limits"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdarg-25N3ULU1I5YHSEDIFGGP68IP2.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdarg-BGZ8T5L6D1HQ3DMJA3KQJ7AMX.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdarg"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdatomic-4OVI1C1FJ0LS6FYNIS8FQORWM.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdatomic-BLT9T01J52HVI7PWHZ9DT9ER1.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdatomic"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdbool-CZ4RNWQFRVCJPPMCC87CN736U.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdbool-88RJ7SLHGQQVO0Q44CBGCERD8.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdbool"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stddef-87FKGR79H1TDWDYOK1Y2Y2OT4.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stddef-C826DZWABB4QZJINND1IWQ9Z4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stddef"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdint-6R9APRVHW073RDCQ8EH41CER7.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_stdint-1Q3A1CR6G4W4XBEJE4JOVSZO4.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_stdint"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_tgmath-7LP4JC7DMMTLH7FTQU5JH9VP1.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_Builtin_tgmath-ARVKB8E2ZO8C2CSQQAT6YNJUM.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_Builtin_tgmath"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation1.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation1-DOU2QH4MLDKM7XVQONHBYMFOF.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation1-6GGOR1IWZ98EII5VI7MB4OQYN.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation1"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation2.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation2-53XJUL3OKDDHK49CCZTS933P6.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation2-3AHZNN20974J3H54OWA2WZGXA.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation2"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation3.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation3-4O380U4DUXOPTKCTWRZKH9DI7.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_DarwinFoundation3-4PVWT54H77SQGCAOFUDEA7FQG.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_DarwinFoundation3"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/System\/Library\/Frameworks\/_LocationEssentials.framework\/Modules\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_LocationEssentials-2Z55GF2NY2NOM0M8PK4GZDQ6A.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_LocationEssentials-AQ1L1FCTHH1VMVG3IYTIXCJTD.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_LocationEssentials"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/lib\/swift\/shims\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_SwiftConcurrencyShims-8KIBA7NXHW6KEW8IMWDI8SGJS.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/_SwiftConcurrencyShims-8Y0LPWBJOWW58M3Y1MKBBUA2A.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "_SwiftConcurrencyShims"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/dnssd.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/dnssd-3RYB3Q3WOR7BWTWR0W2MTLK6Y.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/dnssd-AU4TZTIX3G1KVF61S8I21UPYP.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "dnssd"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/os-2SFA9QP0A2WN7WYHO1MTBLDYV.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/os-DE08F365KKQTRCVHCGJ0DBEX8.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/os_object-5XDAWIGA9T0ZVUVIEB793KI1W.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/os_object-7BJBP1WK1IXKWGQD4KA1KV5Q.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os_object"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/os.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/os_workgroup-BX6AOG6X7ZPGIKO4KDOB15RDN.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/os_workgroup-5KF5O5R5MP53KGDBOJYAOVXE.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "os_workgroup"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ptrauth-TKDWFGYMNVJPDJHUOFHVRYCR.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ptrauth-ECSL6Y2BYNNXOFMYLEUKKEN31.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ptrauth"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Toolchains\/XcodeDefault.xctoolchain\/usr\/lib\/clang\/17\/include\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ptrcheck-12D4ADX70731MFL2G1D2PMF42.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/ptrcheck-G7B4W3WP1QT7PQN937RLBAIB.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "ptrcheck"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/simd\/module.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/simd-65V8WJMJ951RP764ZIYQU9RXS.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/simd-7CJ2YJLM2HYVWCEA05WLIYHGP.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "simd"
   },
   {
     "clangModuleMapPath" : "\/Applications\/Xcode.app\/Contents\/Developer\/Platforms\/iPhoneOS.platform\/Developer\/SDKs\/iPhoneOS.sdk\/usr\/include\/DarwinFoundation2.modulemap",
-    "clangModulePath" : "\/Users\/siddharthchhatpar\/Documents\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/sys_types-147J66ZBV65PR930PYTPBHCIG.pcm",
+    "clangModulePath" : "\/Users\/siddharthchhatpar\/Developer\/TrackMyHabbit-iOS\/DerivedData\/ModuleCache.noindex\/sys_types-BCF668Y3SSSQN3FW03CM4Q6W7.pcm",
     "isBridgingHeaderDependency" : false,
     "isFramework" : false,
     "moduleName" : "sys_types"

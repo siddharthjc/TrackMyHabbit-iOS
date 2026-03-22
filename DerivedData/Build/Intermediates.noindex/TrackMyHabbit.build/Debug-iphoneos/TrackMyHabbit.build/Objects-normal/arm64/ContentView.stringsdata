@@ -1,0 +1,24 @@
+{
+  "source": "/Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/ContentView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Calendar view coming next",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 280
+        }
+      },
+      {
+        "comment": "",
+        "key": "The new system tab bar is in place, so we can plug the calendar screen into this tab next.",
+        "location": {
+          "startingColumn": 22,
+          "startingLine": 284
+        }
+      }
+    ]
+  },
+  "version": 1
+}

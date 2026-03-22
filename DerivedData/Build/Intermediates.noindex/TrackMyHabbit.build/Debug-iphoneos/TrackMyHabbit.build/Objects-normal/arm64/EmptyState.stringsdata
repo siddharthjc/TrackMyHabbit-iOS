@@ -1,0 +1,40 @@
+{
+  "source": "/Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Views/Components/EmptyState.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 36
+        }
+      },
+      {
+        "comment": "",
+        "key": "Meet your better self.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 41
+        }
+      },
+      {
+        "comment": "",
+        "key": "Small habits. Big change.",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 45
+        }
+      },
+      {
+        "comment": "",
+        "key": "Continue",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 57
+        }
+      }
+    ]
+  },
+  "version": 1
+}

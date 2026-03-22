@@ -1,0 +1,16 @@
+{
+  "source": "/Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/LiquidGlassBar.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Title",
+        "location": {
+          "startingColumn": 1,
+          "startingLine": 64
+        }
+      }
+    ]
+  },
+  "version": 1
+}

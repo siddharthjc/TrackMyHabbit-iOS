@@ -1,0 +1,144 @@
+{
+  "source": "/Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Views/Components/CreateHabitSheet.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Delete Habit",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 231
+        }
+      },
+      {
+        "comment": "",
+        "key": "Couldn’t Save",
+        "location": {
+          "startingColumn": 16,
+          "startingLine": 237
+        }
+      },
+      {
+        "comment": "",
+        "key": "I want to",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 118
+        }
+      },
+      {
+        "comment": "",
+        "key": "Enter your habit",
+        "location": {
+          "startingColumn": 74,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "",
+        "location": {
+          "startingColumn": 39,
+          "startingLine": 122
+        }
+      },
+      {
+        "comment": "",
+        "key": "Trying to build a habit? Start small",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 147
+        }
+      },
+      {
+        "comment": "",
+        "key": "Here are a few suggestions to start off!",
+        "location": {
+          "startingColumn": 34,
+          "startingLine": 152
+        }
+      },
+      {
+        "comment": "",
+        "key": "Cancel",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 232
+        }
+      },
+      {
+        "comment": "",
+        "key": "Delete",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 233
+        }
+      },
+      {
+        "comment": "",
+        "key": "Are you sure you want to delete \"%@\"? This action cannot be undone.",
+        "location": {
+          "startingColumn": 18,
+          "startingLine": 235
+        }
+      },
+      {
+        "comment": "",
+        "key": "OK",
+        "location": {
+          "startingColumn": 20,
+          "startingLine": 238
+        }
+      },
+      {
+        "comment": "",
+        "key": " on",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 274
+        }
+      },
+      {
+        "comment": "",
+        "key": "every week,",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 269
+        }
+      },
+      {
+        "comment": "",
+        "key": " on the",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 299
+        }
+      },
+      {
+        "comment": "",
+        "key": "every month,",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 294
+        }
+      },
+      {
+        "comment": "",
+        "key": " on",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 324
+        }
+      },
+      {
+        "comment": "",
+        "key": "every year,",
+        "location": {
+          "startingColumn": 30,
+          "startingLine": 319
+        }
+      }
+    ]
+  },
+  "version": 1
+}

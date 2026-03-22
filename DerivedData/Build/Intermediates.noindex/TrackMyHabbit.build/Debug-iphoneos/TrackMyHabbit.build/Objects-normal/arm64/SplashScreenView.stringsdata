@@ -1,0 +1,16 @@
+{
+  "source": "/Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Views/SplashScreenView.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Better habits start here.",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 270
+        }
+      }
+    ]
+  },
+  "version": 1
+}

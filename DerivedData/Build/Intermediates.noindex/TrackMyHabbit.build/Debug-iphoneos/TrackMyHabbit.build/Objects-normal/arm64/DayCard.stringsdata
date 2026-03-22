@@ -1,0 +1,16 @@
+{
+  "source": "/Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Views/Components/DayCard.swift",
+  "tables": {
+    "Localizable": [
+      {
+        "comment": "",
+        "key": "Add photo",
+        "location": {
+          "startingColumn": 26,
+          "startingLine": 138
+        }
+      }
+    ]
+  },
+  "version": 1
+}
