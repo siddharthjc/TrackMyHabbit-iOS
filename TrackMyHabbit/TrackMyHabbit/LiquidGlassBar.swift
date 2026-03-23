@@ -5,7 +5,7 @@ struct LiquidGlassBar<Content: View>: View {
     let cornerRadius: CGFloat
     @ViewBuilder var content: () -> Content
 
-    init(height: CGFloat = 56, cornerRadius: CGFloat = 28, @ViewBuilder content: @escaping () -> Content) {
+    init(height: CGFloat = AppTheme.Layout.glassBarHeight, cornerRadius: CGFloat = AppTheme.Radius.glass, @ViewBuilder content: @escaping () -> Content) {
         self.height = height
         self.cornerRadius = cornerRadius
         self.content = content
@@ -20,8 +20,8 @@ struct LiquidGlassBar<Content: View>: View {
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.white.opacity(0.42),
-                            Color.white.opacity(0.16)
+                            Color.white.opacity(AppTheme.Glass.fillTop),
+                            Color.white.opacity(AppTheme.Glass.fillBottom)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
@@ -29,35 +29,35 @@ struct LiquidGlassBar<Content: View>: View {
                 )
 
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                .stroke(Color.white.opacity(0.78), lineWidth: 1)
+                .stroke(Color.white.opacity(AppTheme.Glass.stroke), lineWidth: AppTheme.Spacing.hairline)
 
             RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                 .fill(
                     LinearGradient(
                         colors: [
-                            Color.white.opacity(0.48),
-                            Color.white.opacity(0.02)
+                            Color.white.opacity(AppTheme.Glass.innerTop),
+                            Color.white.opacity(AppTheme.Glass.innerBottom)
                         ],
                         startPoint: .top,
                         endPoint: .bottom
                     )
                 )
-                .padding(1.5)
+                .padding(AppTheme.Spacing.insetFine)
                 .mask(
                     RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-                        .padding(1.5)
+                        .padding(AppTheme.Spacing.insetFine)
                 )
         }
         .frame(height: height)
         .background(.clear)
-        .shadow(color: Color.black.opacity(0.12), radius: 20, x: 0, y: 10)
-        .shadow(color: Color.white.opacity(0.35), radius: 8, x: 0, y: -1)
+        .appShadow(AppTheme.Elevation.glassDark)
+        .appShadow(AppTheme.Elevation.glassLight)
         .overlay {
             HStack { content() }
-                .padding(.horizontal, 16)
+                .padding(.horizontal, AppTheme.Spacing.md)
         }
-        .padding(.horizontal, 20)
-        .padding(.top, 8)
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.top, AppTheme.Spacing.sm)
     }
 }
 

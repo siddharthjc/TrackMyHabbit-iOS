@@ -157,16 +157,16 @@ struct FrequencyBottomSheet: View {
                 .padding(AppTheme.Spacing.lg)
                 .background(AppTheme.Colors.bgPrimary)
                 .cornerRadius(AppTheme.Radius.xl)
-                .shadow(color: AppTheme.Neutral._700.opacity(0.2), radius: 28, x: 0, y: 4)
+                .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
                 .padding(.bottom, AppTheme.Spacing.lg)
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    withAnimation(AppTheme.Motion.easeSheetIn) {
                         backdropOpacity = 1.0
                     }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
+                    withAnimation(AppTheme.Motion.springSheetOverlay) {
                         sheetOffset = 0
                     }
                 }
@@ -175,7 +175,7 @@ struct FrequencyBottomSheet: View {
     }
     
     private func closeSheet() {
-        withAnimation(.easeOut(duration: 0.18)) {
+        withAnimation(AppTheme.Motion.easeSheetOut) {
             backdropOpacity = 0.0
         }
         withAnimation(.spring(response: 0.3, dampingFraction: 1.0, blendDuration: 0)) {
@@ -222,16 +222,16 @@ struct DayOfWeekBottomSheet: View {
                 .padding(AppTheme.Spacing.lg)
                 .background(AppTheme.Colors.bgPrimary)
                 .cornerRadius(AppTheme.Radius.xl)
-                .shadow(color: AppTheme.Neutral._700.opacity(0.2), radius: 28, x: 0, y: 4)
+                .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
                 .padding(.bottom, AppTheme.Spacing.lg)
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    withAnimation(AppTheme.Motion.easeSheetIn) {
                         backdropOpacity = 1.0
                     }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
+                    withAnimation(AppTheme.Motion.springSheetOverlay) {
                         sheetOffset = 0
                     }
                 }
@@ -240,7 +240,7 @@ struct DayOfWeekBottomSheet: View {
     }
     
     private func closeSheet() {
-        withAnimation(.easeOut(duration: 0.18)) {
+        withAnimation(AppTheme.Motion.easeSheetOut) {
             backdropOpacity = 0.0
         }
         withAnimation(.spring(response: 0.3, dampingFraction: 1.0, blendDuration: 0)) {
@@ -292,16 +292,16 @@ struct DayOfMonthBottomSheet: View {
                 .frame(maxHeight: 320)
                 .background(AppTheme.Colors.bgPrimary)
                 .cornerRadius(AppTheme.Radius.xl)
-                .shadow(color: AppTheme.Neutral._700.opacity(0.2), radius: 28, x: 0, y: 4)
+                .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
                 .padding(.bottom, AppTheme.Spacing.lg)
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    withAnimation(AppTheme.Motion.easeSheetIn) {
                         backdropOpacity = 1.0
                     }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
+                    withAnimation(AppTheme.Motion.springSheetOverlay) {
                         sheetOffset = 0
                     }
                 }
@@ -310,7 +310,7 @@ struct DayOfMonthBottomSheet: View {
     }
     
     private func closeSheet() {
-        withAnimation(.easeOut(duration: 0.18)) {
+        withAnimation(AppTheme.Motion.easeSheetOut) {
             backdropOpacity = 0.0
         }
         withAnimation(.spring(response: 0.3, dampingFraction: 1.0, blendDuration: 0)) {
@@ -362,16 +362,16 @@ struct MonthPickerBottomSheet: View {
                 .frame(maxHeight: 320)
                 .background(AppTheme.Colors.bgPrimary)
                 .cornerRadius(AppTheme.Radius.xl)
-                .shadow(color: AppTheme.Neutral._700.opacity(0.2), radius: 28, x: 0, y: 4)
+                .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
                 .padding(.bottom, AppTheme.Spacing.lg)
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
-                    withAnimation(.easeIn(duration: 0.18)) {
+                    withAnimation(AppTheme.Motion.easeSheetIn) {
                         backdropOpacity = 1.0
                     }
-                    withAnimation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0)) {
+                    withAnimation(AppTheme.Motion.springSheetOverlay) {
                         sheetOffset = 0
                     }
                 }
@@ -380,7 +380,7 @@ struct MonthPickerBottomSheet: View {
     }
     
     private func closeSheet() {
-        withAnimation(.easeOut(duration: 0.18)) {
+        withAnimation(AppTheme.Motion.easeSheetOut) {
             backdropOpacity = 0.0
         }
         withAnimation(.spring(response: 0.3, dampingFraction: 1.0, blendDuration: 0)) {

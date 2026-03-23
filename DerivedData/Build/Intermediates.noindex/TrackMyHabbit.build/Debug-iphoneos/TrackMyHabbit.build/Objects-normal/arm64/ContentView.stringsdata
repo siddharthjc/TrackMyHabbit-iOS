@@ -7,7 +7,7 @@
         "key": "Calendar view coming next",
         "location": {
           "startingColumn": 22,
-          "startingLine": 280
+          "startingLine": 273
         }
       },
       {
@@ -15,7 +15,7 @@
         "key": "The new system tab bar is in place, so we can plug the calendar screen into this tab next.",
         "location": {
           "startingColumn": 22,
-          "startingLine": 284
+          "startingLine": 277
         }
       }
     ]

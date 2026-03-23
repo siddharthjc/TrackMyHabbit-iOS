@@ -81,12 +81,12 @@ struct ContentView: View {
                     activeHabitId: activeHabitId,
                     onSelect: { id in
                         activeHabitId = id
-                        withAnimation(.easeInOut(duration: 0.25)) {
+                        withAnimation(AppTheme.Motion.easeTab) {
                             showHabitDropdown = false
                         }
                     },
                     onDismiss: {
-                        withAnimation(.easeInOut(duration: 0.25)) {
+                        withAnimation(AppTheme.Motion.easeTab) {
                             showHabitDropdown = false
                         }
                     }
@@ -115,12 +115,10 @@ struct ContentView: View {
         )
     }
 
-    private static let createSheetDelayNanoseconds: UInt64 = 250_000_000
-
     /// Lets the CTA finish its press animation before the sheet appears.
     private func presentCreateSheetAfterCTADelay() {
         Task { @MainActor in
-            try? await Task.sleep(nanoseconds: Self.createSheetDelayNanoseconds)
+            try? await Task.sleep(nanoseconds: AppTheme.Motion.createSheetDelayNanoseconds)
             showCreateSheet = true
         }
     }
@@ -141,12 +139,12 @@ struct ContentView: View {
                         habitName: habit.name,
                         habitCount: habits.count,
                         onSwitchPress: {
-                            withAnimation(.easeInOut(duration: 0.25)) {
+                            withAnimation(AppTheme.Motion.easeTab) {
                                 showHabitDropdown.toggle()
                             }
                         }
                     )
-                    .padding(.top, 8)
+                    .padding(.top, AppTheme.Spacing.tabBarTopInset)
 
                     Spacer()
 
@@ -155,7 +153,7 @@ struct ContentView: View {
                     Spacer()
                 }
             }
-            .padding(.bottom, habits.isEmpty ? 0 : 20)
+            .padding(.bottom, habits.isEmpty ? 0 : AppTheme.Spacing.lg)
         }
     }
 }
@@ -206,7 +204,7 @@ private struct HabitDropdownOverlay: View {
     var body: some View {
         ZStack(alignment: .top) {
             // Dimmed background
-            Color.black.opacity(0.30)
+            AppTheme.Overlay.black030
                 .ignoresSafeArea()
                 .onTapGesture { onDismiss() }
 
@@ -222,8 +220,8 @@ private struct HabitDropdownOverlay: View {
                             Text(habit.name)
                                 .customFont(
                                     isActive ? .semibold : .medium,
-                                    size: 16,
-                                    tracking: isActive ? -0.32 : -0.08
+                                    size: AppTheme.Typography.Size.md,
+                                    tracking: isActive ? AppTheme.Typography.Tracking.tight : AppTheme.Typography.Tracking.body
                                 )
                                 .foregroundColor(
                                     isActive
@@ -233,12 +231,12 @@ private struct HabitDropdownOverlay: View {
 
                             Spacer()
                         }
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 16)
+                        .padding(.horizontal, AppTheme.Spacing.sm3)
+                        .padding(.vertical, AppTheme.Spacing.md)
                         .background(
                             isActive
-                                ? RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                    .fill(Color(hex: "#E1E5EA"))
+                                ? RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
+                                    .fill(AppTheme.Colors.surfaceSelected)
                                 : nil
                         )
                         .contentShape(Rectangle())
@@ -246,19 +244,14 @@ private struct HabitDropdownOverlay: View {
                     .buttonStyle(.plain)
                 }
             }
-            .padding(20)
+            .padding(AppTheme.Spacing.lg)
             .background(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
                     .fill(AppTheme.Colors.bgPrimary)
-                    .shadow(
-                        color: Color(hex: "#5E5E72").opacity(0.2),
-                        radius: 56,
-                        x: 0,
-                        y: 4.416
-                    )
+                    .appShadow(AppTheme.Elevation.dropdownCard)
             )
-            .padding(.horizontal, 20)
-            .padding(.top, 74)
+            .padding(.horizontal, AppTheme.Spacing.lg)
+            .padding(.top, AppTheme.Spacing.dropdownOffsetTop)
             .transition(.move(edge: .top).combined(with: .opacity))
         }
     }
@@ -272,20 +265,20 @@ private struct CalendarPlaceholderView: View {
             AppTheme.Colors.emptyStateBackground
                 .ignoresSafeArea()
 
-            VStack(spacing: 8) {
+            VStack(spacing: AppTheme.Spacing.sm) {
                 Image(systemName: "calendar")
-                    .font(.system(size: 40, weight: .semibold))
+                    .font(.system(size: AppTheme.Typography.Size.display, weight: .semibold))
                     .foregroundColor(AppTheme.Colors.textSecondary)
 
                 Text("Calendar view coming next")
-                    .customFont(.semibold, size: 20, lineHeight: 24, tracking: -0.4)
+                    .customFont(.semibold, size: AppTheme.Typography.Size.lg, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.nav)
                     .foregroundColor(AppTheme.Colors.textPrimary)
 
                 Text("The new system tab bar is in place, so we can plug the calendar screen into this tab next.")
-                    .customFont(.medium, size: 14, lineHeight: 20, tracking: -0.14)
+                    .customFont(.medium, size: AppTheme.Typography.Size.sm, lineHeight: AppTheme.Typography.Line.body20, tracking: AppTheme.Typography.Tracking.caption)
                     .foregroundColor(AppTheme.Colors.textSecondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 36)
+                    .padding(.horizontal, AppTheme.Spacing.block)
             }
         }
     }

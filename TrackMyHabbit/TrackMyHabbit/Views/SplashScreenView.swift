@@ -196,16 +196,16 @@ struct SplashLogoShape: Shape {
 
 /// Renders the logo with the exact gradient and inner shadow from the Figma design.
 struct SplashLogoView: View {
-    var size: CGFloat = 120
+    var size: CGFloat = AppTheme.Layout.splashLogoSize
 
     var body: some View {
         SplashLogoShape()
             .fill(
                 LinearGradient(
                     stops: [
-                        .init(color: Color(hex: "#6F8EFF"), location: 0.0),
-                        .init(color: Color(hex: "#4D6FEA"), location: 0.42),
-                        .init(color: Color(hex: "#5778F1"), location: 1.0),
+                        .init(color: AppTheme.Colors.emptyStateCTAStart, location: 0.0),
+                        .init(color: AppTheme.Colors.emptyStateCTAMid, location: 0.42),
+                        .init(color: AppTheme.Colors.emptyStateCTAEnd, location: 1.0),
                     ],
                     startPoint: .top,
                     endPoint: UnitPoint(x: 0.5, y: 1.556)
@@ -215,23 +215,23 @@ struct SplashLogoView: View {
                 SplashLogoShape()
                     .fill(
                         LinearGradient(
-                            colors: [Color.black.opacity(0.2), .clear],
+                            colors: [AppTheme.Overlay.black020, .clear],
                             startPoint: .bottom,
                             endPoint: UnitPoint(x: 0.5, y: 0.5)
                         )
                     )
                     .mask(
                         SplashLogoShape()
-                            .stroke(lineWidth: 3)
-                            .blur(radius: 1)
-                            .offset(y: -1.5)
+                            .stroke(lineWidth: AppTheme.Layout.logoInnerStrokeWidth)
+                            .blur(radius: AppTheme.Layout.logoInnerBlur)
+                            .offset(y: AppTheme.Layout.logoInnerOffsetY)
                     )
             )
             .overlay(
                 SplashLogoShape()
                     .stroke(
-                        Color(hex: "#8A8A9F").opacity(0.23),
-                        lineWidth: 0.2
+                        AppTheme.Colors.ctaHairline,
+                        lineWidth: AppTheme.Layout.logoStrokeWidth
                     )
             )
             .frame(width: size, height: size)
@@ -252,15 +252,14 @@ struct SplashScreenView: View {
 
     var body: some View {
         ZStack {
-            // Background — matches Figma #f9fafa
-            Color(hex: "#F9FAFA")
+            AppTheme.Colors.emptyStateBackground
                 .ignoresSafeArea()
 
-            VStack(spacing: 24) {
+            VStack(spacing: AppTheme.Spacing.xl) {
                 Spacer()
 
                 // Logo with entrance animation
-                SplashLogoView(size: 120)
+                SplashLogoView(size: AppTheme.Layout.splashLogoSize)
                     .scaleEffect(logoScale)
                     .opacity(logoOpacity)
                     .rotationEffect(.degrees(logoRotation))
@@ -268,7 +267,7 @@ struct SplashScreenView: View {
                 // Tagline — fades/slides in after logo
                 if showTagline {
                     Text("Better habits start here.")
-                        .customFont(.serifsemibold, size: 24, lineHeight: 24, tracking: -0.4)
+                        .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.nav)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
@@ -287,26 +286,26 @@ struct SplashScreenView: View {
 
     private func runAnimationSequence() {
         // Step 1: Logo entrance — scale up + fade in + rotate into place
-        withAnimation(.spring(response: 0.7, dampingFraction: 0.7, blendDuration: 0)) {
+        withAnimation(AppTheme.Motion.springSplashLogo) {
             logoScale = 1.0
             logoOpacity = 1.0
             logoRotation = 0
         }
 
         // Step 2: Show tagline after a short delay
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.6) {
-            withAnimation(.easeOut(duration: 0.5)) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + AppTheme.Motion.durationSplashDelay) {
+            withAnimation(AppTheme.Motion.easeTagline) {
                 showTagline = true
             }
         }
 
         // Step 3: Dismiss splash and transition to main app
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.8) {
-            withAnimation(.easeInOut(duration: 0.4)) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + AppTheme.Motion.durationSplashBeforeDismiss) {
+            withAnimation(AppTheme.Motion.easeSplashDismiss) {
                 dismissing = true
             }
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.45) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + AppTheme.Motion.durationSplashDismissDelay) {
                 onFinished()
             }
         }

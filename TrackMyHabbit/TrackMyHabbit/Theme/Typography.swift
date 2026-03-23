@@ -26,15 +26,15 @@ enum TypographyStyle {
 
     var size: CGFloat {
         switch self {
-        case .titlePrefix: return 24
-        case .body: return AppTheme.Spacing.md
-        case .subtitle: return AppTheme.Spacing.md
+        case .titlePrefix: return AppTheme.Typography.Size.xl
+        case .body: return AppTheme.Typography.Size.md
+        case .subtitle: return AppTheme.Typography.Size.md
         }
     }
 
     var lineHeight: CGFloat? {
         switch self {
-        case .titlePrefix: return 29
+        case .titlePrefix: return AppTheme.Typography.Line.title29
         case .body: return nil
         case .subtitle: return nil
         }
@@ -42,9 +42,9 @@ enum TypographyStyle {
 
     var tracking: CGFloat? {
         switch self {
-        case .titlePrefix: return -0.48
+        case .titlePrefix: return AppTheme.Typography.Tracking.titleXL
         case .body: return nil
-        case .subtitle: return -0.08
+        case .subtitle: return AppTheme.Typography.Tracking.body
         }
     }
 
@@ -77,7 +77,7 @@ struct CustomFontModifier: ViewModifier {
 extension View {
     func customFont(
         _ font: CustomFont = .regular,
-        size: CGFloat = AppTheme.Spacing.md, // 16 is default
+        size: CGFloat = AppTheme.Typography.Size.md,
         lineHeight: CGFloat? = nil,
         tracking: CGFloat? = nil
     ) -> some View {

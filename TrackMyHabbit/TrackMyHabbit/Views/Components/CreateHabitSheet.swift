@@ -59,14 +59,14 @@ struct CreateHabitSheet: View {
                         dismiss()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 20, weight: .medium))
+                            .font(.system(size: AppTheme.Typography.Size.lg, weight: .medium))
                             .foregroundColor(AppTheme.Colors.textPrimary)
-                            .frame(width: 48, height: 48)
+                            .frame(width: AppTheme.Layout.navIconSize, height: AppTheme.Layout.navIconSize)
                             .background(
                                 Circle()
                                     .fill(AppTheme.Colors.bgPrimary)
-                                    .overlay(Circle().stroke(AppTheme.Colors.bgPrimary, lineWidth: 1))
-                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
+                                    .overlay(Circle().stroke(AppTheme.Colors.bgPrimary, lineWidth: AppTheme.Spacing.hairline))
+                                    .appShadow(AppTheme.Elevation.floatingCircularButton)
                             )
                     }
                     
@@ -75,18 +75,18 @@ struct CreateHabitSheet: View {
                     // Action buttons container (Delete + Confirm)
                     let hasName = !habitName.trimmingCharacters(in: .whitespaces).isEmpty
                     
-                    HStack(spacing: 12) {
+                    HStack(spacing: AppTheme.Spacing.sm3) {
                         // Delete button — only visible in edit mode
                         if isEditMode {
                             Button(action: { showDeleteAlert = true }) {
                                 Image(systemName: "trash")
-                                    .font(.system(size: 20, weight: .medium))
-                                    .foregroundColor(Color(hex: "#E53935"))
-                                    .frame(width: 48, height: 48)
+                                    .font(.system(size: AppTheme.Typography.Size.lg, weight: .medium))
+                                    .foregroundColor(AppTheme.Colors.destructive)
+                                    .frame(width: AppTheme.Layout.navIconSize, height: AppTheme.Layout.navIconSize)
                                     .background(
                                         Circle()
                                             .fill(AppTheme.Colors.bgPrimary)
-                                            .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
+                                            .appShadow(AppTheme.Elevation.floatingCircularButton)
                                     )
                             }
                         }
@@ -94,13 +94,13 @@ struct CreateHabitSheet: View {
                         // Confirm button
                         Button(action: saveHabit) {
                             Image(systemName: "checkmark")
-                                .font(.system(size: 20, weight: .semibold))
+                                .font(.system(size: AppTheme.Typography.Size.lg, weight: .semibold))
                                 .foregroundColor(hasName ? AppTheme.Colors.systemBlue : AppTheme.Colors.textDisabled)
-                                .frame(width: 48, height: 48)
+                                .frame(width: AppTheme.Layout.navIconSize, height: AppTheme.Layout.navIconSize)
                                 .background(
                                     Circle()
                                         .fill(AppTheme.Colors.bgPrimary)
-                                        .shadow(color: Color(hex: "#5E5E72").opacity(0.4), radius: 56, x: 0, y: 4.416)
+                                        .appShadow(AppTheme.Elevation.floatingCircularButton)
                                 )
                         }
                         .disabled(!hasName)
@@ -116,11 +116,11 @@ struct CreateHabitSheet: View {
                         // Input Section
                         VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
                             Text("I want to")
-                                .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                                .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                             
                             TextField("", text: $habitName, prompt: Text("Enter your habit").foregroundColor(AppTheme.Colors.textDisabled))
-                                .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                                .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .tint(AppTheme.Colors.primary) // cursor color
                                 .focused($isInputFocused)
@@ -135,8 +135,8 @@ struct CreateHabitSheet: View {
                                 frequencyInlineView
                             }
                         }
-                        .padding(.top, 40)
-                        .padding(.bottom, 32)
+                        .padding(.top, AppTheme.Spacing.sectionTop)
+                        .padding(.bottom, AppTheme.Spacing.sectionBottom)
                         
                         Divider()
                             .background(AppTheme.Neutral._300)
@@ -145,34 +145,34 @@ struct CreateHabitSheet: View {
                         // Suggestions Section
                         VStack(alignment: .leading, spacing: 0) {
                             Text("Trying to build a habit? Start small")
-                                .customFont(.semibold, size: 16, tracking: -0.32)
+                                .customFont(.semibold, size: AppTheme.Typography.Size.md, tracking: AppTheme.Typography.Tracking.tight)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
                                 .padding(.bottom, AppTheme.Spacing.xs)
                             
                             Text("Here are a few suggestions to start off!")
-                                .customFont(.medium, size: 16, tracking: -0.08)
+                                .customFont(.medium, size: AppTheme.Typography.Size.md, tracking: AppTheme.Typography.Tracking.body)
                                 .foregroundColor(AppTheme.Colors.textDisabled)
                                 .padding(.bottom, AppTheme.Spacing.xl)
                             
-                            VStack(alignment: .leading, spacing: 12) {
+                            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm3) {
                                 ForEach(suggestions, id: \.self) { suggestion in
                                     Button(action: {
                                         habitName = suggestion
                                         isInputFocused = true
                                     }) {
                                         Text(suggestion)
-                                            .customFont(.medium, size: 14, tracking: -0.07)
+                                            .customFont(.medium, size: AppTheme.Typography.Size.sm, tracking: AppTheme.Typography.Tracking.suggestion)
                                             .foregroundColor(AppTheme.Colors.textPrimary)
-                                            .padding(.horizontal, 12)
-                                            .padding(.vertical, 8)
+                                            .padding(.horizontal, AppTheme.Spacing.sm3)
+                                            .padding(.vertical, AppTheme.Spacing.sm)
                                             .background(
-                                                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                                                RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
                                                     .fill(AppTheme.Colors.bgPrimary)
                                                     .overlay(
-                                                        RoundedRectangle(cornerRadius: 24, style: .continuous)
-                                                            .stroke(AppTheme.Colors.bgTertiary, lineWidth: 1)
+                                                        RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
+                                                            .stroke(AppTheme.Colors.bgTertiary, lineWidth: AppTheme.Spacing.hairline)
                                                     )
-                                                    .shadow(color: Color(hex: "#5E5E72").opacity(0.2), radius: 56, x: 0, y: 4.416)
+                                                    .appShadow(AppTheme.Elevation.suggestionChip)
                                             )
                                     }
                                 }
@@ -180,7 +180,7 @@ struct CreateHabitSheet: View {
                         }
                         
                         // Bottom Padding for scroll
-                        Spacer().frame(height: anySheetVisible ? 380 : AppTheme.Spacing.xxxl)
+                        Spacer().frame(height: anySheetVisible ? AppTheme.Spacing.sheetScrollReserve : AppTheme.Spacing.xxxl)
                     }
                     .padding(.horizontal, AppTheme.Spacing.lg)
                 }
@@ -254,33 +254,33 @@ struct CreateHabitSheet: View {
             // Simple: just "everyday." / "every weekday." / "every weekend."
             Button(action: presentFrequencySheet) {
                 Text(freq.simpleInlineLabel)
-                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .underline()
             }
             .scaleEffect(frequencyScale)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+            .animation(AppTheme.Motion.springFrequency, value: frequencyScale)
             
         case "every_week":
             // "every week, on  wednesday" — single line
-            HStack(spacing: 8) {
+            HStack(spacing: AppTheme.Spacing.sm) {
                 HStack(spacing: 0) {
                     Button(action: presentFrequencySheet) {
                         Text("every week,")
-                            .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                            .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .underline()
                     }
                     Text(" on")
-                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 .scaleEffect(frequencyScale)
-                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+                .animation(AppTheme.Motion.springFrequency, value: frequencyScale)
                 
                 Button(action: presentDayOfWeekSheet) {
                     Text(selectedDayOfWeek.name.lowercased())
-                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .underline()
                 }
@@ -288,24 +288,24 @@ struct CreateHabitSheet: View {
             
         case "every_month":
             // "every month, on the  23rd" — single line
-            HStack(spacing: 8) {
+            HStack(spacing: AppTheme.Spacing.sm) {
                 HStack(spacing: 0) {
                     Button(action: presentFrequencySheet) {
                         Text("every month,")
-                            .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                            .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .underline()
                     }
                     Text(" on the")
-                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 .scaleEffect(frequencyScale)
-                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+                .animation(AppTheme.Motion.springFrequency, value: frequencyScale)
                 
                 Button(action: presentDayOfMonthSheet) {
                     Text(ordinalSuffix(for: selectedDayOfMonth))
-                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .underline()
                 }
@@ -313,31 +313,31 @@ struct CreateHabitSheet: View {
             
         case "every_year":
             // "every year, on  March  23rd" — single line
-            HStack(spacing: 8) {
+            HStack(spacing: AppTheme.Spacing.sm) {
                 HStack(spacing: 0) {
                     Button(action: presentFrequencySheet) {
                         Text("every year,")
-                            .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                            .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .underline()
                     }
                     Text(" on")
-                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                 }
                 .scaleEffect(frequencyScale)
-                .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+                .animation(AppTheme.Motion.springFrequency, value: frequencyScale)
                 
                 Button(action: presentMonthSheet) {
                     Text(selectedMonth.name)
-                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .underline()
                 }
                 
                 Button(action: presentDayOfMonthSheet) {
                     Text(ordinalSuffix(for: selectedDayOfMonth))
-                        .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                         .foregroundColor(AppTheme.Colors.textPrimary)
                         .underline()
                 }
@@ -346,12 +346,12 @@ struct CreateHabitSheet: View {
         default:
             Button(action: presentFrequencySheet) {
                 Text(freq.simpleInlineLabel)
-                    .customFont(.semibold, size: 24, lineHeight: 29, tracking: -0.48)
+                    .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title29, tracking: AppTheme.Typography.Tracking.titleXL)
                     .foregroundColor(AppTheme.Colors.textPrimary)
                     .underline()
             }
             .scaleEffect(frequencyScale)
-            .animation(.spring(response: 0.3, dampingFraction: 0.6), value: frequencyScale)
+            .animation(AppTheme.Motion.springFrequency, value: frequencyScale)
         }
     }
     
@@ -379,10 +379,10 @@ struct CreateHabitSheet: View {
     private func presentFrequencySheet() {
         isInputFocused = false
         
-        withAnimation(.easeOut(duration: 0.1)) {
+        withAnimation(AppTheme.Motion.easeFrequencyPress) {
             frequencyScale = 0.96
         }
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+        DispatchQueue.main.asyncAfter(deadline: .now() + AppTheme.Motion.durationInstant) {
             frequencyScale = 1.0
             showFrequencySheet = true
         }

@@ -8,8 +8,8 @@ struct EmptyState: View {
         GeometryReader { geometry in
             let safeBottom = geometry.safeAreaInsets.bottom
             let availableWidth = geometry.size.width
-            let heroSize = min(availableWidth, 402)
-            let illustrationHeight = heroSize * (456.0 / 402.0)
+            let heroSize = min(availableWidth, AppTheme.Layout.emptyHeroWidth)
+            let illustrationHeight = heroSize * AppTheme.Layout.emptyHeroAspect
 
             ZStack {
                 AppTheme.Colors.emptyStateBackground
@@ -32,34 +32,34 @@ struct EmptyState: View {
 
                     Spacer(minLength: geometry.size.height * 0.02)
 
-                    VStack(alignment: .leading, spacing: 12) {
+                    VStack(alignment: .leading, spacing: AppTheme.Spacing.sm3) {
                         Text("")
-                            .customFont(.medium, size: 24, lineHeight: 28.8, tracking: -0.48)
-                            .foregroundColor(AppTheme.Colors.textSecondary.opacity(0.5))
+                            .customFont(.medium, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
+                            .foregroundColor(AppTheme.Colors.textSecondary.opacity(AppTheme.Opacity.emptyStatePlaceholder))
 
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                             Text("Meet your better self.")
-                                .customFont(.serifsemibold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
 
                             Text("Small habits. Big change.")
-                                .customFont(.serifsemibold, size: 24, lineHeight: 28.8, tracking: -0.48)
+                                .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
                     .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
-                    .padding(.vertical, 8)
+                    .padding(.horizontal, AppTheme.Spacing.lg)
+                    .padding(.vertical, AppTheme.Spacing.sm)
 
-                    Spacer(minLength: 18)
+                    Spacer(minLength: AppTheme.Spacing.relaxed)
 
                     Button(action: onCreateHabit) {
                         Text("Continue")
                     }
                     .buttonStyle(EmptyStateCTAButtonStyle())
-                    .padding(.horizontal, 20)
+                    .padding(.horizontal, AppTheme.Spacing.lg)
 
-                    Spacer(minLength: max(20, safeBottom + 8))
+                    Spacer(minLength: max(AppTheme.Spacing.lg, safeBottom + AppTheme.Spacing.sm))
                 }
             }
         }
@@ -71,7 +71,7 @@ private struct EmptyStateCTA: View {
     var title: String
     var isPressed: Bool
 
-    private let cornerRadius: CGFloat = 56
+    private let cornerRadius: CGFloat = AppTheme.Radius.pill
 
     private var navyRimY: CGFloat { isPressed ? 2.0 : 3.45 }
     private let navyRimLineWidth: CGFloat = 5.5
@@ -83,28 +83,18 @@ private struct EmptyStateCTA: View {
     private let bottomLightRimWidth: CGFloat = 2.4
     private let bottomLightRimOpacity: Double = 0.36
 
-    /// Figma `0px 1px 2px rgba(94,94,114,0.3)` — fixed; not tied to press.
-    private let outerShadowY: CGFloat = 1
-    private let outerShadowRadius: CGFloat = 1.25
-    private let outerShadowOpacity: Double = 0.3
-
     var body: some View {
-        HStack(alignment: .center, spacing: 8) {
+        HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
             Text(title)
-                .customFont(.semibold, size: 16, lineHeight: 19.2, tracking: -0.32)
+                .customFont(.semibold, size: AppTheme.Typography.Size.md, lineHeight: AppTheme.Typography.Line.body192, tracking: AppTheme.Typography.Tracking.tight)
                 .foregroundColor(AppTheme.Neutral._0)
         }
-        .padding(.horizontal, 8)
-        .padding(.vertical, 20)
+        .padding(.horizontal, AppTheme.Spacing.sm)
+        .padding(.vertical, AppTheme.Spacing.lg)
         .frame(maxWidth: .infinity, alignment: .center)
         .background(ctaBackground)
         .compositingGroup()
-        .shadow(
-            color: Color(red: 94 / 255, green: 94 / 255, blue: 114 / 255).opacity(outerShadowOpacity),
-            radius: outerShadowRadius,
-            x: 0,
-            y: outerShadowY
-        )
+        .appShadow(AppTheme.Elevation.ctaOuter)
     }
 
     private var ctaBackground: some View {
@@ -114,7 +104,7 @@ private struct EmptyStateCTA: View {
             .fill(figmaGradient)
             .innerInsetRim(
                 shape: shape,
-                color: Color(red: 0.07, green: 0.11, blue: 0.36).opacity(0.2),
+                color: AppTheme.Colors.ctaInsetNavy.opacity(0.2),
                 lineWidth: navyRimLineWidth,
                 blur: 0,
                 offsetX: 0,
@@ -122,7 +112,7 @@ private struct EmptyStateCTA: View {
             )
             .innerInsetRim(
                 shape: shape,
-                color: Color.black.opacity(0.2),
+                color: AppTheme.Overlay.black020,
                 lineWidth: navyRimAccentWidth,
                 blur: 0,
                 offsetX: 0,
@@ -138,7 +128,7 @@ private struct EmptyStateCTA: View {
             )
             .overlay(
                 shape.stroke(
-                    Color(red: 138 / 255, green: 138 / 255, blue: 159 / 255).opacity(0.23),
+                    AppTheme.Colors.ctaHairline,
                     lineWidth: hairline
                 )
             )
@@ -213,7 +203,7 @@ private struct EmptyStateCTAButtonStyle: ButtonStyle {
                 .hidden()
                 .accessibilityHidden(true)
         }
-        .animation(.spring(response: 0.18, dampingFraction: 0.86), value: configuration.isPressed)
+        .animation(AppTheme.Motion.springCTA, value: configuration.isPressed)
     }
 }
 
@@ -221,8 +211,8 @@ private struct EmptyStateBackgroundPattern: View {
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
-            let dotSpacing: CGFloat = 22
-            let dotRadius: CGFloat = 1.2
+            let dotSpacing: CGFloat = AppTheme.Layout.patternDotSpacing
+            let dotRadius: CGFloat = AppTheme.Layout.patternDotRadius
 
             Canvas { context, _ in
                 let cols = Int(ceil(size.width / dotSpacing))
@@ -233,15 +223,15 @@ private struct EmptyStateBackgroundPattern: View {
                         let x = CGFloat(c) * dotSpacing + dotSpacing * 0.5
                         let y = CGFloat(r) * dotSpacing + dotSpacing * 0.5
                         let rect = CGRect(x: x - dotRadius, y: y - dotRadius, width: dotRadius * 2, height: dotRadius * 2)
-                        context.fill(Path(ellipseIn: rect), with: .color(AppTheme.Neutral._500.opacity(0.10)))
+                        context.fill(Path(ellipseIn: rect), with: .color(AppTheme.Neutral._500.opacity(AppTheme.Layout.patternDotOpacity)))
                     }
                 }
             }
             .mask(
                 RadialGradient(
                     gradient: Gradient(stops: [
-                        .init(color: Color.black.opacity(0.55), location: 0),
-                        .init(color: Color.black.opacity(0.0), location: 1)
+                        .init(color: AppTheme.Overlay.black055, location: 0),
+                        .init(color: AppTheme.Overlay.black000, location: 1)
                     ]),
                     center: .center,
                     startRadius: 0,

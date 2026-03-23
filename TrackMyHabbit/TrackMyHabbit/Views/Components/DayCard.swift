@@ -50,14 +50,9 @@ struct DayCard: View {
         }
         .frame(width: cardWidth, height: cardHeight)
         .background(
-            RoundedRectangle(cornerRadius: 24)
+            RoundedRectangle(cornerRadius: AppTheme.Radius.xl)
                 .fill(AppTheme.Neutral._0)
-                .shadow(
-                    color: Color(hex: "#5E5E72").opacity(isActive ? 0.2 : 0.08),
-                    radius: isActive ? 56 : 36,
-                    x: 0,
-                    y: 2
-                )
+                .appShadow(AppTheme.Elevation.dayCard(isActive: isActive))
         )
     }
 
@@ -69,33 +64,33 @@ struct DayCard: View {
                         .resizable()
                         .aspectRatio(contentMode: .fill)
                 } placeholder: {
-                    Color.gray.opacity(0.3)
+                    AppTheme.Overlay.grayPhotoPlaceholder
                 }
                 .frame(width: proxy.size.width, height: proxy.size.height)
                 .clipped()
             } else {
-                Color.gray.opacity(0.3)
+                AppTheme.Overlay.grayPhotoPlaceholder
             }
 
             VStack {
                 Spacer()
                 LinearGradient(
-                    colors: [.clear, Color.black.opacity(0.18)],
+                    colors: [.clear, AppTheme.Overlay.black018],
                     startPoint: .top,
                     endPoint: .bottom
                 )
-                .frame(height: 80)
+                .frame(height: AppTheme.Layout.photoGradientHeight)
                 .overlay(
-                    VStack(alignment: .leading, spacing: 4) {
+                    VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                         Text(DateUtils.formatDate(dateStr))
-                            .customFont(isActive ? .semibold : .medium, size: isActive ? 16 : 14, tracking: isActive ? -0.08 : 0)
+                            .customFont(isActive ? .semibold : .medium, size: isActive ? AppTheme.Typography.Size.md : AppTheme.Typography.Size.sm, tracking: isActive ? AppTheme.Typography.Tracking.body : 0)
                             .foregroundColor(AppTheme.Neutral._0)
-                            .shadow(color: .black.opacity(0.22), radius: 3, x: 0, y: 1)
+                            .appShadow(AppTheme.Elevation.photoLabelText)
 
                         Text(DateUtils.getRelativeLabel(dateStr))
-                            .customFont(.medium, size: 12)
+                            .customFont(.medium, size: AppTheme.Typography.Size.xs)
                             .foregroundColor(AppTheme.Neutral._0)
-                            .shadow(color: .black.opacity(0.22), radius: 3, x: 0, y: 1)
+                            .appShadow(AppTheme.Elevation.photoLabelText)
                     }
                     .padding(.horizontal, AppTheme.Spacing.lg)
                     .padding(.bottom, AppTheme.Spacing.md),
@@ -104,19 +99,19 @@ struct DayCard: View {
             }
         }
         .background(AppTheme.Neutral._0)
-        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 24, style: .continuous)
-                .stroke(isActive ? AppTheme.Neutral._0 : Color(hex: "#EDEFF3"), lineWidth: 1)
+            RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
+                .stroke(isActive ? AppTheme.Neutral._0 : AppTheme.Colors.bgTertiary, lineWidth: AppTheme.Spacing.hairline)
         )
     }
 
     private var emptyCard: some View {
-        RoundedRectangle(cornerRadius: 24, style: .continuous)
+        RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
             .fill(
                 isActive
                 ? LinearGradient(
-                    colors: [Color(hex: "#E2E8FF"), AppTheme.Neutral._0],
+                    colors: [AppTheme.Colors.gradientDayCardStart, AppTheme.Neutral._0],
                     startPoint: .top,
                     endPoint: .bottom
                 )
@@ -127,29 +122,29 @@ struct DayCard: View {
                 )
             )
             .overlay(
-                RoundedRectangle(cornerRadius: 24, style: .continuous)
-                    .stroke(isActive ? AppTheme.Neutral._0 : Color(hex: "#EDEFF3"), lineWidth: 1)
+                RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
+                    .stroke(isActive ? AppTheme.Neutral._0 : AppTheme.Colors.bgTertiary, lineWidth: AppTheme.Spacing.hairline)
             )
             .overlay(alignment: .topLeading) {
-                HStack(spacing: isActive ? 8 : 6) {
+                HStack(spacing: isActive ? AppTheme.Spacing.sm : AppTheme.Layout.habitChipSpacing) {
                     Image(systemName: "plus")
-                        .font(.system(size: 16, weight: .semibold))
+                        .font(.system(size: AppTheme.Typography.Size.md, weight: .semibold))
 
                     Text("Add photo")
-                        .customFont(.semibold, size: 16, lineHeight: 22.4, tracking: -0.32)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.md, lineHeight: AppTheme.Typography.Line.body224, tracking: AppTheme.Typography.Tracking.tight)
                 }
                 .foregroundColor(isActive ? AppTheme.Colors.textPrimary : AppTheme.Colors.textSecondary)
-                .padding(20)
+                .padding(AppTheme.Spacing.lg)
             }
             .overlay(alignment: .bottomLeading) {
-                VStack(alignment: .leading, spacing: 4) {
+                VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                     Text(DateUtils.formatDate(dateStr))
-                        .customFont(isActive ? .semibold : .medium, size: isActive ? 16 : 14, lineHeight: isActive ? 22.4 : 19.6, tracking: isActive ? -0.08 : 0)
+                        .customFont(isActive ? .semibold : .medium, size: isActive ? AppTheme.Typography.Size.md : AppTheme.Typography.Size.sm, lineHeight: isActive ? AppTheme.Typography.Line.body224 : AppTheme.Typography.Line.body196, tracking: isActive ? AppTheme.Typography.Tracking.body : 0)
                     Text(DateUtils.getRelativeLabel(dateStr))
-                        .customFont(.medium, size: 12)
+                        .customFont(.medium, size: AppTheme.Typography.Size.xs)
                 }
                 .foregroundColor(isActive ? AppTheme.Colors.textPrimary : AppTheme.Colors.textSecondary)
-                .padding(20)
+                .padding(AppTheme.Spacing.lg)
             }
     }
 }

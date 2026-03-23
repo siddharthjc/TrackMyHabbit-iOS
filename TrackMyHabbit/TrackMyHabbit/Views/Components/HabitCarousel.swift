@@ -10,14 +10,14 @@ struct HabitCarousel: View {
     @State private var currentIndex: Int = 0
     @State private var dragOffset: CGFloat = 0
 
-    private let cardWidth: CGFloat = 288
-    private let cardHeight: CGFloat = 397
-    private let scaleStep: CGFloat = 0.9
-    private let cardStep: CGFloat = 47 // cardWidth + HStack spacing (-241) from Figma
-    private let maxVisibleBehind: Int = 2
-    private let swipeThreshold: CGFloat = 60
+    private var cardWidth: CGFloat { AppTheme.Layout.dayCardWidth }
+    private var cardHeight: CGFloat { AppTheme.Layout.dayCardHeight }
+    private var scaleStep: CGFloat { AppTheme.Layout.carouselScaleStep }
+    private var cardStep: CGFloat { AppTheme.Layout.carouselCardStep }
+    private var maxVisibleBehind: Int { AppTheme.Layout.carouselMaxVisibleBehind }
+    private var swipeThreshold: CGFloat { AppTheme.Layout.carouselSwipeThreshold }
     private let screenWidth: CGFloat = UIScreen.main.bounds.width
-    private let leftPeekFromEdge: CGFloat = 12
+    private var leftPeekFromEdge: CGFloat { AppTheme.Layout.carouselLeftPeek }
 
     /// Days ordered from newest (today) to oldest.
     private var orderedDays: [String] {
@@ -32,11 +32,11 @@ struct HabitCarousel: View {
             }
         }
         .offset(x: centeringOffset)
-        .frame(height: cardHeight + 160)
+        .frame(height: cardHeight + AppTheme.Layout.carouselExtraHeight)
         .frame(maxWidth: .infinity)
         .contentShape(Rectangle())
         .gesture(swipeGesture)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, AppTheme.Spacing.lg)
         .onAppear {
             refreshDaysIfNeeded()
         }
@@ -56,7 +56,7 @@ struct HabitCarousel: View {
         let deepestRightEdge = behindCount * cardStep + (cardWidth * deepestScale) / 2
         let activeRightEdge = cardWidth / 2
         let idealOffset = -(deepestRightEdge - activeRightEdge) / 2
-        let maxLeftShift = -(screenWidth / 2 - cardWidth / 2 - 20)
+        let maxLeftShift = -(screenWidth / 2 - cardWidth / 2 - AppTheme.Layout.carouselEdgeClamp)
         return max(idealOffset, maxLeftShift)
     }
 
@@ -79,10 +79,10 @@ struct HabitCarousel: View {
         let entry = habit.entries.first(where: { $0.dateString == dateStr })
 
         let leftProgress: CGFloat = dragOffset < 0
-            ? min(-dragOffset / (cardWidth * 0.5), 1.0)
+            ? min(-dragOffset / (cardWidth * AppTheme.Layout.carouselProgressDivisor), 1.0)
             : 0
         let rightProgress: CGFloat = dragOffset > 0
-            ? min(dragOffset / (cardWidth * 0.5), 1.0)
+            ? min(dragOffset / (cardWidth * AppTheme.Layout.carouselProgressDivisor), 1.0)
             : 0
 
         let scale = cardScale(depth: depth, leftProgress: leftProgress, rightProgress: rightProgress)
@@ -101,7 +101,7 @@ struct HabitCarousel: View {
         )
         .scaleEffect(scale, anchor: .center)
         .offset(x: xOffset)
-        .zIndex(depth < 0 ? 150 : (depth == 0 ? 100 : Double(50 - depth)))
+        .zIndex(depth < 0 ? AppTheme.Layer.carouselBack : (depth == 0 ? AppTheme.Layer.carouselActive : AppTheme.Layer.carouselStackBase - Double(depth)))
         .allowsHitTesting(isActive)
     }
 
@@ -130,26 +130,26 @@ struct HabitCarousel: View {
     // MARK: - Swipe gesture
 
     private var swipeGesture: some Gesture {
-        DragGesture(minimumDistance: 20)
+        DragGesture(minimumDistance: AppTheme.Layout.carouselDragMin)
             .onChanged { value in
                 let t = value.translation.width
                 if t < 0 && currentIndex < orderedDays.count - 1 {
                     dragOffset = t
                 } else if t > 0 && currentIndex > 0 {
-                    dragOffset = t * 0.4
+                    dragOffset = t * AppTheme.Layout.carouselDragResistanceOuter
                 } else {
-                    dragOffset = t * 0.15
+                    dragOffset = t * AppTheme.Layout.carouselDragResistanceEdge
                 }
             }
             .onEnded { value in
                 let velocity = value.predictedEndTranslation.width
-                let shouldAdvance = (value.translation.width < -swipeThreshold || velocity < -500)
+                let shouldAdvance = (value.translation.width < -swipeThreshold || velocity < -AppTheme.Layout.carouselVelocityThreshold)
                     && currentIndex < orderedDays.count - 1
-                let shouldGoBack = (value.translation.width > swipeThreshold || velocity > 500)
+                let shouldGoBack = (value.translation.width > swipeThreshold || velocity > AppTheme.Layout.carouselVelocityThreshold)
                     && currentIndex > 0
 
                 if shouldAdvance || shouldGoBack {
-                    withAnimation(.spring(duration: 0.45, bounce: 0.12)) {
+                    withAnimation(AppTheme.Motion.springCarouselSettle) {
                         if shouldAdvance {
                             currentIndex += 1
                         } else {
@@ -158,7 +158,7 @@ struct HabitCarousel: View {
                         dragOffset = 0
                     }
                 } else {
-                    withAnimation(.spring(duration: 0.3, bounce: 0)) {
+                    withAnimation(AppTheme.Motion.springCarouselReset) {
                         dragOffset = 0
                     }
                 }
