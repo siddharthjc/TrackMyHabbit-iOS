@@ -16,7 +16,7 @@ struct HabitCarousel: View {
     private var cardStep: CGFloat { AppTheme.Layout.carouselCardStep }
     private var maxVisibleBehind: Int { AppTheme.Layout.carouselMaxVisibleBehind }
     private var swipeThreshold: CGFloat { AppTheme.Layout.carouselSwipeThreshold }
-    private let screenWidth: CGFloat = UIScreen.main.bounds.width
+    @State private var screenWidth: CGFloat = 393 // updated by GeometryReader
     private var leftPeekFromEdge: CGFloat { AppTheme.Layout.carouselLeftPeek }
 
     /// Days ordered from newest (today) to oldest.
@@ -37,6 +37,11 @@ struct HabitCarousel: View {
         .contentShape(Rectangle())
         .gesture(swipeGesture)
         .padding(.horizontal, AppTheme.Spacing.lg)
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { newWidth in
+            screenWidth = newWidth
+        }
         .onAppear {
             refreshDaysIfNeeded()
         }

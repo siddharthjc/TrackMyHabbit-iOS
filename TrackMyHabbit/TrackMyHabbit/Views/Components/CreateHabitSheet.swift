@@ -62,13 +62,8 @@ struct CreateHabitSheet: View {
                             .font(.system(size: AppTheme.Typography.Size.lg, weight: .medium))
                             .foregroundColor(AppTheme.Colors.textPrimary)
                             .frame(width: AppTheme.Layout.navIconSize, height: AppTheme.Layout.navIconSize)
-                            .background(
-                                Circle()
-                                    .fill(AppTheme.Colors.bgPrimary)
-                                    .overlay(Circle().stroke(AppTheme.Colors.bgPrimary, lineWidth: AppTheme.Spacing.hairline))
-                                    .appShadow(AppTheme.Elevation.floatingCircularButton)
-                            )
                     }
+                    .glassEffect(.regular, in: Circle())
                     
                     Spacer()
                     
@@ -83,12 +78,8 @@ struct CreateHabitSheet: View {
                                     .font(.system(size: AppTheme.Typography.Size.lg, weight: .medium))
                                     .foregroundColor(AppTheme.Colors.destructive)
                                     .frame(width: AppTheme.Layout.navIconSize, height: AppTheme.Layout.navIconSize)
-                                    .background(
-                                        Circle()
-                                            .fill(AppTheme.Colors.bgPrimary)
-                                            .appShadow(AppTheme.Elevation.floatingCircularButton)
-                                    )
                             }
+                            .glassEffect(.regular, in: Circle())
                         }
                         
                         // Confirm button
@@ -97,12 +88,8 @@ struct CreateHabitSheet: View {
                                 .font(.system(size: AppTheme.Typography.Size.lg, weight: .semibold))
                                 .foregroundColor(hasName ? AppTheme.Colors.systemBlue : AppTheme.Colors.textDisabled)
                                 .frame(width: AppTheme.Layout.navIconSize, height: AppTheme.Layout.navIconSize)
-                                .background(
-                                    Circle()
-                                        .fill(AppTheme.Colors.bgPrimary)
-                                        .appShadow(AppTheme.Elevation.floatingCircularButton)
-                                )
                         }
+                        .glassEffect(.regular, in: Circle())
                         .disabled(!hasName)
                     }
                 }

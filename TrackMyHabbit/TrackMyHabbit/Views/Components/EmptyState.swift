@@ -1,5 +1,4 @@
 import SwiftUI
-import UIKit
 
 struct EmptyState: View {
     let onCreateHabit: () -> Void
@@ -99,7 +98,7 @@ private struct EmptyStateCTA: View {
 
     private var ctaBackground: some View {
         let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        let hairline = 1 / max(UIScreen.main.scale, 2)
+        let hairline: CGFloat = 0.5
         return shape
             .fill(figmaGradient)
             .innerInsetRim(
