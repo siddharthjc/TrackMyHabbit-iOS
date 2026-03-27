@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 // MARK: - AppTheme (Layer 2 semantic API; mirrors tokens.css)
 
@@ -31,35 +32,67 @@ enum AppTheme {
         static let _800 = Color(hex: "#392c9d")
     }
 
-    // MARK: - Layer 2 — Semantic colors
+    // MARK: - Layer 2 — Semantic colors (light / dark; Figma dark: 263:3338, 263:3320)
 
     enum Colors {
-        static let textPrimary = Color(hex: "#16191d")
-        static let textSecondary = Color(hex: "#5b6271")
-        static let textDisabled = Color(hex: "#8c95a6")
+        private static func semantic(_ light: String, _ dark: String) -> Color {
+            Color(UIColor { tc in
+                UIColor(hex: tc.userInterfaceStyle == .dark ? dark : light)
+            })
+        }
 
-        static let bgPrimary = Neutral._0
-        static let bgSecondary = Color(hex: "#f6f7f9")
-        static let bgTertiary = Color(hex: "#edeff3")
+        private static func semantic(_ light: UIColor, _ dark: UIColor) -> Color {
+            Color(UIColor { tc in
+                tc.userInterfaceStyle == .dark ? dark : light
+            })
+        }
 
-        static let systemBlue = Color(hex: "#007aff")
-        static let primary = Brand._600
-        static let primaryLight = Brand._0
-        static let cardBorder = Brand._200
+        static let textPrimary = semantic("#16191d", "#fafafa")
+        static let textSecondary = semantic("#5b6271", "#6e6e6e")
+        static let textDisabled = semantic("#8c95a6", "#636366")
 
-        static let emptyStateBackground = Color(hex: "#f9fafa")
-        static let emptyStateCardTint = Color(hex: "#f0f3ff")
+        static let bgPrimary = semantic("#ffffff", "#171717")
+        static let bgSecondary = semantic("#f6f7f9", "#1c1c1e")
+        static let bgTertiary = semantic("#edeff3", "#2c2c2e")
+
+        /// Tab bar accent (Figma `--accents/blue`).
+        static let tabBarAccent = semantic("#007aff", "#0091ff")
+
+        static let systemBlue = Color(UIColor.systemBlue)
+        static let primary = semantic("#6253d5", "#8f84ee")
+        static let primaryLight = semantic("#f3f1ff", "#2e2654")
+        static let cardBorder = semantic("#c7c0fb", "#4a3f8a")
+
+        static let emptyStateBackground = semantic("#f9fafa", "#171717")
+        static let emptyStateCardTint = semantic("#f0f3ff", "#1c1c1e")
         static let emptyStateCTAStart = Color(hex: "#6f8eff")
         static let emptyStateCTAMid = Color(hex: "#4d6fea")
         static let emptyStateCTAEnd = Color(hex: "#5778f1")
 
-        static let destructive = Color(hex: "#e53935")
-        static let surfaceSelected = Color(hex: "#e1e5ea")
-        static let gradientDayCardStart = Color(hex: "#e2e8ff")
+        static let destructive = semantic("#e53935", "#ff453a")
+        static let surfaceSelected = semantic("#e1e5ea", "#3a3a3c")
+        static let gradientDayCardStart = semantic("#e2e8ff", "#171717")
+        static let gradientDayCardEnd = semantic("#ffffff", "#212121")
+
+        static let dayCardFill = semantic("#ffffff", "#1a1a1a")
+        static let borderSubtle = semantic("#e9e9ef", "#212121")
+        static let chipBackground = semantic("#ffffff", "#2c2c2e")
 
         /// Inset rim on empty-state CTA (matches tokens `--ds-cta-navy-rim`).
         static let ctaInsetNavy = Color(red: 18 / 255, green: 28 / 255, blue: 92 / 255)
-        static let ctaHairline = Neutral._600.opacity(0.23)
+        static let ctaHairline = semantic(
+            UIColor(red: 138 / 255, green: 138 / 255, blue: 159 / 255, alpha: 0.23),
+            UIColor(white: 1, alpha: 0.23)
+        )
+
+        /// Text on photos, gradient CTAs, and dark media (always light).
+        static let textInverse = semantic("#ffffff", "#ffffff")
+
+        /// Dotted marketing background (`EmptyStateBackgroundPattern`).
+        static let patternDot = semantic(
+            UIColor(red: 179 / 255, green: 179 / 255, blue: 195 / 255, alpha: 0.10),
+            UIColor(white: 1, alpha: 0.12)
+        )
     }
 
     // MARK: - Spacing (aligns with --space-* in tokens.css)
@@ -180,21 +213,35 @@ enum AppTheme {
     }
 
     enum Elevation {
-        static let sheet = ShadowToken(color: Neutral._700.opacity(0.2), radius: 28, x: 0, y: 4)
-        static let floatingCircularButton = ShadowToken(color: Neutral._700.opacity(0.4), radius: 56, x: 0, y: 4.416)
-        static let suggestionChip = ShadowToken(color: Neutral._700.opacity(0.2), radius: 56, x: 0, y: 4.416)
-        static let dropdownCard = ShadowToken(color: Neutral._700.opacity(0.2), radius: 56, x: 0, y: 4.416)
+        /// Neutral-tinted shadow in light; black with matched opacity in dark (`--color-shadow-neutral`).
+        private static func shadowNeutral(_ lightAlpha: CGFloat, _ darkAlpha: CGFloat) -> Color {
+            Color(UIColor { tc in
+                if tc.userInterfaceStyle == .dark {
+                    return UIColor.black.withAlphaComponent(darkAlpha)
+                }
+                return UIColor(red: 94 / 255, green: 94 / 255, blue: 114 / 255, alpha: lightAlpha)
+            })
+        }
 
+        static let sheet = ShadowToken(color: shadowNeutral(0.2, 0.38), radius: 28, x: 0, y: 4)
+        static let floatingCircularButton = ShadowToken(color: shadowNeutral(0.4, 0.45), radius: 56, x: 0, y: 4.416)
+        static let suggestionChip = ShadowToken(color: shadowNeutral(0.2, 0.32), radius: 56, x: 0, y: 4.416)
+        static let dropdownCard = ShadowToken(color: shadowNeutral(0.2, 0.35), radius: 56, x: 0, y: 4.416)
+
+        /// Light mode carousel card shadow.
         static func dayCard(isActive: Bool) -> ShadowToken {
             ShadowToken(
-                color: Neutral._700.opacity(isActive ? 0.2 : 0.08),
+                color: shadowNeutral(isActive ? 0.2 : 0.08, isActive ? 0.22 : 0.12),
                 radius: isActive ? 56 : 36,
                 x: 0,
                 y: 2
             )
         }
 
-        static let ctaOuter = ShadowToken(color: Neutral._700.opacity(0.3), radius: 1.25, x: 0, y: 1)
+        /// Figma dark (263:3329): `0px 2px 72px rgba(0,0,0,0.29)`.
+        static let dayCardDark = ShadowToken(color: Color.black.opacity(0.29), radius: 72, x: 0, y: 2)
+
+        static let ctaOuter = ShadowToken(color: shadowNeutral(0.3, 0.4), radius: 1.25, x: 0, y: 1)
 
         static let photoLabelText = ShadowToken(color: Overlay.black022, radius: 3, x: 0, y: 1)
         static let glassDark = ShadowToken(color: .black.opacity(0.12), radius: 20, x: 0, y: 10)
@@ -286,6 +333,33 @@ enum AppTheme {
 extension View {
     func appShadow(_ token: AppTheme.ShadowToken) -> some View {
         shadow(color: token.color, radius: token.radius, x: token.x, y: token.y)
+    }
+}
+
+// MARK: - UIColor hex (semantic dynamic colors)
+
+extension UIColor {
+    convenience init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3:
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6:
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8:
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (255, 0, 0, 0)
+        }
+        self.init(
+            red: CGFloat(r) / 255,
+            green: CGFloat(g) / 255,
+            blue: CGFloat(b) / 255,
+            alpha: CGFloat(a) / 255
+        )
     }
 }
 

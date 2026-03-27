@@ -267,8 +267,8 @@ struct SplashScreenView: View {
                 // Tagline — fades/slides in after logo
                 if showTagline {
                     Text("Better habits start here.")
-                        .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.nav)
-                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.nav)
+                        .foregroundColor(AppTheme.Colors.textInverse)
                         .transition(.opacity.combined(with: .move(edge: .bottom)))
                 }
 

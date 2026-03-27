@@ -24,7 +24,9 @@ Hero illustration, serif headline, and gradient CTA pill when the user has no ha
 
 ## Tokens used
 
-`AppTheme.Colors`, `AppTheme.Neutral`, `AppTheme.Spacing`, `AppTheme.Radius.pill`, `AppTheme.Elevation.ctaOuter`, `AppTheme.Motion.ctaSpring`, `AppTheme.Colors.ctaInsetNavy`, `AppTheme.Colors.ctaHairline`, `customFont`.
+`AppTheme.Colors` (`emptyStateBackground`, `patternDot`, `textPrimary`/`Secondary`, `textInverse` on CTA label, CTA gradient), `AppTheme.Spacing`, `AppTheme.Radius.pill`, `AppTheme.Elevation.ctaOuter`, `AppTheme.Motion.springCTA`, `ctaInsetNavy`, `ctaHairline`, `customFont`. Asset: `EmptyStateHero` in `Assets.xcassets`.
+
+**Appearance:** Hero uses bundled `EmptyStateHero` (3D box + habit icons illustration) in all appearances; dotted `patternDot` behind it.
 
 ## Props / API
 

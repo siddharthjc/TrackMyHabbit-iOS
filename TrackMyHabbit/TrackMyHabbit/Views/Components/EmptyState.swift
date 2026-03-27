@@ -14,7 +14,7 @@ struct EmptyState: View {
                 AppTheme.Colors.emptyStateBackground
                     .ignoresSafeArea()
 
-                EmptyStateBackgroundPattern()
+                EmptyStateBackgroundPattern(dotColor: AppTheme.Colors.patternDot)
                     .frame(width: heroSize, height: heroSize)
                     .offset(y: -geometry.size.height * 0.14)
                     .allowsHitTesting(false)
@@ -38,11 +38,11 @@ struct EmptyState: View {
 
                         VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                             Text("Meet your better self.")
-                                .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
+                                .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
 
                             Text("Small habits. Big change.")
-                                .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
+                                .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
@@ -86,7 +86,7 @@ private struct EmptyStateCTA: View {
         HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
             Text(title)
                 .customFont(.semibold, size: AppTheme.Typography.Size.md, lineHeight: AppTheme.Typography.Line.body192, tracking: AppTheme.Typography.Tracking.tight)
-                .foregroundColor(AppTheme.Neutral._0)
+                .foregroundColor(AppTheme.Colors.textInverse)
         }
         .padding(.horizontal, AppTheme.Spacing.sm)
         .padding(.vertical, AppTheme.Spacing.lg)
@@ -133,7 +133,6 @@ private struct EmptyStateCTA: View {
             )
     }
 
-    /// Figma: `to-b` from `#6f8eff`, via `#4d6fea` @ 85.222%, to `#5778f1` with end ~155.56% (`shadow-[...to-[155.56%]...]`).
     private var figmaGradient: LinearGradient {
         LinearGradient(
             stops: [
@@ -147,7 +146,6 @@ private struct EmptyStateCTA: View {
     }
 }
 
-/// Stroke + offset + `mask(shape)` — inner rim; optional blur (CTA uses `0` for crisp edges).
 private struct InnerInsetRimModifier<S: Shape>: ViewModifier {
     let shape: S
     var color: Color
@@ -193,7 +191,6 @@ private extension View {
     }
 }
 
-/// `isPressed` only drives navy rim **Y**; white rim and outer shadow stay fixed.
 private struct EmptyStateCTAButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
@@ -207,6 +204,8 @@ private struct EmptyStateCTAButtonStyle: ButtonStyle {
 }
 
 private struct EmptyStateBackgroundPattern: View {
+    var dotColor: Color
+
     var body: some View {
         GeometryReader { proxy in
             let size = proxy.size
@@ -222,7 +221,7 @@ private struct EmptyStateBackgroundPattern: View {
                         let x = CGFloat(c) * dotSpacing + dotSpacing * 0.5
                         let y = CGFloat(r) * dotSpacing + dotSpacing * 0.5
                         let rect = CGRect(x: x - dotRadius, y: y - dotRadius, width: dotRadius * 2, height: dotRadius * 2)
-                        context.fill(Path(ellipseIn: rect), with: .color(AppTheme.Neutral._500.opacity(AppTheme.Layout.patternDotOpacity)))
+                        context.fill(Path(ellipseIn: rect), with: .color(dotColor))
                     }
                 }
             }
@@ -243,4 +242,9 @@ private struct EmptyStateBackgroundPattern: View {
 
 #Preview {
     EmptyState {}
+}
+
+#Preview("Dark") {
+    EmptyState {}
+        .environment(\.colorScheme, .dark)
 }

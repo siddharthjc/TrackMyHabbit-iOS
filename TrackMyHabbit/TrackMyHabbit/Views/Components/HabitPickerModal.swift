@@ -44,7 +44,7 @@ struct HabitPickerModal: View {
                     .listRowInsets(EdgeInsets(top: 0, leading: AppTheme.Spacing.xl, bottom: 0, trailing: AppTheme.Spacing.xl))
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.visible)
-                    .listRowSeparatorTint(AppTheme.Neutral._300)
+                    .listRowSeparatorTint(AppTheme.Colors.borderSubtle)
                 }
             }
             .listStyle(.plain)

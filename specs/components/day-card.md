@@ -23,7 +23,9 @@ Photo card or empty gradient card for a single day, with date labels and optiona
 
 ## Tokens used
 
-`AppTheme.Colors`, `AppTheme.Neutral`, `AppTheme.Spacing`, `AppTheme.Radius.xl`, `AppTheme.Elevation.dayCardActive`, `AppTheme.Elevation.dayCardInactive`, `AppTheme.Elevation.photoLabelText`, `customFont`.
+`AppTheme.Colors` (`dayCardFill`, `gradientDayCardStart`/`End`, `borderSubtle`, `textPrimary`/`Secondary`, `textInverse` on photo scrim), `AppTheme.Spacing`, `AppTheme.Radius.xl`, `AppTheme.Elevation.dayCard` / `dayCardDark`, `AppTheme.Elevation.photoLabelText`, `customFont`.
+
+**Appearance:** Dark mode uses `dayCardDark` shadow and `#212121` border via `borderSubtle`; light mode keeps white hairline on active empty card via `textInverse`.
 
 ## Props / API
 

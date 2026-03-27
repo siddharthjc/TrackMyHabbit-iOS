@@ -155,7 +155,7 @@ struct FrequencyBottomSheet: View {
                     }
                 }
                 .padding(AppTheme.Spacing.lg)
-                .background(AppTheme.Colors.bgPrimary)
+                .background(AppTheme.Colors.bgSecondary)
                 .cornerRadius(AppTheme.Radius.xl)
                 .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
@@ -220,7 +220,7 @@ struct DayOfWeekBottomSheet: View {
                     }
                 }
                 .padding(AppTheme.Spacing.lg)
-                .background(AppTheme.Colors.bgPrimary)
+                .background(AppTheme.Colors.bgSecondary)
                 .cornerRadius(AppTheme.Radius.xl)
                 .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
@@ -290,7 +290,7 @@ struct DayOfMonthBottomSheet: View {
                     }
                 }
                 .frame(maxHeight: 320)
-                .background(AppTheme.Colors.bgPrimary)
+                .background(AppTheme.Colors.bgSecondary)
                 .cornerRadius(AppTheme.Radius.xl)
                 .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
@@ -360,7 +360,7 @@ struct MonthPickerBottomSheet: View {
                     }
                 }
                 .frame(maxHeight: 320)
-                .background(AppTheme.Colors.bgPrimary)
+                .background(AppTheme.Colors.bgSecondary)
                 .cornerRadius(AppTheme.Radius.xl)
                 .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)

@@ -53,7 +53,7 @@ struct ContentView: View {
                     Label(AppTab.add.title, systemImage: AppTab.add.icon)
                 }
             }
-            .tint(AppTheme.Colors.emptyStateCTAMid)
+            .tint(AppTheme.Colors.tabBarAccent)
             .tabBarMinimizeBehavior(.onScrollDown)
             .onAppear {
                 if activeHabitId == nil, let first = habits.first {
@@ -287,4 +287,10 @@ private struct CalendarPlaceholderView: View {
 #Preview {
     ContentView()
         .modelContainer(for: Habit.self, inMemory: true)
+}
+
+#Preview("Dark") {
+    ContentView()
+        .modelContainer(for: Habit.self, inMemory: true)
+        .environment(\.colorScheme, .dark)
 }

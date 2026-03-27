@@ -26,6 +26,8 @@ Animated logo (vector shape + gradient + inner treatments) and tagline on splash
 
 `AppTheme.Colors` (CTA gradient, stroke, background), `AppTheme.Motion.splash*`, `customFont`.
 
+**Appearance:** Canvas uses `emptyStateBackground` (light/dark semantic); tagline uses `textSecondary`.
+
 ## Props / API
 
 - `onFinished: () -> Void`

@@ -18,7 +18,7 @@ struct HabitSwitcher: View {
                 if habitCount >= 2 {
                     Image(systemName: "chevron.down")
                         .font(.system(size: AppTheme.Typography.Size.md, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .foregroundColor(AppTheme.Colors.textInverse)
                 }
             }
         }

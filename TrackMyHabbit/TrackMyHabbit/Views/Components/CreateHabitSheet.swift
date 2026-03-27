@@ -126,7 +126,7 @@ struct CreateHabitSheet: View {
                         .padding(.bottom, AppTheme.Spacing.sectionBottom)
                         
                         Divider()
-                            .background(AppTheme.Neutral._300)
+                            .background(AppTheme.Colors.borderSubtle)
                             .padding(.bottom, AppTheme.Spacing.xl)
                         
                         // Suggestions Section
@@ -154,10 +154,10 @@ struct CreateHabitSheet: View {
                                             .padding(.vertical, AppTheme.Spacing.sm)
                                             .background(
                                                 RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
-                                                    .fill(AppTheme.Colors.bgPrimary)
+                                                    .fill(AppTheme.Colors.chipBackground)
                                                     .overlay(
                                                         RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
-                                                            .stroke(AppTheme.Colors.bgTertiary, lineWidth: AppTheme.Spacing.hairline)
+                                                            .stroke(AppTheme.Colors.borderSubtle, lineWidth: AppTheme.Spacing.hairline)
                                                     )
                                                     .appShadow(AppTheme.Elevation.suggestionChip)
                                             )

@@ -80,6 +80,10 @@
   --color-destructive: var(--ds-destructive, #e53935);
   --color-surface-selected: var(--ds-surface-selected, #e1e5ea);
   --color-gradient-daycard-start: var(--ds-gradient-daycard-start, #e2e8ff);
+  --color-gradient-daycard-end: #ffffff;
+  --color-day-card-fill: var(--ds-neutral-0, #ffffff);
+  --color-chip-background: var(--ds-neutral-0, #ffffff);
+  --color-tab-bar-accent: var(--ds-system-blue, #007aff);
 
   --color-shadow-neutral: var(--ds-neutral-700, #5e5e72);
   --color-stroke-logo: var(--ds-neutral-600, #8a8a9f);
@@ -185,4 +189,46 @@
   --duration-spring-peek-bounce: 0.12;
   --duration-spring-reset-response: 0.3s;
   --duration-spring-reset-bounce: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dark appearance — mirrors AppTheme.Colors semantic (Figma 263:3338, 263:3320) */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #fafafa;
+    --color-text-secondary: #6e6e6e;
+    --color-text-disabled: #636366;
+    --color-text-inverse: #171717;
+
+    --color-bg-primary: #171717;
+    --color-bg-secondary: #1c1c1e;
+    --color-bg-tertiary: #2c2c2e;
+    --color-bg-splash: #171717;
+    --color-bg-empty: #171717;
+    --color-bg-empty-card-tint: #1c1c1e;
+
+    --color-border-subtle: #212121;
+    --color-border-card: #212121;
+    --color-border-brand: #4a3f8a;
+
+    --color-link: #0091ff;
+    --color-brand-primary: #8f84ee;
+    --color-brand-primary-light: #2e2654;
+
+    --color-destructive: #ff453a;
+    --color-surface-selected: #3a3a3c;
+    --color-gradient-daycard-start: #171717;
+    --color-gradient-daycard-end: #212121;
+    --color-day-card-fill: #1a1a1a;
+    --color-chip-background: #2c2c2e;
+    --color-tab-bar-accent: #0091ff;
+
+    --color-shadow-neutral: #000000;
+    --color-stroke-logo: #8e8e93;
+
+    --color-interactive-hover-overlay: rgba(255, 255, 255, 0.06);
+    --color-interactive-pressed-overlay: rgba(255, 255, 255, 0.12);
+  }
 }

@@ -43,6 +43,7 @@ struct TrackMyHabbitApp: App {
 
     var body: some Scene {
         WindowGroup {
+            // Inherits `UIUserInterfaceStyle` from the system (Light / Dark); no forced appearance.
             if showSplash {
                 SplashScreenView {
                     showSplash = false

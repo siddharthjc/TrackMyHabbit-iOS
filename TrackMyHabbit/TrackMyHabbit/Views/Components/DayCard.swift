@@ -3,6 +3,8 @@ import SwiftUI
 import SwiftData
 
 struct DayCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let dateStr: String
     let entry: HabitEntry?
     var isActive: Bool = true
@@ -14,6 +16,27 @@ struct DayCard: View {
     var isEmpty: Bool { entry?.imageUri == nil }
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showPhotoPicker = false
+
+    private var cardShadow: AppTheme.ShadowToken {
+        if colorScheme == .dark {
+            return AppTheme.Elevation.dayCardDark
+        }
+        return AppTheme.Elevation.dayCard(isActive: isActive)
+    }
+
+    private var emptyStrokeColor: Color {
+        if colorScheme == .dark {
+            return AppTheme.Colors.borderSubtle
+        }
+        return isActive ? AppTheme.Colors.textInverse : AppTheme.Colors.bgTertiary
+    }
+
+    private var photoStrokeColor: Color {
+        if colorScheme == .dark {
+            return AppTheme.Colors.borderSubtle
+        }
+        return isActive ? AppTheme.Colors.textInverse : AppTheme.Colors.bgTertiary
+    }
 
     var body: some View {
         cardContent
@@ -51,8 +74,8 @@ struct DayCard: View {
         .frame(width: cardWidth, height: cardHeight)
         .background(
             RoundedRectangle(cornerRadius: AppTheme.Radius.xl)
-                .fill(AppTheme.Neutral._0)
-                .appShadow(AppTheme.Elevation.dayCard(isActive: isActive))
+                .fill(AppTheme.Colors.dayCardFill)
+                .appShadow(cardShadow)
         )
     }
 
@@ -84,12 +107,12 @@ struct DayCard: View {
                     VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                         Text(DateUtils.formatDate(dateStr))
                             .customFont(isActive ? .semibold : .medium, size: isActive ? AppTheme.Typography.Size.md : AppTheme.Typography.Size.sm, tracking: isActive ? AppTheme.Typography.Tracking.body : 0)
-                            .foregroundColor(AppTheme.Neutral._0)
+                            .foregroundColor(AppTheme.Colors.textInverse)
                             .appShadow(AppTheme.Elevation.photoLabelText)
 
                         Text(DateUtils.getRelativeLabel(dateStr))
                             .customFont(.medium, size: AppTheme.Typography.Size.xs)
-                            .foregroundColor(AppTheme.Neutral._0)
+                            .foregroundColor(AppTheme.Colors.textInverse)
                             .appShadow(AppTheme.Elevation.photoLabelText)
                     }
                     .padding(.horizontal, AppTheme.Spacing.lg)
@@ -98,11 +121,11 @@ struct DayCard: View {
                 )
             }
         }
-        .background(AppTheme.Neutral._0)
+        .background(AppTheme.Colors.dayCardFill)
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous))
         .overlay(
             RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
-                .stroke(isActive ? AppTheme.Neutral._0 : AppTheme.Colors.bgTertiary, lineWidth: AppTheme.Spacing.hairline)
+                .stroke(photoStrokeColor, lineWidth: AppTheme.Spacing.hairline)
         )
     }
 
@@ -111,19 +134,19 @@ struct DayCard: View {
             .fill(
                 isActive
                 ? LinearGradient(
-                    colors: [AppTheme.Colors.gradientDayCardStart, AppTheme.Neutral._0],
+                    colors: [AppTheme.Colors.gradientDayCardStart, AppTheme.Colors.gradientDayCardEnd],
                     startPoint: .top,
                     endPoint: .bottom
                 )
                 : LinearGradient(
-                    colors: [AppTheme.Neutral._0, AppTheme.Neutral._0],
+                    colors: [AppTheme.Colors.gradientDayCardEnd, AppTheme.Colors.gradientDayCardEnd],
                     startPoint: .top,
                     endPoint: .bottom
                 )
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
-                    .stroke(isActive ? AppTheme.Neutral._0 : AppTheme.Colors.bgTertiary, lineWidth: AppTheme.Spacing.hairline)
+                    .stroke(emptyStrokeColor, lineWidth: AppTheme.Spacing.hairline)
             )
             .overlay(alignment: .topLeading) {
                 HStack(spacing: isActive ? AppTheme.Spacing.sm : AppTheme.Layout.habitChipSpacing) {

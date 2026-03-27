@@ -24,7 +24,9 @@ Full-screen style sheet to create or edit a habit: name, inline frequency copy w
 
 ## Tokens used
 
-`AppTheme.Colors`, `AppTheme.Spacing`, `AppTheme.Radius`, `AppTheme.Elevation.floatingCircularButton`, `AppTheme.Elevation.suggestionChip`, `AppTheme.Motion`, `customFont`.
+`AppTheme.Colors` (`bgPrimary`, `chipBackground`, `borderSubtle`, `textPrimary`/`Disabled`, `primary`), `AppTheme.Spacing`, `AppTheme.Radius`, `AppTheme.Elevation.floatingCircularButton`, `AppTheme.Elevation.suggestionChip`, `AppTheme.Motion`, `customFont`.
+
+**Appearance:** Sheet canvas and chips follow semantic backgrounds; divider uses `borderSubtle`.
 
 ## Props / API
 
