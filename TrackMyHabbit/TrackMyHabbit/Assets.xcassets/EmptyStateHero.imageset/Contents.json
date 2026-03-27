@@ -1,17 +1,50 @@
 {
   "images" : [
     {
-      "filename" : "empty-state-hero.png",
+      "filename" : "empty-state-hero-light.png",
       "idiom" : "universal",
       "scale" : "1x"
     },
     {
-      "filename" : "empty-state-hero@2x.png",
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "empty-state-hero-dark.png",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "filename" : "empty-state-hero-light@2x.png",
       "idiom" : "universal",
       "scale" : "2x"
     },
     {
-      "filename" : "empty-state-hero@3x.png",
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "empty-state-hero-dark@2x.png",
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "filename" : "empty-state-hero-light@3x.png",
+      "idiom" : "universal",
+      "scale" : "3x"
+    },
+    {
+      "appearances" : [
+        {
+          "appearance" : "luminosity",
+          "value" : "dark"
+        }
+      ],
+      "filename" : "empty-state-hero-dark@3x.png",
       "idiom" : "universal",
       "scale" : "3x"
     }
@@ -21,4 +54,3 @@
     "version" : 1
   }
 }
-

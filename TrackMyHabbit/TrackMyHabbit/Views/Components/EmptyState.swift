@@ -23,6 +23,7 @@ struct EmptyState: View {
                     Spacer(minLength: geometry.size.height * 0.06)
 
                     Image("EmptyStateHero")
+                        .interpolation(.high)
                         .resizable()
                         .scaledToFill()
                         .frame(width: heroSize, height: illustrationHeight, alignment: .top)
