@@ -39,11 +39,11 @@ struct EmptyState: View {
 
                         VStack(alignment: .leading, spacing: AppTheme.Spacing.xs) {
                             Text("Meet your better self.")
-                                .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
+                                .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textPrimary)
 
                             Text("Small habits. Big change.")
-                                .customFont(.semibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
+                                .customFont(.serifsemibold, size: AppTheme.Typography.Size.xl, lineHeight: AppTheme.Typography.Line.title288, tracking: AppTheme.Typography.Tracking.titleXL)
                                 .foregroundColor(AppTheme.Colors.textSecondary)
                         }
                     }
