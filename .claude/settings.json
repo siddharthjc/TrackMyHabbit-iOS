@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(xcodebuild -project TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16' -quiet build)"
+    ]
+  }
+}

@@ -1,0 +1,294 @@
+/**
+ * TrackMyHabbit — design tokens (LLM-readable)
+ *
+ * Layer 1 — Upstream / DS primitives (--ds-*)
+ * Layer 2 — Project aliases (--*) referencing Layer 1 with fallbacks
+ * Layer 3 — UI implementation: SwiftUI uses AppTheme.* mirroring Layer 2;
+ *           any future CSS must use only var(--*) from Layer 2, never raw values.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* Layer 1 — Design system primitives                                         */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Neutral scale */
+  --ds-neutral-0: #ffffff;
+  --ds-neutral-100: #fafafc;
+  --ds-neutral-200: #f5f5f8;
+  --ds-neutral-300: #e9e9ef;
+  --ds-neutral-400: #d4d4dc;
+  --ds-neutral-500: #b3b3c3;
+  --ds-neutral-600: #8a8a9f;
+  --ds-neutral-700: #5e5e72;
+  --ds-neutral-800: #2e2e3d;
+  --ds-neutral-900: #1a1a25;
+
+  /* Brand scale */
+  --ds-brand-0: #f3f1ff;
+  --ds-brand-100: #e2dfff;
+  --ds-brand-200: #c7c0fb;
+  --ds-brand-300: #aba0f5;
+  --ds-brand-400: #8f84ee;
+  --ds-brand-500: #7569e0;
+  --ds-brand-600: #6253d5;
+  --ds-brand-700: #4d3dbd;
+  --ds-brand-800: #392c9d;
+
+  /* Raw accents used in product surfaces */
+  --ds-semantic-text-primary: #16191d;
+  --ds-semantic-text-secondary: #5b6271;
+  --ds-semantic-text-disabled: #8c95a6;
+  --ds-system-blue: #007aff;
+  --ds-destructive: #e53935;
+  --ds-surface-selected: #e1e5ea;
+  --ds-gradient-daycard-start: #e2e8ff;
+  --ds-cta-navy-rim: rgb(18, 28, 92);
+  --ds-cta-hairline: rgba(138, 138, 159, 0.23);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Layer 2 — Semantic aliases (reference Layer 1 + fallbacks)               */
+/* -------------------------------------------------------------------------- */
+
+:root {
+  /* Color — text & surfaces */
+  --color-text: var(--ds-semantic-text-primary, #16191d);
+  --color-text-secondary: var(--ds-semantic-text-secondary, #5b6271);
+  --color-text-disabled: var(--ds-semantic-text-disabled, #8c95a6);
+  --color-text-inverse: var(--ds-neutral-0, #ffffff);
+
+  --color-bg-primary: var(--ds-neutral-0, #ffffff);
+  --color-bg-secondary: var(--ds-neutral-200, #f5f5f8);
+  --color-bg-tertiary: #edeff3;
+  --color-bg-splash: #f9fafa;
+  --color-bg-empty: #f9fafa;
+  --color-bg-empty-card-tint: #f0f3ff;
+
+  --color-border-subtle: var(--ds-neutral-300, #e9e9ef);
+  --color-border-card: var(--color-bg-tertiary);
+  --color-border-brand: var(--ds-brand-200, #c7c0fb);
+
+  --color-link: var(--ds-system-blue, #007aff);
+  --color-brand-primary: var(--ds-brand-600, #6253d5);
+  --color-brand-primary-light: var(--ds-brand-0, #f3f1ff);
+
+  --color-cta-start: #6f8eff;
+  --color-cta-mid: #4d6fea;
+  --color-cta-end: #5778f1;
+
+  --color-destructive: var(--ds-destructive, #e53935);
+  --color-surface-selected: var(--ds-surface-selected, #e1e5ea);
+  --color-gradient-daycard-start: var(--ds-gradient-daycard-start, #e2e8ff);
+  --color-gradient-daycard-end: #ffffff;
+  --color-day-card-fill: var(--ds-neutral-0, #ffffff);
+  --color-chip-background: var(--ds-neutral-0, #ffffff);
+  --color-tab-bar-accent: var(--ds-system-blue, #007aff);
+
+  --color-calendar-shell-border: #eeeeee;
+  --color-calendar-day-selected-fill: #18191b;
+  --color-calendar-day-selected-stroke: #ffffff;
+  --color-calendar-habit-chip-fill: #eef3ff;
+  --color-calendar-habit-chip-text: #0e2772;
+  --color-calendar-placeholder-pill-blue-fill: #eef3ff;
+  --color-calendar-placeholder-pill-blue-text: #0e2772;
+  --color-calendar-placeholder-pill-orange-fill: #fff3ed;
+  --color-calendar-placeholder-pill-orange-text: #7f2a10;
+  --color-calendar-placeholder-pill-green-fill: #ecfef7;
+  --color-calendar-placeholder-pill-green-text: #003221;
+  /* Calendar placeholder pills — selected (Figma 410:7611). */
+  --color-calendar-placeholder-pill-blue-fill-selected: #c5d9ff;
+  --color-calendar-placeholder-pill-orange-fill-selected: #ffe0d0;
+  --color-calendar-placeholder-pill-green-fill-selected: #d0f5e8;
+  --color-calendar-placeholder-pill-tag-inner-shadow: rgba(255, 255, 255, 0.8);
+  --color-calendar-photo-selected-inner-shadow: rgba(255, 255, 255, 0.52);
+  --layout-calendar-placeholder-pill-tag-inner-shadow-spread: 2px;
+  --layout-calendar-placeholder-pill-tag-inner-shadow-blur: 9.5px;
+  --layout-calendar-placeholder-pill-tag-inner-shadow-offset-x: 0px;
+  --layout-calendar-placeholder-pill-tag-inner-shadow-offset-y: 0px;
+  --layout-calendar-photo-inner-shadow-line-width: 2.5px;
+  --layout-calendar-photo-inner-shadow-blur: 2px;
+  --layout-calendar-photo-inner-shadow-offset-y: 1.1px;
+
+  --color-shadow-neutral: var(--ds-neutral-700, #5e5e72);
+  --color-stroke-logo: var(--ds-neutral-600, #8a8a9f);
+
+  /* Interactive (documented states) */
+  --color-interactive-hover-overlay: rgba(0, 0, 0, 0.04);
+  --color-interactive-pressed-overlay: rgba(0, 0, 0, 0.08);
+
+  /* Spacing scale (8 steps + extended) */
+  --space-1: 4px;
+  --space-2: 8px;
+  /* Calendar day-chip row: vertical bleed so shadows are not clipped (mirrors AppTheme.Spacing.calendarChipStripShadowBleed). */
+  --space-calendar-chip-shadow-bleed: var(--space-4);
+  /* Calendar habit shell card: horizontal scroll inset so blur 72 shell shadow is not clipped (mirrors AppTheme.Spacing.calendarHabitCardShadowBleed). */
+  --space-calendar-habit-card-shadow-bleed: var(--space-9);
+  /* Day-chip row bottom → habit card top (Figma 397:6240). */
+  --space-calendar-day-strip-to-card: var(--space-6);
+  /* Horizontal gap between day chips (mirrors AppTheme.Spacing.calendarDayChipGap). */
+  --space-calendar-day-chip-gap: var(--space-4);
+  /* Day chip height (Figma; mirrors AppTheme.Layout.calendarDayChipHeight). */
+  --layout-calendar-day-chip-height: var(--space-14);
+  /* Day chip width (Figma; mirrors AppTheme.Layout.calendarDayChipWidth). */
+  --layout-calendar-day-chip-width: var(--space-14);
+  /* Date sheet wheel picker detent (mirrors AppTheme.Layout.calendarDateSheetDetentHeight). */
+  --layout-calendar-date-sheet-detent-height: 320px;
+  /* Calendar habit shell (white card) drop shadow (Figma: #5E5E72 @ 24%, blur 72, y 2, spread 4). */
+  --shadow-calendar-shell-blur: 72px;
+  --shadow-calendar-shell-y: 2px;
+  --shadow-calendar-shell-spread: 4px;
+  --shadow-calendar-shell-color: #5e5e72;
+  --shadow-calendar-shell-opacity: 0.24;
+  /* Calendar habit shell (Figma 389:5191). */
+  --radius-calendar-shell: 32px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-7: 32px;
+  --space-8: 40px;
+  --space-9: 80px;
+  --space-10: 1px;
+  --space-11: 1.5px;
+  --space-12: 18px;
+  --space-13: 36px;
+  --space-14: 48px;
+  --space-15: 74px;
+  --space-16: 380px;
+
+  /* Typography */
+  --font-sans: "Geist", system-ui, sans-serif;
+  --font-serif-display: "SeasonMix-SemiBold-TRIAL", ui-serif, serif;
+
+  --font-size-xs: 12px;
+  --font-size-calendar-day-abbrev: 10px;
+  --font-size-sm: 14px;
+  --font-size-md: 16px;
+  --font-size-lg: 20px;
+  --font-size-xl: 24px;
+  --font-size-display: 40px;
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.2;
+  --line-height-title: 29px;
+  --line-height-body: 24px;
+
+  /* Radius */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+  --radius-2xl: 30px;
+  --radius-pill: 56px;
+  --radius-glass: 28px;
+  --radius-full: 999px;
+
+  /* Elevation — logical tokens (implementation uses shadow color + blur + offset) */
+  --shadow-sheet-blur: 28px;
+  --shadow-sheet-y: 4px;
+  --shadow-sheet-opacity: 0.2;
+
+  --shadow-floating-blur: 56px;
+  --shadow-floating-y: 4.416px;
+  --shadow-floating-opacity-strong: 0.4;
+  --shadow-floating-opacity-soft: 0.2;
+
+  --shadow-card-active-blur: 56px;
+  --shadow-card-inactive-blur: 36px;
+  --shadow-card-y: 2px;
+
+  --shadow-cta-outer-blur: 1.25px;
+  --shadow-cta-outer-y: 1px;
+
+  --shadow-glass-dark-blur: 20px;
+  --shadow-glass-dark-y: 10px;
+  --shadow-glass-light-blur: 8px;
+  --shadow-glass-light-y: -1px;
+
+  --shadow-photo-label-blur: 3px;
+  --shadow-photo-label-y: 1px;
+
+  /* z-index */
+  --z-carousel-back: 150;
+  --z-carousel-active: 100;
+  --z-carousel-stack-base: 50;
+
+  /* Motion */
+  --duration-instant: 0.1s;
+  --duration-fast: 0.18s;
+  --duration-normal: 0.25s;
+  --duration-medium: 0.3s;
+  --duration-slow: 0.4s;
+  --duration-emphasis: 0.45s;
+  --duration-reveal: 0.5s;
+  --duration-splash: 0.6s;
+  --duration-spring-cta-response: 0.18s;
+  --duration-spring-cta-damping: 0.86;
+  --duration-spring-cta-response-alt: 0.3s;
+  --duration-spring-cta-damping-alt: 0.6;
+  --duration-spring-large-response: 0.7s;
+  --duration-spring-large-damping: 0.7;
+  --duration-spring-peek-response: 0.45s;
+  --duration-spring-peek-bounce: 0.12;
+  --duration-spring-reset-response: 0.3s;
+  --duration-spring-reset-bounce: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Dark appearance — mirrors AppTheme.Colors semantic (Figma 263:3338, 263:3320) */
+/* -------------------------------------------------------------------------- */
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-text: #fafafa;
+    --color-text-secondary: #6e6e6e;
+    --color-text-disabled: #636366;
+    --color-text-inverse: #171717;
+
+    --color-bg-primary: #171717;
+    --color-bg-secondary: #1c1c1e;
+    --color-bg-tertiary: #2c2c2e;
+    --color-bg-splash: #171717;
+    --color-bg-empty: #171717;
+    --color-bg-empty-card-tint: #1c1c1e;
+
+    --color-border-subtle: #212121;
+    --color-border-card: #212121;
+    --color-border-brand: #4a3f8a;
+
+    --color-link: #0091ff;
+    --color-brand-primary: #8f84ee;
+    --color-brand-primary-light: #2e2654;
+
+    --color-destructive: #ff453a;
+    --color-surface-selected: #3a3a3c;
+    --color-gradient-daycard-start: #171717;
+    --color-gradient-daycard-end: #212121;
+    --color-day-card-fill: #1a1a1a;
+    --color-chip-background: #2c2c2e;
+    --color-tab-bar-accent: #0091ff;
+
+    --color-calendar-shell-border: #2c2c2e;
+    --color-calendar-day-selected-fill: #3a3a3c;
+    --color-calendar-day-selected-stroke: #48484a;
+    --color-calendar-habit-chip-fill: #2e2654;
+    --color-calendar-habit-chip-text: #c7c0fb;
+
+    --color-calendar-placeholder-pill-blue-fill-selected: #3d3458;
+    --color-calendar-placeholder-pill-orange-fill-selected: #4a3828;
+    --color-calendar-placeholder-pill-green-fill-selected: #244a3a;
+    --color-calendar-placeholder-pill-tag-inner-shadow: rgba(255, 255, 255, 0.42);
+    --color-calendar-photo-selected-inner-shadow: rgba(255, 255, 255, 0.26);
+
+    --color-shadow-neutral: #000000;
+    --color-stroke-logo: #8e8e93;
+
+    --color-interactive-hover-overlay: rgba(255, 255, 255, 0.06);
+    --color-interactive-pressed-overlay: rgba(255, 255, 255, 0.12);
+  }
+}
