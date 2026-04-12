@@ -101,4 +101,42 @@ struct DateUtils {
         dayFormatter.dateFormat = "EEEE" // Full day name
         return dayFormatter.string(from: date)
     }
+
+    /// Public date parsing for external use.
+    static func parseDate(_ dateStr: String) -> Date? {
+        parseDayKey(dateStr)
+    }
+
+    /// Returns ordinal suffix string like "1st", "2nd", "3rd", etc.
+    static func ordinalSuffix(for day: Int) -> String {
+        switch day {
+        case 11, 12, 13: return "\(day)th"
+        default:
+            switch day % 10 {
+            case 1: return "\(day)st"
+            case 2: return "\(day)nd"
+            case 3: return "\(day)rd"
+            default: return "\(day)th"
+            }
+        }
+    }
+
+    /// Formats a YYYY-MM-DD date string as "16th March, 2024".
+    static func formatDateWithOrdinal(_ dateStr: String) -> String {
+        guard let date = parseDayKey(dateStr) else { return dateStr }
+        let cal = gregorianCalendar
+        let day = cal.component(.day, from: date)
+        let year = cal.component(.year, from: date)
+        return "\(ordinalSuffix(for: day)) \(monthName(for: date)), \(year)"
+    }
+
+    /// Number of days since a habit was created (day 1 = creation day).
+    static func dayNumber(createdAt: Date, dateStr: String) -> Int {
+        guard let date = parseDayKey(dateStr) else { return 1 }
+        let cal = gregorianCalendar
+        let start = cal.startOfDay(for: createdAt)
+        let end = cal.startOfDay(for: date)
+        let days = cal.dateComponents([.day], from: start, to: end).day ?? 0
+        return max(0, days + 1)
+    }
 }

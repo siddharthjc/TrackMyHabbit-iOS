@@ -1,31 +1,52 @@
 import SwiftUI
 
 struct HabitSwitcher: View {
-    let habitName: String
-    let habitCount: Int
-    let onSwitchPress: () -> Void
-    
+    let habits: [Habit]
+    let activeHabitId: UUID?
+    let onSelect: (UUID) -> Void
+
+    private var activeHabitName: String {
+        habits.first(where: { $0.id == activeHabitId })?.name
+            ?? habits.first?.name
+            ?? ""
+    }
+
     var body: some View {
-        Button(action: {
-            guard habitCount >= 2 else { return }
-            onSwitchPress()
-        }) {
-            HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
-                Text(habitName)
-                    .customFont(.semibold, size: AppTheme.Typography.Size.lg, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.nav)
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                
-                if habitCount >= 2 {
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: AppTheme.Typography.Size.md, weight: .medium))
-                        .foregroundColor(AppTheme.Colors.textInverse)
+        Group {
+            if habits.count >= 2 {
+                Menu {
+                    ForEach(habits) { habit in
+                        Button {
+                            onSelect(habit.id)
+                        } label: {
+                            if habit.id == activeHabitId {
+                                Label(habit.name, systemImage: "checkmark")
+                            } else {
+                                Text(habit.name)
+                            }
+                        }
+                    }
+                } label: {
+                    switcherLabel
                 }
+            } else {
+                switcherLabel
             }
         }
-        .buttonStyle(.plain)
-        .contentShape(Rectangle())
-        .frame(maxWidth: .infinity, minHeight: AppTheme.Layout.minTouchTarget, alignment: .center)
         .padding(.vertical, AppTheme.Spacing.md)
-        .opacity(habitCount >= 2 ? 1.0 : 0.6)
+    }
+
+    private var switcherLabel: some View {
+        HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
+            Text(activeHabitName)
+                .customFont(.semibold, size: AppTheme.Typography.Size.lg, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.nav)
+                .foregroundColor(AppTheme.Colors.textPrimary)
+
+            if habits.count >= 2 {
+                Image(systemName: "chevron.down")
+                    .font(.system(size: AppTheme.Typography.Size.sm, weight: .medium))
+                    .foregroundColor(AppTheme.Colors.textSecondary)
+            }
+        }
     }
 }

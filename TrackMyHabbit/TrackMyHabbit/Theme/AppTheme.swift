@@ -210,6 +210,7 @@ enum AppTheme {
             static let nav: CGFloat = -0.4
             static let suggestion: CGFloat = -0.07
             static let caption: CGFloat = -0.14
+            static let uppercaseLabel: CGFloat = 0.28
         }
 
         enum Line {
@@ -353,6 +354,9 @@ enum AppTheme {
         static let emptyHeroAspect: CGFloat = 456.0 / 402.0
         static let minTouchTarget: CGFloat = 44
         static let navIconSize: CGFloat = 48
+        static let homeAddButtonSize: CGFloat = 40
+        /// Vertical gap from home header bottom to card carousel top (Figma 429:943).
+        static let homeHeaderToCard: CGFloat = 56
         static let patternDotSpacing: CGFloat = 22
         static let patternDotRadius: CGFloat = 1.2
         static let patternDotOpacity: Double = 0.10

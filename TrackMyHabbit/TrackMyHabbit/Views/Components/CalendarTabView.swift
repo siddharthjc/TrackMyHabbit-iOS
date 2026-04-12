@@ -21,8 +21,8 @@ struct CalendarTabView: View {
     @State private var selectedDate: Date
     @State private var showDateSheet = false
     @State private var dayStripScrollHapticBucket: Int?
-    /// Which habit card is aligned in the horizontal strip; header day = anchor + index.
-    @State private var habitScrollPosition = ScrollPosition(idType: UUID.self)
+    /// Which day card is aligned in the horizontal strip; drives header + chip highlight.
+    @State private var dayCardScrollPosition = ScrollPosition(idType: String.self)
 
     init(habits: [Habit], todayOverride: Date? = nil, initialSelectedDate: Date? = nil) {
         self.habits = habits
@@ -50,33 +50,13 @@ struct CalendarTabView: View {
         DateUtils.toDateString(date: selectedDayStart)
     }
 
-    /// `selectedDate` is the calendar day for habit at index 0; each next card uses anchor + card index.
-    private var focusedHabitIndex: Int {
-        guard habits.count > 1 else { return 0 }
-        let id = habitScrollPosition.viewID(type: UUID.self)
-        guard let idx = habits.firstIndex(where: { $0.id == id }) else { return 0 }
-        return idx
-    }
-
-    /// Day shown in the title + chip row (habit pager offset from anchor).
+    /// Day shown in the title + chip row — follows whichever day card is scrolled into view.
     private var calendarDisplayDayStart: Date {
-        let scrollDays = focusedHabitIndex
-        guard scrollDays != 0,
-              let shifted = calendar.date(byAdding: .day, value: scrollDays, to: selectedDayStart)
-        else { return selectedDayStart }
-        return calendar.startOfDay(for: shifted)
-    }
-
-    private func dayStartForHabitCard(at index: Int) -> Date {
-        guard index != 0,
-              let shifted = calendar.date(byAdding: .day, value: index, to: selectedDayStart)
-        else { return selectedDayStart }
-        return calendar.startOfDay(for: shifted)
-    }
-
-    /// Stable signature so we reset scroll alignment only when the habit list identity changes.
-    private var habitsIdentitySignature: String {
-        habits.map(\.id.uuidString).joined(separator: "|")
+        if let key = dayCardScrollPosition.viewID(type: String.self),
+           let date = DateUtils.parseDate(key) {
+            return calendar.startOfDay(for: date)
+        }
+        return selectedDayStart
     }
 
     private var displayedDateKey: String {
@@ -85,7 +65,7 @@ struct CalendarTabView: View {
 
     /// Every calendar day in the month that contains the selection (Figma 389:5141 — full month, horizontally scrollable).
     private var daysInSelectedMonth: [Date] {
-        guard let interval = calendar.dateInterval(of: .month, for: calendarDisplayDayStart) else { return [] }
+        guard let interval = calendar.dateInterval(of: .month, for: selectedDayStart) else { return [] }
         var result: [Date] = []
         var day = calendar.startOfDay(for: interval.start)
         let end = interval.end
@@ -126,44 +106,35 @@ struct CalendarTabView: View {
                     if habits.isEmpty {
                         emptyHabitsPlaceholder
                             .padding(.top, AppTheme.Spacing.calendarDayStripToCard)
-                    } else {
+                    } else if let habit = habits.first {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: AppTheme.Spacing.sm) {
-                                if habits.count == 1 {
-                                    Spacer(minLength: 0)
-                                }
-                                ForEach(Array(habits.enumerated()), id: \.element.id) { index, habit in
+                                ForEach(daysInSelectedMonth, id: \.timeIntervalSince1970) { day in
+                                    let dayStart = calendar.startOfDay(for: day)
+                                    let dateKey = DateUtils.toDateString(date: dayStart)
                                     CalendarHabitDayCard(
                                         habit: habit,
-                                        selectedDate: dayStartForHabitCard(at: index),
+                                        selectedDate: dayStart,
                                         cardWidth: cardWidth,
                                         calendar: calendar,
                                         effectiveToday: effectiveToday,
                                         onImagePicked: { data in
-                                            saveEntryImage(data, habit: habit, date: dayStartForHabitCard(at: index))
+                                            saveEntryImage(data, habit: habit, date: dayStart)
                                         }
                                     )
-                                    .id("\(habit.id.uuidString)-\(selectedDateKey)")
-                                }
-                                if habits.count == 1 {
-                                    Spacer(minLength: 0)
+                                    .id(dateKey)
                                 }
                             }
-                            .padding(.horizontal, AppTheme.Spacing.lg)
                             .padding(.bottom, AppTheme.Spacing.calendarHabitCardShadowBleed)
-                            .frame(minWidth: effectiveWidth)
                             .scrollTargetLayout()
                         }
+                        .contentMargins(.horizontal, (effectiveWidth - cardWidth) / 2)
                         .scrollTargetBehavior(.viewAligned)
                         .scrollBounceBehavior(.basedOnSize)
-                        .scrollPosition($habitScrollPosition)
+                        .scrollPosition($dayCardScrollPosition)
                         .onAppear {
-                            alignHabitScrollToFirstHabit()
+                            scrollToSelectedDay()
                         }
-                        .onChange(of: habitsIdentitySignature) { _, _ in
-                            alignHabitScrollToFirstHabit()
-                        }
-                        .scrollDisabled(habits.count <= 1)
                         .padding(.top, AppTheme.Spacing.calendarDayStripToCard)
                         .scrollClipDisabled()
                     }
@@ -323,17 +294,30 @@ struct CalendarTabView: View {
         }
     }
 
-    /// Sets anchor `selectedDate` so the headline day matches `absoluteDay` for the current habit index.
+    /// Navigates to an absolute day: updates the month anchor if needed, then scrolls the card strip.
     private func applyAbsoluteDisplayedDay(_ absoluteDayStart: Date) {
         let abs = calendar.startOfDay(for: absoluteDayStart)
-        let idx = focusedHabitIndex
-        guard let anchor = calendar.date(byAdding: .day, value: -idx, to: abs) else { return }
-        selectedDate = calendar.startOfDay(for: anchor)
+        let key = DateUtils.toDateString(date: abs)
+
+        if !calendar.isDate(abs, equalTo: selectedDayStart, toGranularity: .month) {
+            // Different month — regenerate cards first, then scroll after layout.
+            selectedDate = abs
+            DispatchQueue.main.async {
+                withAnimation(AppTheme.Motion.easeTab) {
+                    dayCardScrollPosition.scrollTo(id: key, anchor: .center)
+                }
+            }
+        } else {
+            // Same month — scroll directly with animation.
+            withAnimation(AppTheme.Motion.easeTab) {
+                dayCardScrollPosition.scrollTo(id: key, anchor: .center)
+            }
+        }
     }
 
-    private func alignHabitScrollToFirstHabit() {
-        guard habits.count > 1, let first = habits.first?.id else { return }
-        habitScrollPosition.scrollTo(id: first, anchor: .leading)
+    private func scrollToSelectedDay() {
+        let key = selectedDateKey
+        dayCardScrollPosition.scrollTo(id: key, anchor: .center)
     }
 
     private func scrollDayStripToSelection(proxy: ScrollViewProxy, animated: Bool) {

@@ -1,7 +1,30 @@
 {
   "permissions": {
     "allow": [
-      "Bash(xcodebuild -project TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16' -quiet build)"
+      "Bash(xcodebuild -project TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16' -quiet build)",
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build)",
+      "Bash(open -a Simulator)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -derivedDataPath /Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda build)",
+      "Read(//tmp/**)",
+      "Read(//private/tmp/**)",
+      "WebFetch(domain:x.com)",
+      "WebFetch(domain:nitter.net)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,id=53DA8A6A-5295-4839-94C5-2DBED182532D' build)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,id=53DA8A6A-5295-4839-94C5-2DBED182532D' build -quiet)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,id=53DA8A6A-5295-4839-94C5-2DBED182532D' -allowProvisioningUpdates)",
+      "Read(//Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda/Build/Products/Debug-iphonesimulator/TrackMyHabbit.app/**)",
+      "Bash(plutil -p /Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda/Build/Products/Debug-iphonesimulator/TrackMyHabbit.app/Info.plist)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build -quiet)",
+      "Bash(osascript -e ':*)",
+      "Bash(find /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS -type f -name \"*.swift\" -exec grep -l \"func glassEffect\" {} \\\\;)",
+      "Bash(xargs cat:*)",
+      "Bash(ls -la /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/*.swift)",
+      "Bash(find /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS -name \"*.swift\" -type f -exec grep -l \"glassEffect\" {} \\\\;)",
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && cat {}')",
+      "WebFetch(domain:raw.githubusercontent.com)"
+    ],
+    "additionalDirectories": [
+      "/Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda"
     ]
   }
 }

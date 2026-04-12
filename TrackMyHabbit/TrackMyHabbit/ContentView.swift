@@ -7,18 +7,20 @@
 
 import SwiftUI
 import SwiftData
+import UIKit
 
 struct ContentView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
-    
+
     @State private var activeHabitId: UUID?
     @State private var selectedTab: AppTab = .home
-    
+
     @State private var showCreateSheet = false
     @State private var showEditSheet = false
-    @State private var showHabitDropdown = false
-    
+    @State private var homeDays: [String] = DateUtils.generateDays(count: 30)
+    @State private var homeScreenWidth: CGFloat = 393
+
     var activeHabit: Habit? {
         // Fallback to the first habit if active is not set or not found
         habits.first(where: { $0.id == activeHabitId }) ?? habits.first
@@ -74,25 +76,6 @@ struct ContentView: View {
                 }
             }
 
-            // MARK: - Habit Dropdown Overlay (Home only — must not cover other tabs)
-            if showHabitDropdown && selectedTab == .home {
-                HabitDropdownOverlay(
-                    habits: habits,
-                    activeHabitId: activeHabitId,
-                    onSelect: { id in
-                        activeHabitId = id
-                        withAnimation(AppTheme.Motion.easeTab) {
-                            showHabitDropdown = false
-                        }
-                    },
-                    onDismiss: {
-                        withAnimation(AppTheme.Motion.easeTab) {
-                            showHabitDropdown = false
-                        }
-                    }
-                )
-                .transition(.opacity)
-            }
         }
     }
 
@@ -129,32 +112,140 @@ struct ContentView: View {
             AppTheme.Colors.emptyStateBackground
                 .ignoresSafeArea()
 
-            VStack(spacing: 0) {
-                if habits.isEmpty {
-                    EmptyState {
-                        presentCreateSheetAfterCTADelay()
-                    }
-                } else if let habit = activeHabit {
+            if habits.isEmpty {
+                EmptyState {
+                    presentCreateSheetAfterCTADelay()
+                }
+            } else if habits.count == 1, let habit = habits.first {
+                singleHabitHome(habit: habit)
+            } else if let habit = activeHabit {
+                VStack(spacing: 0) {
                     HabitSwitcher(
-                        habitName: habit.name,
-                        habitCount: habits.count,
-                        onSwitchPress: {
-                            withAnimation(AppTheme.Motion.easeTab) {
-                                showHabitDropdown.toggle()
-                            }
-                        }
+                        habits: habits,
+                        activeHabitId: activeHabitId,
+                        onSelect: { id in activeHabitId = id }
                     )
                     .padding(.top, AppTheme.Spacing.tabBarTopInset)
 
                     Spacer()
-
                     HabitCarousel(habit: habit)
-
                     Spacer()
                 }
+                .padding(.bottom, AppTheme.Spacing.lg)
             }
-            .padding(.bottom, habits.isEmpty ? 0 : AppTheme.Spacing.lg)
         }
+    }
+
+    // MARK: - Single-Habit Home
+
+    private var homeHeader: some View {
+        HStack {
+            Text("TrackMyHabbit")
+                .customFont(
+                    .serifsemibold,
+                    size: AppTheme.Typography.Size.xl,
+                    tracking: AppTheme.Typography.Tracking.titleXL
+                )
+                .foregroundColor(AppTheme.Colors.textPrimary)
+
+            Spacer()
+
+            Button(action: { showCreateSheet = true }) {
+                Image(systemName: "plus")
+                    .font(.system(size: AppTheme.Typography.Size.lg, weight: .medium))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .frame(
+                        width: AppTheme.Layout.navIconSize,
+                        height: AppTheme.Layout.navIconSize
+                    )
+            }
+            .glassEffect(.regular, in: Circle())
+        }
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .padding(.top, AppTheme.Spacing.tabBarTopInset)
+    }
+
+    @ViewBuilder
+    private func singleHabitHome(habit: Habit) -> some View {
+        let cardWidth = min(
+            AppTheme.Layout.calendarCardWidth,
+            homeScreenWidth - AppTheme.Spacing.lg * 2
+        )
+        let today = Calendar.current.startOfDay(for: Date())
+
+        VStack(spacing: 0) {
+            homeHeader
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: AppTheme.Spacing.sm) {
+                    ForEach(homeDays, id: \.self) { dateStr in
+                        HomeDayCard(
+                            habit: habit,
+                            dateStr: dateStr,
+                            cardWidth: cardWidth,
+                            effectiveToday: today,
+                            onImagePicked: { data in
+                                saveHomeEntryImage(data, habit: habit, dateStr: dateStr)
+                            }
+                        )
+                    }
+                }
+                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.bottom, AppTheme.Spacing.calendarHabitCardShadowBleed)
+                .scrollTargetLayout()
+            }
+            .scrollTargetBehavior(.viewAligned)
+            .scrollBounceBehavior(.basedOnSize)
+            .scrollClipDisabled()
+            .padding(.top, AppTheme.Layout.homeHeaderToCard)
+
+            Spacer(minLength: 0)
+        }
+        .onGeometryChange(for: CGFloat.self) { proxy in
+            proxy.size.width
+        } action: { newWidth in
+            homeScreenWidth = newWidth
+        }
+        .onAppear { refreshHomeDays() }
+        .onReceive(
+            NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)
+        ) { _ in
+            refreshHomeDays()
+        }
+    }
+
+    private func saveHomeEntryImage(_ data: Data, habit: Habit, dateStr: String) {
+        let existing = habit.entries.first(where: { $0.dateString == dateStr })
+
+        do {
+            let fileURL = try HabitPhotoFileStore.persistJPEG(
+                data: data,
+                habitID: habit.id,
+                dateString: dateStr
+            )
+            do {
+                if let existing {
+                    existing.imageUri = fileURL.absoluteString
+                } else {
+                    let newEntry = HabitEntry(
+                        dateString: dateStr,
+                        imageUri: fileURL.absoluteString,
+                        habit: habit
+                    )
+                    modelContext.insert(newEntry)
+                }
+                try modelContext.save()
+            } catch {
+                try? FileManager.default.removeItem(at: fileURL)
+            }
+        } catch {
+            print("Failed to save home photo: \(error.localizedDescription)")
+        }
+    }
+
+    private func refreshHomeDays() {
+        let newDays = DateUtils.generateDays(count: 30)
+        if newDays != homeDays { homeDays = newDays }
     }
 }
 
@@ -189,70 +280,6 @@ private enum AppTab: Hashable, CaseIterable {
             return "line.3.horizontal.decrease"
         case .add:
             return "plus"
-        }
-    }
-}
-
-// MARK: - Habit Dropdown Overlay
-
-private struct HabitDropdownOverlay: View {
-    let habits: [Habit]
-    let activeHabitId: UUID?
-    let onSelect: (UUID) -> Void
-    let onDismiss: () -> Void
-
-    var body: some View {
-        ZStack(alignment: .top) {
-            // Dimmed background
-            AppTheme.Overlay.black030
-                .ignoresSafeArea()
-                .onTapGesture { onDismiss() }
-
-            // Dropdown card
-            VStack(spacing: 0) {
-                ForEach(habits) { habit in
-                    let isActive = habit.id == activeHabitId
-
-                    Button {
-                        onSelect(habit.id)
-                    } label: {
-                        HStack {
-                            Text(habit.name)
-                                .customFont(
-                                    isActive ? .semibold : .medium,
-                                    size: AppTheme.Typography.Size.md,
-                                    tracking: isActive ? AppTheme.Typography.Tracking.tight : AppTheme.Typography.Tracking.body
-                                )
-                                .foregroundColor(
-                                    isActive
-                                        ? AppTheme.Colors.textPrimary
-                                        : AppTheme.Colors.textDisabled
-                                )
-
-                            Spacer()
-                        }
-                        .padding(.horizontal, AppTheme.Spacing.sm3)
-                        .padding(.vertical, AppTheme.Spacing.md)
-                        .background(
-                            isActive
-                                ? RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
-                                    .fill(AppTheme.Colors.surfaceSelected)
-                                : nil
-                        )
-                        .contentShape(Rectangle())
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-            .padding(AppTheme.Spacing.lg)
-            .background(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
-                    .fill(AppTheme.Colors.bgPrimary)
-                    .appShadow(AppTheme.Elevation.dropdownCard)
-            )
-            .padding(.horizontal, AppTheme.Spacing.lg)
-            .padding(.top, AppTheme.Spacing.dropdownOffsetTop)
-            .transition(.move(edge: .top).combined(with: .opacity))
         }
     }
 }
