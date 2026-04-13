@@ -36,7 +36,9 @@ struct ContentView: View {
                 }
 
                 Tab(value: AppTab.calendar) {
-                    CalendarTabView(habits: habits)
+                    CalendarTabView(habits: habits) {
+                        presentCreateSheetAfterCTADelay()
+                    }
                 } label: {
                     Label(AppTab.calendar.title, systemImage: AppTab.calendar.icon)
                 }
@@ -177,7 +179,7 @@ struct ContentView: View {
             homeHeader
 
             ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AppTheme.Spacing.sm) {
+                HStack(spacing: AppTheme.Spacing.horizontalHabitCardGap) {
                     ForEach(homeDays, id: \.self) { dateStr in
                         HomeDayCard(
                             habit: habit,

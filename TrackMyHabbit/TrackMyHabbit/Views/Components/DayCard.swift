@@ -133,16 +133,8 @@ struct DayCard: View {
         RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
             .fill(
                 isActive
-                ? LinearGradient(
-                    colors: [AppTheme.Colors.gradientDayCardStart, AppTheme.Colors.gradientDayCardEnd],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-                : LinearGradient(
-                    colors: [AppTheme.Colors.gradientDayCardEnd, AppTheme.Colors.gradientDayCardEnd],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
+                    ? AppTheme.Gradients.dayCardShell(colorScheme: colorScheme)
+                    : AppTheme.Gradients.dayCardInactiveFill(colorScheme: colorScheme)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)

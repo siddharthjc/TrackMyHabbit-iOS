@@ -4,6 +4,8 @@ import SwiftUI
 import UIKit
 
 struct HomeDayCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let habit: Habit
     let dateStr: String
     let cardWidth: CGFloat
@@ -52,10 +54,11 @@ struct HomeDayCard: View {
         .frame(width: cardWidth, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: AppTheme.Radius.calendarShell, style: .continuous)
-                .fill(AppTheme.Colors.bgPrimary)
+                .fill(AppTheme.Gradients.calendarHabitShell(colorScheme: colorScheme))
         )
         .overlay(
             RoundedRectangle(cornerRadius: AppTheme.Radius.calendarShell, style: .continuous)
+                .inset(by: 0.5)
                 .stroke(AppTheme.Colors.calendarShellBorder, lineWidth: AppTheme.Spacing.hairline)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.calendarShell, style: .continuous))
@@ -90,11 +93,11 @@ struct HomeDayCard: View {
                         size: AppTheme.Typography.Size.sm,
                         tracking: AppTheme.Typography.Tracking.uppercaseLabel
                     )
-                    .foregroundColor(AppTheme.Colors.textDisabled)
+                    .foregroundColor(AppTheme.Colors.calendarCardMetaText)
                     .textCase(.uppercase)
 
                 Circle()
-                    .fill(AppTheme.Colors.textDisabled)
+                    .fill(AppTheme.Colors.calendarCardMetaText)
                     .frame(width: 4, height: 4)
 
                 Text("DAY \(dayNumber)")
@@ -103,7 +106,8 @@ struct HomeDayCard: View {
                         size: AppTheme.Typography.Size.sm,
                         tracking: AppTheme.Typography.Tracking.uppercaseLabel
                     )
-                    .foregroundColor(AppTheme.Colors.textDisabled)
+                    .foregroundColor(AppTheme.Colors.calendarCardMetaText)
+                    .textCase(.uppercase)
             }
         }
         .frame(maxWidth: .infinity, alignment: .center)
@@ -121,7 +125,7 @@ struct HomeDayCard: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: AppTheme.Layout.calendarPhotoFrameHeight)
-        .background(AppTheme.Colors.bgPrimary)
+        .background(AppTheme.Colors.calendarPhotoPlaceholderFill)
         .clipShape(photoClipShape)
         .overlay {
             if !hasPhoto {

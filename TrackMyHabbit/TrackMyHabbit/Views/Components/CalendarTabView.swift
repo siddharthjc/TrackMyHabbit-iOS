@@ -13,10 +13,13 @@ private enum DayChipStripScrollOffsetKey: PreferenceKey {
 
 struct CalendarTabView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.colorScheme) private var colorScheme
 
     let habits: [Habit]
     /// Overrides calendar “today” (e.g. 11 Apr 2026 in previews).
     var todayOverride: Date? = nil
+    /// Called when the user taps “Add habit” in the empty state.
+    var onCreateHabit: (() -> Void)? = nil
 
     @State private var selectedDate: Date
     @State private var showDateSheet = false
@@ -24,9 +27,10 @@ struct CalendarTabView: View {
     /// Which day card is aligned in the horizontal strip; drives header + chip highlight.
     @State private var dayCardScrollPosition = ScrollPosition(idType: String.self)
 
-    init(habits: [Habit], todayOverride: Date? = nil, initialSelectedDate: Date? = nil) {
+    init(habits: [Habit], todayOverride: Date? = nil, initialSelectedDate: Date? = nil, onCreateHabit: (() -> Void)? = nil) {
         self.habits = habits
         self.todayOverride = todayOverride
+        self.onCreateHabit = onCreateHabit
         let seed = initialSelectedDate ?? todayOverride ?? Date()
         _selectedDate = State(initialValue: seed)
     }
@@ -61,6 +65,11 @@ struct CalendarTabView: View {
 
     private var displayedDateKey: String {
         DateUtils.toDateString(date: calendarDisplayDayStart)
+    }
+
+    /// Figma 465:2017 (dark): Geist semibold; light: existing Season Mix display.
+    private var calendarDateTitleFont: CustomFont {
+        colorScheme == .dark ? .semibold : .serifsemibold
     }
 
     /// Every calendar day in the month that contains the selection (Figma 389:5141 — full month, horizontally scrollable).
@@ -108,7 +117,7 @@ struct CalendarTabView: View {
                             .padding(.top, AppTheme.Spacing.calendarDayStripToCard)
                     } else if let habit = habits.first {
                         ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: AppTheme.Spacing.sm) {
+                            HStack(spacing: AppTheme.Spacing.horizontalHabitCardGap) {
                                 ForEach(daysInSelectedMonth, id: \.timeIntervalSince1970) { day in
                                     let dayStart = calendar.startOfDay(for: day)
                                     let dateKey = DateUtils.toDateString(date: dayStart)
@@ -172,7 +181,7 @@ struct CalendarTabView: View {
                     ToolbarItem(placement: .principal) {
                         Text("Choose date")
                             .customFont(.semibold, size: AppTheme.Typography.Size.lg, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.tight)
-                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Done") {
@@ -197,25 +206,25 @@ struct CalendarTabView: View {
                     HStack(alignment: .firstTextBaseline, spacing: 0) {
                         Text(String(calendar.component(.day, from: calendarDisplayDayStart)))
                             .customFont(
-                                .serifsemibold,
+                                calendarDateTitleFont,
                                 size: AppTheme.Typography.Size.xl,
                                 lineHeight: AppTheme.Typography.Line.title288,
                                 tracking: AppTheme.Typography.Tracking.titleXL
                             )
-                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
                             .contentTransition(.numericText())
                         Text(" \(DateUtils.monthName(for: calendarDisplayDayStart))")
                             .customFont(
-                                .serifsemibold,
+                                calendarDateTitleFont,
                                 size: AppTheme.Typography.Size.xl,
                                 lineHeight: AppTheme.Typography.Line.title288,
                                 tracking: AppTheme.Typography.Tracking.titleXL
                             )
-                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
                     }
                     Image(systemName: "chevron.down")
                         .font(.system(size: AppTheme.Typography.Size.md, weight: .semibold))
-                        .foregroundColor(AppTheme.Colors.textPrimary)
+                        .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
                 }
             }
             .buttonStyle(.plain)
@@ -290,8 +299,31 @@ struct CalendarTabView: View {
                 dayStripScrollHapticBucket = nil
                 scrollDayStripToSelection(proxy: proxy, animated: true)
             }
-            .scrollClipDisabled()
+            .overlay(alignment: .leading) {
+                dayChipStripEdgeFade(leading: true)
+                    .allowsHitTesting(false)
+            }
+            .overlay(alignment: .trailing) {
+                dayChipStripEdgeFade(leading: false)
+                    .allowsHitTesting(false)
+            }
         }
+    }
+
+    /// Progressive fade overlay for left/right edges of the day chip strip.
+    private func dayChipStripEdgeFade(leading: Bool) -> some View {
+        let fadeWidth: CGFloat = 32
+        return LinearGradient(
+            stops: [
+                .init(color: AppTheme.Colors.emptyStateBackground, location: 0),
+                .init(color: AppTheme.Colors.emptyStateBackground.opacity(0.6), location: 0.4),
+                .init(color: AppTheme.Colors.emptyStateBackground.opacity(0), location: 1),
+            ],
+            startPoint: leading ? .leading : .trailing,
+            endPoint: leading ? .trailing : .leading
+        )
+        .frame(width: fadeWidth)
+        .ignoresSafeArea()
     }
 
     /// Navigates to an absolute day: updates the month anchor if needed, then scrolls the card strip.
@@ -335,18 +367,38 @@ struct CalendarTabView: View {
     }
 
     private var emptyHabitsPlaceholder: some View {
-        VStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
-            Text("No habits yet")
-                .customFont(.semibold, size: AppTheme.Typography.Size.lg, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.nav)
-                .foregroundColor(AppTheme.Colors.textPrimary)
-            Text("Create a habit from the Home tab to see it here.")
-                .customFont(.medium, size: AppTheme.Typography.Size.sm, lineHeight: AppTheme.Typography.Line.body20, tracking: AppTheme.Typography.Tracking.caption)
-                .foregroundColor(AppTheme.Colors.textSecondary)
-                .multilineTextAlignment(.center)
+        VStack(spacing: AppTheme.Spacing.relaxed) {
+            CalendarEmptyStateCollage()
+
+            VStack(spacing: AppTheme.Spacing.xs) {
+                Text("No habits yet")
+                    .customFont(
+                        .semibold,
+                        size: AppTheme.Typography.Size.lg,
+                        lineHeight: AppTheme.Typography.Line.body24,
+                        tracking: AppTheme.Typography.Tracking.nav
+                    )
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                Text("Create a habit from the Home tab to see it here")
+                    .customFont(
+                        .medium,
+                        size: AppTheme.Typography.Size.sm,
+                        lineHeight: AppTheme.Typography.Line.body196,
+                        tracking: AppTheme.Typography.Tracking.suggestion
+                    )
+                    .foregroundColor(AppTheme.Colors.textDisabled)
+            }
+            .multilineTextAlignment(.center)
+
+            if let onCreateHabit {
+                Button(action: onCreateHabit) {
+                    Text("Add habit")
+                }
+                .buttonStyle(CalendarEmptyCTAButtonStyle())
+            }
         }
         .frame(maxWidth: .infinity)
-        .padding(.horizontal, AppTheme.Spacing.block)
-        .padding(.top, AppTheme.Spacing.xl)
+        .padding(.top, AppTheme.Spacing.touch)
     }
 
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
@@ -400,11 +452,21 @@ struct CalendarTabView: View {
 // MARK: - Day chip
 
 private struct CalendarDayChip: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let date: Date
     let calendar: Calendar
     let isSelected: Bool
     let isToday: Bool
     let action: () -> Void
+
+    /// Figma 465:2014 (dark): Geist for all chip numerals; light keeps serif accent on “today” when unselected.
+    private var dayNumberFont: CustomFont {
+        if colorScheme == .dark {
+            return .semibold
+        }
+        return isToday ? .serifsemibold : .semibold
+    }
 
     var body: some View {
         Button(action: action) {
@@ -418,7 +480,7 @@ private struct CalendarDayChip: View {
                     )
                 Text(String(calendar.component(.day, from: date)))
                     .customFont(
-                        isToday ? .serifsemibold : .semibold,
+                        dayNumberFont,
                         size: AppTheme.Typography.Size.md,
                         lineHeight: AppTheme.Typography.Line.title288,
                         tracking: AppTheme.Typography.Tracking.calendarDayNumber
@@ -426,7 +488,9 @@ private struct CalendarDayChip: View {
                     .contentTransition(.numericText())
             }
             .multilineTextAlignment(.center)
-            .foregroundColor(isSelected ? AppTheme.Colors.textInverse : AppTheme.Colors.textSecondary)
+            .foregroundColor(
+                isSelected ? AppTheme.Colors.calendarDayChipSelectedLabel : AppTheme.Colors.calendarDayChipRestText
+            )
             .padding(.horizontal, AppTheme.Spacing.sm3)
             .frame(
                 width: AppTheme.Layout.calendarDayChipWidth,
@@ -435,12 +499,27 @@ private struct CalendarDayChip: View {
             )
             .background(
                 RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
-                    .fill(isSelected ? AppTheme.Colors.calendarDaySelectedFill : AppTheme.Colors.surfaceSelected)
+                    .fill(isSelected ? AppTheme.Colors.calendarDaySelectedFill : AppTheme.Colors.calendarDayChipRestFill)
             )
             .overlay(
                 RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
                     .stroke(isSelected ? AppTheme.Colors.calendarDaySelectedStroke : Color.clear, lineWidth: AppTheme.Spacing.hairline)
             )
+            .overlay(alignment: .bottom) {
+                if isSelected && colorScheme == .dark {
+                    Rectangle()
+                        .fill(
+                            LinearGradient(
+                                colors: [.clear, Color.white.opacity(0.1)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
+                        )
+                        .frame(height: 3)
+                        .allowsHitTesting(false)
+                }
+            }
+            .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
             .modifier(CalendarChipShadowModifier(isSelected: isSelected))
         }
         .buttonStyle(.plain)
@@ -451,6 +530,8 @@ private struct CalendarDayChip: View {
 // MARK: - Habit card
 
 private struct CalendarHabitDayCard: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let habit: Habit
     let selectedDate: Date
     let cardWidth: CGFloat
@@ -481,8 +562,13 @@ private struct CalendarHabitDayCard: View {
             : "Add photo"
     }
 
+    private var dayNumber: Int {
+        DateUtils.dayNumber(createdAt: habit.createdAt, dateStr: dateString)
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: AppTheme.Spacing.lg) {
+            titleSection
             photoFrame
             footerContent
         }
@@ -492,10 +578,11 @@ private struct CalendarHabitDayCard: View {
         .frame(width: cardWidth, alignment: .leading)
         .background(
             RoundedRectangle(cornerRadius: AppTheme.Radius.calendarShell, style: .continuous)
-                .fill(AppTheme.Colors.bgPrimary)
+                .fill(AppTheme.Gradients.calendarHabitShell(colorScheme: colorScheme))
         )
         .overlay(
             RoundedRectangle(cornerRadius: AppTheme.Radius.calendarShell, style: .continuous)
+                .inset(by: 0.5)
                 .stroke(AppTheme.Colors.calendarShellBorder, lineWidth: AppTheme.Spacing.hairline)
         )
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.calendarShell, style: .continuous))
@@ -508,6 +595,46 @@ private struct CalendarHabitDayCard: View {
                 onImagePicked(data)
             }
         }
+    }
+
+    // MARK: - Title (Figma 458:1791–458:1797)
+
+    private var titleSection: some View {
+        VStack(spacing: AppTheme.Spacing.sm) {
+            Text(habit.name)
+                .customFont(
+                    .serifsemibold,
+                    size: AppTheme.Typography.Size.lg,
+                    lineHeight: AppTheme.Typography.Line.body24,
+                    tracking: AppTheme.Typography.Tracking.nav
+                )
+                .foregroundColor(AppTheme.Colors.textPrimary)
+
+            HStack(spacing: AppTheme.Spacing.sm) {
+                Text(DateUtils.formatDateWithOrdinal(dateString))
+                    .customFont(
+                        .semibold,
+                        size: AppTheme.Typography.Size.sm,
+                        tracking: AppTheme.Typography.Tracking.uppercaseLabel
+                    )
+                    .foregroundColor(AppTheme.Colors.calendarCardMetaText)
+                    .textCase(.uppercase)
+
+                Circle()
+                    .fill(AppTheme.Colors.calendarCardMetaText)
+                    .frame(width: 4, height: 4)
+
+                Text("DAY \(dayNumber)")
+                    .customFont(
+                        .semibold,
+                        size: AppTheme.Typography.Size.sm,
+                        tracking: AppTheme.Typography.Tracking.uppercaseLabel
+                    )
+                    .foregroundColor(AppTheme.Colors.calendarCardMetaText)
+                    .textCase(.uppercase)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .center)
     }
 
     private var footerContent: some View {
@@ -586,7 +713,7 @@ private struct CalendarHabitDayCard: View {
         }
         .frame(maxWidth: .infinity)
         .frame(height: AppTheme.Layout.calendarPhotoFrameHeight)
-        .background(AppTheme.Colors.bgPrimary)
+        .background(AppTheme.Colors.calendarPhotoPlaceholderFill)
         .clipShape(calendarPhotoClipShape)
         .overlay {
             if !hasPhoto {
@@ -826,6 +953,183 @@ private struct CalendarChipShadowModifier: ViewModifier {
             content
         }
     }
+}
+
+// MARK: - Calendar empty-state collage (Figma 458:1620)
+
+/// Four overlapping, rotated photo thumbnails used as a decorative illustration
+/// in the calendar empty state (Figma node 458:1620).
+private struct CalendarEmptyStateCollage: View {
+    private struct CollageItem {
+        let image: String
+        let rotation: Double
+        let offsetX: CGFloat
+        let offsetY: CGFloat
+        let zIndex: Double
+    }
+
+    private let items: [CollageItem] = [
+        // Back-right (Figma 458:1584)
+        .init(image: "CalendarCollage1", rotation: 8.89, offsetX: 36, offsetY: 3, zIndex: 0),
+        // Back-left (Figma 458:1585)
+        .init(image: "CalendarCollage2", rotation: -13.68, offsetX: -34, offsetY: 4, zIndex: 1),
+        // Middle (Figma 458:1586)
+        .init(image: "CalendarCollage3", rotation: -8.1, offsetX: -15, offsetY: -5, zIndex: 2),
+        // Front-center (Figma 458:1587)
+        .init(image: "CalendarCollage4", rotation: -1.21, offsetX: 5, offsetY: 3, zIndex: 3),
+    ]
+
+    var body: some View {
+        ZStack {
+            ForEach(items.indices, id: \.self) { i in
+                let item = items[i]
+                Image(item.image)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(
+                        width: AppTheme.Layout.calendarCollagePhotoSize,
+                        height: AppTheme.Layout.calendarCollagePhotoSize
+                    )
+                    .clipShape(
+                        RoundedRectangle(
+                            cornerRadius: AppTheme.Layout.calendarCollagePhotoRadius,
+                            style: .continuous
+                        )
+                    )
+                    .overlay(
+                        RoundedRectangle(
+                            cornerRadius: AppTheme.Layout.calendarCollagePhotoRadius,
+                            style: .continuous
+                        )
+                        .stroke(Color.white, lineWidth: AppTheme.Layout.calendarCollageBorderWidth)
+                    )
+                    .appShadow(AppTheme.Elevation.calendarCollagePhoto)
+                    .rotationEffect(.degrees(item.rotation))
+                    .offset(x: item.offsetX, y: item.offsetY)
+                    .zIndex(item.zIndex)
+            }
+        }
+        .frame(
+            width: AppTheme.Layout.calendarCollageWidth,
+            height: AppTheme.Layout.calendarCollageHeight
+        )
+    }
+}
+
+// MARK: - Calendar empty-state CTA (Figma 458:1582)
+
+/// Pill-shaped blue gradient "Add habit" button matching the EmptyStateCTA chrome.
+private struct CalendarEmptyCTA: View {
+    var title: String
+    var isPressed: Bool
+
+    private let cornerRadius: CGFloat = AppTheme.Radius.pill
+
+    private var navyRimY: CGFloat { isPressed ? 2.0 : 3.45 }
+    private let navyRimLineWidth: CGFloat = 5.5
+    private var navyRimAccentY: CGFloat { isPressed ? 0.28 : 0.42 }
+    private let navyRimAccentWidth: CGFloat = 2.2
+
+    private let lightRimOffsetY: CGFloat = 2.05
+    private let bottomLightRimWidth: CGFloat = 2.4
+    private let bottomLightRimOpacity: Double = 0.36
+
+    var body: some View {
+        Text(title)
+            .customFont(
+                .medium,
+                size: AppTheme.Typography.Size.md,
+                lineHeight: AppTheme.Typography.Line.body224,
+                tracking: AppTheme.Typography.Tracking.body
+            )
+            .foregroundColor(AppTheme.Colors.textInverse)
+            .padding(.horizontal, AppTheme.Spacing.lg)
+            .padding(.vertical, AppTheme.Spacing.md)
+            .frame(
+                width: AppTheme.Layout.calendarEmptyCTAWidth,
+                height: AppTheme.Layout.calendarEmptyCTAHeight
+            )
+            .background(ctaBackground)
+            .compositingGroup()
+            .appShadow(AppTheme.Elevation.ctaOuter)
+    }
+
+    private var ctaBackground: some View {
+        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
+        let hairline: CGFloat = 0.5
+        return shape
+            .fill(figmaGradient)
+            .innerInsetRim(
+                shape: shape,
+                color: AppTheme.Colors.ctaInsetNavy.opacity(0.2),
+                lineWidth: navyRimLineWidth,
+                blur: 0,
+                offsetX: 0,
+                offsetY: -navyRimY
+            )
+            .innerInsetRim(
+                shape: shape,
+                color: AppTheme.Overlay.black020,
+                lineWidth: navyRimAccentWidth,
+                blur: 0,
+                offsetX: 0,
+                offsetY: -navyRimAccentY
+            )
+            .innerInsetRim(
+                shape: shape,
+                color: Color.white.opacity(bottomLightRimOpacity),
+                lineWidth: bottomLightRimWidth,
+                blur: 0,
+                offsetX: 0,
+                offsetY: lightRimOffsetY
+            )
+            .overlay(
+                shape.stroke(
+                    AppTheme.Colors.ctaHairline,
+                    lineWidth: hairline
+                )
+            )
+    }
+
+    private var figmaGradient: LinearGradient {
+        LinearGradient(
+            stops: [
+                .init(color: AppTheme.Colors.emptyStateCTAStart, location: 0),
+                .init(color: AppTheme.Colors.emptyStateCTAMid, location: 0.85222),
+                .init(color: AppTheme.Colors.emptyStateCTAEnd, location: 1),
+            ],
+            startPoint: UnitPoint(x: 0.5, y: 0),
+            endPoint: UnitPoint(x: 0.5, y: 1.5556)
+        )
+    }
+}
+
+private struct CalendarEmptyCTAButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        ZStack {
+            CalendarEmptyCTA(title: "Add habit", isPressed: configuration.isPressed)
+            configuration.label
+                .hidden()
+                .accessibilityHidden(true)
+        }
+        .animation(AppTheme.Motion.springCTA, value: configuration.isPressed)
+    }
+}
+
+#Preview("Calendar — Empty State") {
+    let schema = Schema([Habit.self, HabitEntry.self])
+    let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+    let container = try! ModelContainer(for: schema, configurations: configuration)
+    let cal = Calendar(identifier: .gregorian)
+    let april11 = cal.date(from: DateComponents(year: 2026, month: 4, day: 11))!
+
+    return CalendarTabView(
+        habits: [],
+        todayOverride: april11,
+        initialSelectedDate: april11,
+        onCreateHabit: {}
+    )
+    .modelContainer(container)
 }
 
 #Preview("Calendar — 11 Apr 2026") {

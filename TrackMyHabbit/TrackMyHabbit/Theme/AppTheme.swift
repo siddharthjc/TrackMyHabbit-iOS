@@ -70,7 +70,7 @@ enum AppTheme {
         static let emptyStateCTAEnd = Color(hex: "#5778f1")
 
         static let destructive = semantic("#e53935", "#ff453a")
-        static let surfaceSelected = semantic("#e1e5ea", "#3a3a3c")
+        static let surfaceSelected = semantic("#e1e5ea", "#53555c")
         static let gradientDayCardStart = semantic("#e2e8ff", "#171717")
         static let gradientDayCardEnd = semantic("#ffffff", "#212121")
 
@@ -78,12 +78,26 @@ enum AppTheme {
         static let borderSubtle = semantic("#e9e9ef", "#212121")
         static let chipBackground = semantic("#ffffff", "#2c2c2e")
 
-        /// Calendar shell card border (Figma neutral-200 `#eeeeee`).
-        static let calendarShellBorder = semantic("#eeeeee", "#2c2c2e")
-        /// Selected day chip fill (Figma neutral-950 `#18191b`).
-        static let calendarDaySelectedFill = semantic("#18191b", "#3a3a3c")
-        /// Hairline on selected day chip (Figma white ring).
-        static let calendarDaySelectedStroke = semantic("#ffffff", "#48484a")
+        /// Calendar photo placeholder well (Figma 458:1799 — dark `#262626`).
+        static let calendarPhotoPlaceholderFill = semantic("#ffffff", "#262626")
+
+        /// Uppercase date + day row on calendar habit shell (Figma 458:1795 — neutral 600 `#53555c` dark).
+        static let calendarCardMetaText = semantic("#8c95a6", "#53555c")
+
+        /// Calendar shell card border (Figma neutral-200 `#eeeeee`; dark `#212121`).
+        static let calendarShellBorder = semantic("#eeeeee", "#212121")
+        /// Unselected horizontal day chip fill (`surfaceSelected` light; Figma 465:2014 dark `#262626`).
+        static let calendarDayChipRestFill = semantic("#e1e5ea", "#262626")
+        /// Unselected day chip label (Figma 465:2014 dark neutral `#9ea1a8`).
+        static let calendarDayChipRestText = semantic("#5b6271", "#9ea1a8")
+        /// Selected day chip fill (Figma neutral-950 `#18191b` light; Figma 465:2014 dark `#ffffff`).
+        static let calendarDaySelectedFill = semantic("#18191b", "#ffffff")
+        /// Hairline on selected day chip (Figma white ring; 465:2014 dark white border).
+        static let calendarDaySelectedStroke = semantic("#ffffff", "#ffffff")
+        /// Text on selected day chip (inverse on dark pill light; Figma 465:2014 dark `#16191d` on white).
+        static let calendarDayChipSelectedLabel = semantic("#ffffff", "#16191d")
+        /// Calendar header “11 April” title (Figma 465:2017 — white in dark).
+        static let calendarDateHeaderText = semantic("#16191d", "#ffffff")
         /// Habit name pill on calendar card (Figma pond-blue-50 / 900).
         static let calendarHabitChipFill = semantic("#eef3ff", "#2e2654")
         static let calendarHabitChipText = semantic("#0e2772", "#c7c0fb")
@@ -152,6 +166,8 @@ enum AppTheme {
         static let calendarDayStripToCard: CGFloat = 24
         /// Horizontal gap between calendar day chips (tighter than 24pt artboard for denser strip).
         static let calendarDayChipGap: CGFloat = 16
+        /// Horizontal gap between habit day cards in home + calendar `ScrollView` (was `sm` 8pt).
+        static let horizontalHabitCardGap: CGFloat = 12
         /// Add-photo orb ↔ title (Figma 389:5195).
         static let calendarAddOrbTitle: CGFloat = 11
         /// Top inset for the centered empty-photo CTA stack (Figma 389:5195).
@@ -260,6 +276,40 @@ enum AppTheme {
         static var easeFrequencyPress: Animation { .easeOut(duration: durationInstant) }
     }
 
+    // MARK: - Gradients
+
+    /// SwiftUI often renders `LinearGradient` as a flat fill when stops use dynamic semantic `Color` (UIKit-resolved).
+    /// Use fixed sRGB hex stops (mirroring `gradientDayCardStart` / `gradientDayCardEnd`) so the blend interpolates reliably.
+    enum Gradients {
+        /// Home `DayCard` empty shell + calendar habit shell — vertical `#171717` → `#212121` (dark), `#e2e8ff` → `#ffffff` (light).
+        static func dayCardShell(colorScheme: ColorScheme) -> LinearGradient {
+            let isDark = colorScheme == .dark
+            return LinearGradient(
+                stops: [
+                    Gradient.Stop(color: Color(hex: isDark ? "#171717" : "#e2e8ff"), location: 0),
+                    Gradient.Stop(color: Color(hex: isDark ? "#212121" : "#ffffff"), location: 1)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+        }
+
+        /// Inactive home stack card: flat fill matching `gradientDayCardEnd` (dark / light).
+        static func dayCardInactiveFill(colorScheme: ColorScheme) -> LinearGradient {
+            let end = Color(hex: colorScheme == .dark ? "#212121" : "#ffffff")
+            return LinearGradient(colors: [end, end], startPoint: .top, endPoint: .bottom)
+        }
+
+        /// Calendar habit shell: same vertical gradient as `dayCardShell` in dark; in light, flat `#ffffff` (no `#e2e8ff` top wash).
+        static func calendarHabitShell(colorScheme: ColorScheme) -> LinearGradient {
+            if colorScheme == .dark {
+                return dayCardShell(colorScheme: colorScheme)
+            }
+            let white = Color(hex: "#ffffff")
+            return LinearGradient(colors: [white, white], startPoint: .top, endPoint: .bottom)
+        }
+    }
+
     // MARK: - Elevation (shadow tokens)
 
     struct ShadowToken {
@@ -304,23 +354,34 @@ enum AppTheme {
         static let glassDark = ShadowToken(color: .black.opacity(0.12), radius: 20, x: 0, y: 10)
         static let glassLight = ShadowToken(color: Overlay.white035, radius: 8, x: 0, y: -1)
 
-        /// Calendar habit shell (white card) — Figma drop shadow: `#5E5E72` @ 24%, blur 72, y 2, x 0, spread 4 (spread N/A in SwiftUI).
+        /// Calendar habit shell — dark: black @ 29%. Light: neutral black (no `#5E5E72` cast; that hue read as a blue/lavender halo behind the card).
         static let calendarShellCard = ShadowToken(
             color: Color(UIColor { tc in
-                let rgb = UIColor(red: 94 / 255, green: 94 / 255, blue: 114 / 255, alpha: 1)
                 if tc.userInterfaceStyle == .dark {
-                    return rgb.withAlphaComponent(0.32)
+                    return UIColor(red: 0, green: 0, blue: 0, alpha: 0.29)
                 }
-                return rgb.withAlphaComponent(0.24)
+                return UIColor(white: 0, alpha: 0.16)
             }),
-            radius: 72,
+            radius: 36,
             x: 0,
             y: 2
         )
-        /// Dashed photo frame on calendar (Figma soft lift).
-        static let calendarPhotoFrame = ShadowToken(color: shadowNeutral(0.08, 0.14), radius: 56, x: 0, y: 2)
+        /// Dashed photo frame on calendar / home — dark: black @ 14%. Light: neutral black (same reason as `calendarShellCard`).
+        static let calendarPhotoFrame = ShadowToken(
+            color: Color(UIColor { tc in
+                if tc.userInterfaceStyle == .dark {
+                    return UIColor.black.withAlphaComponent(0.14)
+                }
+                return UIColor(white: 0, alpha: 0.10)
+            }),
+            radius: 56,
+            x: 0,
+            y: 2
+        )
         /// Selected day chip (Figma `0px 1px 2px` @ 40%).
         static let calendarDayChipSelected = ShadowToken(color: shadowNeutral(0.4, 0.35), radius: 2, x: 0, y: 1)
+        /// Calendar empty-state collage photo tile (Figma `0px 1.68px 60.471px rgba(0,0,0,0.12)`).
+        static let calendarCollagePhoto = ShadowToken(color: Color.black.opacity(0.12), radius: 60.471, x: 0, y: 1.68)
     }
 
     // MARK: - z-index (carousel)
@@ -383,6 +444,20 @@ enum AppTheme {
         /// Horizontal and vertical bars that make up the plus glyph inside the add-photo orb.
         static let calendarAddGlyphLength: CGFloat = 22
         static let calendarAddGlyphThickness: CGFloat = 2
+        /// Calendar empty-state photo collage tile size (Figma 458:1584 — 83.689pt square).
+        static let calendarCollagePhotoSize: CGFloat = 83.689
+        /// Calendar empty-state photo collage corner radius (Figma 13.438pt).
+        static let calendarCollagePhotoRadius: CGFloat = 13.438
+        /// Calendar empty-state photo collage border width (Figma 1.68pt white).
+        static let calendarCollageBorderWidth: CGFloat = 1.68
+        /// Calendar empty-state collage container height (Figma 458:1620 — 110pt).
+        static let calendarCollageHeight: CGFloat = 110
+        /// Calendar empty-state collage container width (Figma 458:1620 — 168pt).
+        static let calendarCollageWidth: CGFloat = 168
+        /// Calendar empty-state "Add habit" CTA width (Figma 458:1582 — 131pt).
+        static let calendarEmptyCTAWidth: CGFloat = 131
+        /// Calendar empty-state "Add habit" CTA height (Figma 458:1582 — 54pt).
+        static let calendarEmptyCTAHeight: CGFloat = 54
         /// Wheel date-picker sheet: grabber + nav + wheel + home indicator (tight; avoid extra bottom gap).
         static let calendarDateSheetDetentHeight: CGFloat = 320
         static let photoGradientHeight: CGFloat = 80

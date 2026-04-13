@@ -21,7 +21,20 @@
       "Bash(ls -la /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/*.swift)",
       "Bash(find /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS -name \"*.swift\" -type f -exec grep -l \"glassEffect\" {} \\\\;)",
       "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && cat {}')",
-      "WebFetch(domain:raw.githubusercontent.com)"
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "mcp__plugin_figma_figma__get_design_context",
+      "mcp__plugin_figma_figma__get_screenshot",
+      "Bash(grep -r \"glassEffect\\\\|customFont\" /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/*.swift --include=\"*.swift\")",
+      "Bash(curl -sL \"https://www.figma.com/api/mcp/asset/1dfa3316-821d-4a7c-8d2f-d1b22d87ee62\" -o /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Assets.xcassets/CalendarCollage1.imageset/collage1.png)",
+      "Bash(curl -sL \"https://www.figma.com/api/mcp/asset/8a16554b-2b0c-48b1-b27c-6855241cd4f2\" -o /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Assets.xcassets/CalendarCollage2.imageset/collage2.png)",
+      "Bash(curl -sL \"https://www.figma.com/api/mcp/asset/e91c24b0-dd20-4e60-bd45-bbd9d5c5c89d\" -o /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Assets.xcassets/CalendarCollage3.imageset/collage3.png)",
+      "Bash(curl -sL \"https://www.figma.com/api/mcp/asset/9add5d62-6aaa-434c-a61b-ef43150a4b76\" -o /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Assets.xcassets/CalendarCollage4.imageset/collage4.png)",
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16 Pro' build)",
+      "Bash(xcodebuild -project /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build)",
+      "WebFetch(domain:www.figma.com)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -configuration Debug build)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build)",
+      "Bash(gh api:*)"
     ],
     "additionalDirectories": [
       "/Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda"

@@ -86,6 +86,11 @@
   --color-tab-bar-accent: var(--ds-system-blue, #007aff);
 
   --color-calendar-shell-border: #eeeeee;
+  /* Horizontal day chip row (Figma 465:2014); mirrors AppTheme calendarDayChipRest*. */
+  --color-calendar-day-chip-rest-fill: var(--color-surface-selected, #e1e5ea);
+  --color-calendar-day-chip-rest-text: var(--color-text-secondary, #5b6271);
+  --color-calendar-day-chip-selected-label: var(--color-text-inverse, #ffffff);
+  --color-calendar-date-header-text: var(--color-text, #16191d);
   --color-calendar-day-selected-fill: #18191b;
   --color-calendar-day-selected-stroke: #ffffff;
   --color-calendar-habit-chip-fill: #eef3ff;
@@ -96,6 +101,8 @@
   --color-calendar-placeholder-pill-orange-text: #7f2a10;
   --color-calendar-placeholder-pill-green-fill: #ecfef7;
   --color-calendar-placeholder-pill-green-text: #003221;
+  /* Calendar habit card title row meta (Figma 458:1795 — neutral 600). */
+  --color-calendar-card-meta-text: #8c95a6;
   /* Calendar placeholder pills — selected (Figma 410:7611). */
   --color-calendar-placeholder-pill-blue-fill-selected: #c5d9ff;
   --color-calendar-placeholder-pill-orange-fill-selected: #ffe0d0;
@@ -128,18 +135,20 @@
   --space-calendar-day-strip-to-card: var(--space-6);
   /* Horizontal gap between day chips (mirrors AppTheme.Spacing.calendarDayChipGap). */
   --space-calendar-day-chip-gap: var(--space-4);
+  /* Home + calendar horizontal habit card row (mirrors AppTheme.Spacing.horizontalHabitCardGap). */
+  --space-horizontal-habit-card-gap: var(--space-3);
   /* Day chip height (Figma; mirrors AppTheme.Layout.calendarDayChipHeight). */
   --layout-calendar-day-chip-height: var(--space-14);
   /* Day chip width (Figma; mirrors AppTheme.Layout.calendarDayChipWidth). */
   --layout-calendar-day-chip-width: var(--space-14);
   /* Date sheet wheel picker detent (mirrors AppTheme.Layout.calendarDateSheetDetentHeight). */
   --layout-calendar-date-sheet-detent-height: 320px;
-  /* Calendar habit shell (white card) drop shadow (Figma: #5E5E72 @ 24%, blur 72, y 2, spread 4). */
+  /* Calendar habit shell — light: neutral black (SwiftUI uses black @ ~16% to avoid #5E5E72 blue cast). */
   --shadow-calendar-shell-blur: 72px;
   --shadow-calendar-shell-y: 2px;
   --shadow-calendar-shell-spread: 4px;
-  --shadow-calendar-shell-color: #5e5e72;
-  --shadow-calendar-shell-opacity: 0.24;
+  --shadow-calendar-shell-color: #000000;
+  --shadow-calendar-shell-opacity: 0.16;
   /* Calendar habit shell (Figma 389:5191). */
   --radius-calendar-shell: 32px;
   --space-3: 12px;
@@ -274,8 +283,12 @@
     --color-tab-bar-accent: #0091ff;
 
     --color-calendar-shell-border: #2c2c2e;
-    --color-calendar-day-selected-fill: #3a3a3c;
-    --color-calendar-day-selected-stroke: #48484a;
+    --color-calendar-day-chip-rest-fill: #262626;
+    --color-calendar-day-chip-rest-text: #9ea1a8;
+    --color-calendar-day-chip-selected-label: #16191d;
+    --color-calendar-date-header-text: #ffffff;
+    --color-calendar-day-selected-fill: #ffffff;
+    --color-calendar-day-selected-stroke: #ffffff;
     --color-calendar-habit-chip-fill: #2e2654;
     --color-calendar-habit-chip-text: #c7c0fb;
 
@@ -284,6 +297,7 @@
     --color-calendar-placeholder-pill-green-fill-selected: #244a3a;
     --color-calendar-placeholder-pill-tag-inner-shadow: rgba(255, 255, 255, 0.42);
     --color-calendar-photo-selected-inner-shadow: rgba(255, 255, 255, 0.26);
+    --color-calendar-card-meta-text: #53555c;
 
     --color-shadow-neutral: #000000;
     --color-stroke-logo: #8e8e93;
