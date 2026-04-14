@@ -16,6 +16,8 @@ struct CalendarTabView: View {
     @Environment(\.colorScheme) private var colorScheme
 
     let habits: [Habit]
+    /// Currently selected habit; mirrors home tab so switching in one place updates the other.
+    let activeHabitId: UUID?
     /// Overrides calendar “today” (e.g. 11 Apr 2026 in previews).
     var todayOverride: Date? = nil
     /// Called when the user taps “Add habit” in the empty state.
@@ -27,12 +29,23 @@ struct CalendarTabView: View {
     /// Which day card is aligned in the horizontal strip; drives header + chip highlight.
     @State private var dayCardScrollPosition = ScrollPosition(idType: String.self)
 
-    init(habits: [Habit], todayOverride: Date? = nil, initialSelectedDate: Date? = nil, onCreateHabit: (() -> Void)? = nil) {
+    init(
+        habits: [Habit],
+        activeHabitId: UUID? = nil,
+        todayOverride: Date? = nil,
+        initialSelectedDate: Date? = nil,
+        onCreateHabit: (() -> Void)? = nil
+    ) {
         self.habits = habits
+        self.activeHabitId = activeHabitId
         self.todayOverride = todayOverride
         self.onCreateHabit = onCreateHabit
         let seed = initialSelectedDate ?? todayOverride ?? Date()
         _selectedDate = State(initialValue: seed)
+    }
+
+    private var resolvedHabit: Habit? {
+        habits.first(where: { $0.id == activeHabitId }) ?? habits.first
     }
 
     private var calendar: Calendar {
@@ -115,7 +128,7 @@ struct CalendarTabView: View {
                     if habits.isEmpty {
                         emptyHabitsPlaceholder
                             .padding(.top, AppTheme.Spacing.calendarDayStripToCard)
-                    } else if let habit = habits.first {
+                    } else if let habit = resolvedHabit {
                         ScrollView(.horizontal, showsIndicators: false) {
                             HStack(spacing: AppTheme.Spacing.horizontalHabitCardGap) {
                                 ForEach(daysInSelectedMonth, id: \.timeIntervalSince1970) { day in

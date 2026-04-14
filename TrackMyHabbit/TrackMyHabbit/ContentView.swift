@@ -36,9 +36,11 @@ struct ContentView: View {
                 }
 
                 Tab(value: AppTab.calendar) {
-                    CalendarTabView(habits: habits) {
-                        presentCreateSheetAfterCTADelay()
-                    }
+                    CalendarTabView(
+                        habits: habits,
+                        activeHabitId: activeHabitId,
+                        onCreateHabit: { presentCreateSheetAfterCTADelay() }
+                    )
                 } label: {
                     Label(AppTab.calendar.title, systemImage: AppTab.calendar.icon)
                 }
