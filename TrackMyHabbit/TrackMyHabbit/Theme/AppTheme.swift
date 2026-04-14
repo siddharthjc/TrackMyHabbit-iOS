@@ -133,19 +133,22 @@ enum AppTheme {
         /// Text on photos, gradient CTAs, and dark media (always light).
         static let textInverse = semantic("#ffffff", "#ffffff")
 
-        /// Contribution graph heat-map ramp — Figma 485:1279/1281/1282/1283 (greptile-green 300/400/500/600).
+        /// Contribution graph heat-map ramp — 5-tier scale (empty → brightest).
         /// Raw sRGB (not wrapped in `semantic`) so cell fills render at the exact
         /// hex values; `UIColor` dynamic resolution can otherwise drift through
         /// extended sRGB on Shape fills, causing the cells to appear washed out.
+        /// Dark ramp mirrors GitHub's contribution graph.
         enum Heatmap {
-            static let lightTier0 = Color(hex: "#7ef8c8")
-            static let lightTier1 = Color(hex: "#27e99f")
-            static let lightTier2 = Color(hex: "#15d38a")
-            static let lightTier3 = Color(hex: "#0ab171")
-            static let darkTier0 = Color(hex: "#183327")
-            static let darkTier1 = Color(hex: "#0e895a")
-            static let darkTier2 = Color(hex: "#15d38a")
-            static let darkTier3 = Color(hex: "#7ef8c8")
+            static let lightTier0 = Color(hex: "#E0E0E0")
+            static let lightTier1 = Color(hex: "#DCF3DD")
+            static let lightTier2 = Color(hex: "#ADEAB7")
+            static let lightTier3 = Color(hex: "#7BDB86")
+            static let lightTier4 = Color(hex: "#00C444")
+            static let darkTier0 = Color(hex: "#262626")
+            static let darkTier1 = Color(hex: "#0E4429")
+            static let darkTier2 = Color(hex: "#006D32")
+            static let darkTier3 = Color(hex: "#26A641")
+            static let darkTier4 = Color(hex: "#39D353")
         }
 
         /// Dotted marketing background (`EmptyStateBackgroundPattern`).
@@ -191,6 +194,8 @@ enum AppTheme {
         static let calendarChipStripShadowBleed: CGFloat = 16
         /// Inset around calendar habit cards inside horizontal `ScrollView` so shell blur 72 is not clipped (Figma drop shadow).
         static let calendarHabitCardShadowBleed: CGFloat = 80
+        /// Visible vertical gap between the calendar habit card row and the contribution graph card below it.
+        static let calendarHabitCardToGraphGap: CGFloat = 40
 
         static let sectionTop: CGFloat = 40
         static let sectionBottom: CGFloat = 32

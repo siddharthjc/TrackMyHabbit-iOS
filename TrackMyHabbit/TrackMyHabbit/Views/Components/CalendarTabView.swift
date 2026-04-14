@@ -172,7 +172,7 @@ struct CalendarTabView: View {
                             }
                         )
                         .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, AppTheme.Spacing.xxl)
+                        .padding(.top, AppTheme.Spacing.calendarHabitCardToGraphGap - AppTheme.Spacing.calendarHabitCardShadowBleed)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -207,7 +207,7 @@ struct CalendarTabView: View {
                 .toolbar {
                     ToolbarItem(placement: .principal) {
                         Text("Choose date")
-                            .customFont(.semibold, size: AppTheme.Typography.Size.lg, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.tight)
+                            .customFont(.serifsemibold, size: AppTheme.Typography.Size.lg, lineHeight: AppTheme.Typography.Line.body24, tracking: AppTheme.Typography.Tracking.tight)
                             .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
                     }
                     ToolbarItem(placement: .confirmationAction) {

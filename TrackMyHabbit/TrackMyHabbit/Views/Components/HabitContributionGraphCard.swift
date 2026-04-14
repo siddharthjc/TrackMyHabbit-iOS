@@ -5,7 +5,7 @@ import SwiftUI
 /// Renders a `heatmapRows × heatmapColumns` grid of completion cells ending on
 /// `today`, ordered chronologically left→right, top→bottom. Each cell's tier
 /// is derived from the streak length ending on that day — binary `HabitEntry`
-/// data → 4-tier ramp by rewarding consistency.
+/// data → 5-tier ramp by rewarding consistency.
 struct HabitContributionGraphCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -63,8 +63,9 @@ struct HabitContributionGraphCard: View {
         switch streak {
         case 0: return 0
         case 1...2: return 1
-        case 3...6: return 2
-        default: return 3
+        case 3...5: return 2
+        case 6...13: return 3
+        default: return 4
         }
     }
 
@@ -74,6 +75,7 @@ struct HabitContributionGraphCard: View {
         case 1: return isDark ? AppTheme.Colors.Heatmap.darkTier1 : AppTheme.Colors.Heatmap.lightTier1
         case 2: return isDark ? AppTheme.Colors.Heatmap.darkTier2 : AppTheme.Colors.Heatmap.lightTier2
         case 3: return isDark ? AppTheme.Colors.Heatmap.darkTier3 : AppTheme.Colors.Heatmap.lightTier3
+        case 4: return isDark ? AppTheme.Colors.Heatmap.darkTier4 : AppTheme.Colors.Heatmap.lightTier4
         default: return isDark ? AppTheme.Colors.Heatmap.darkTier0 : AppTheme.Colors.Heatmap.lightTier0
         }
     }
@@ -159,7 +161,7 @@ struct HabitContributionGraphCard: View {
                     tracking: AppTheme.Typography.Tracking.calendarHabitChip
                 )
                 .foregroundColor(AppTheme.Colors.textSecondary)
-            ForEach(0..<4, id: \.self) { tier in
+            ForEach(0..<5, id: \.self) { tier in
                 RoundedRectangle(cornerRadius: AppTheme.Layout.heatmapCellRadius, style: .continuous)
                     .fill(tierColor(tier))
                     .frame(width: cellSize, height: cellSize)

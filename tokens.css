@@ -120,11 +120,12 @@
   --color-shadow-neutral: var(--ds-neutral-700, #5e5e72);
   --color-stroke-logo: var(--ds-neutral-600, #8a8a9f);
 
-  /* Contribution heat-map ramp (Figma 485:1279/1281/1282/1283 — greptile-green 300/400/500/600); mirrors AppTheme.Colors.Heatmap.*. */
-  --color-heatmap-tier-0: #7ef8c8;
-  --color-heatmap-tier-1: #27e99f;
-  --color-heatmap-tier-2: #15d38a;
-  --color-heatmap-tier-3: #0ab171;
+  /* Contribution heat-map ramp — 5-tier scale (empty → brightest); mirrors AppTheme.Colors.Heatmap.*. */
+  --color-heatmap-tier-0: #e0e0e0;
+  --color-heatmap-tier-1: #dcf3dd;
+  --color-heatmap-tier-2: #adeab7;
+  --color-heatmap-tier-3: #7bdb86;
+  --color-heatmap-tier-4: #00c444;
   /* Contribution heat-map cell (Figma 20×20pt, 4pt radius); mirrors AppTheme.Layout.heatmap*. */
   --layout-heatmap-cell: var(--space-5);
   --radius-heatmap-cell: var(--space-1);
@@ -319,11 +320,12 @@
     --color-shadow-neutral: #000000;
     --color-stroke-logo: #8e8e93;
 
-    /* Contribution heat-map dark ramp (deep green well → bright tier-0 hex highlight). */
-    --color-heatmap-tier-0: #183327;
-    --color-heatmap-tier-1: #0e895a;
-    --color-heatmap-tier-2: #15d38a;
-    --color-heatmap-tier-3: #7ef8c8;
+    /* Contribution heat-map dark ramp — mirrors GitHub's contribution graph. */
+    --color-heatmap-tier-0: #262626;
+    --color-heatmap-tier-1: #0e4429;
+    --color-heatmap-tier-2: #006d32;
+    --color-heatmap-tier-3: #26a641;
+    --color-heatmap-tier-4: #39d353;
     --shadow-contribution-graph-color: #000000;
 
     --color-interactive-hover-overlay: rgba(255, 255, 255, 0.06);
