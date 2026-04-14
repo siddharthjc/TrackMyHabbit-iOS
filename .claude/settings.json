@@ -34,7 +34,11 @@
       "WebFetch(domain:www.figma.com)",
       "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -configuration Debug build)",
       "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(grep -E \"\\\\.swift$\")",
+      "Bash(grep -r \"isCompleted\\\\|hasEntry\\\\|completion\" /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Views/Components/*.swift)",
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build -quiet)",
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build)"
     ],
     "additionalDirectories": [
       "/Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda"

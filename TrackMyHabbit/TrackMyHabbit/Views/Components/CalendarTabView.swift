@@ -159,6 +159,20 @@ struct CalendarTabView: View {
                         }
                         .padding(.top, AppTheme.Spacing.calendarDayStripToCard)
                         .scrollClipDisabled()
+
+                        HabitContributionGraphCard(
+                            habit: habit,
+                            calendar: calendar,
+                            today: effectiveToday,
+                            cardWidth: cardWidth,
+                            onSelectDate: { date in
+                                withAnimation(AppTheme.Motion.easeTab) {
+                                    applyAbsoluteDisplayedDay(date)
+                                }
+                            }
+                        )
+                        .frame(maxWidth: .infinity, alignment: .center)
+                        .padding(.top, AppTheme.Spacing.xxl)
                     }
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)

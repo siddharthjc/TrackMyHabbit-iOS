@@ -120,6 +120,23 @@
   --color-shadow-neutral: var(--ds-neutral-700, #5e5e72);
   --color-stroke-logo: var(--ds-neutral-600, #8a8a9f);
 
+  /* Contribution heat-map ramp (Figma 485:1279/1281/1282/1283 — greptile-green 300/400/500/600); mirrors AppTheme.Colors.Heatmap.*. */
+  --color-heatmap-tier-0: #7ef8c8;
+  --color-heatmap-tier-1: #27e99f;
+  --color-heatmap-tier-2: #15d38a;
+  --color-heatmap-tier-3: #0ab171;
+  /* Contribution heat-map cell (Figma 20×20pt, 4pt radius); mirrors AppTheme.Layout.heatmap*. */
+  --layout-heatmap-cell: var(--space-5);
+  --radius-heatmap-cell: var(--space-1);
+  --layout-heatmap-min-gap: var(--space-1);
+  --layout-heatmap-columns: 12;
+  --layout-heatmap-rows: 7;
+  /* Contribution graph card shadow (Figma 483:2160 — `0px 2px 72px rgba(94,94,114,0.32)`). */
+  --shadow-contribution-graph-blur: 72px;
+  --shadow-contribution-graph-y: 2px;
+  --shadow-contribution-graph-color: var(--ds-neutral-700, #5e5e72);
+  --shadow-contribution-graph-opacity: 0.32;
+
   /* Interactive (documented states) */
   --color-interactive-hover-overlay: rgba(0, 0, 0, 0.04);
   --color-interactive-pressed-overlay: rgba(0, 0, 0, 0.08);
@@ -301,6 +318,13 @@
 
     --color-shadow-neutral: #000000;
     --color-stroke-logo: #8e8e93;
+
+    /* Contribution heat-map dark ramp (deep green well → bright tier-0 hex highlight). */
+    --color-heatmap-tier-0: #183327;
+    --color-heatmap-tier-1: #0e895a;
+    --color-heatmap-tier-2: #15d38a;
+    --color-heatmap-tier-3: #7ef8c8;
+    --shadow-contribution-graph-color: #000000;
 
     --color-interactive-hover-overlay: rgba(255, 255, 255, 0.06);
     --color-interactive-pressed-overlay: rgba(255, 255, 255, 0.12);

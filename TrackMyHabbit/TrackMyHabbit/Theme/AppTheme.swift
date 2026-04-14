@@ -133,6 +133,21 @@ enum AppTheme {
         /// Text on photos, gradient CTAs, and dark media (always light).
         static let textInverse = semantic("#ffffff", "#ffffff")
 
+        /// Contribution graph heat-map ramp — Figma 485:1279/1281/1282/1283 (greptile-green 300/400/500/600).
+        /// Raw sRGB (not wrapped in `semantic`) so cell fills render at the exact
+        /// hex values; `UIColor` dynamic resolution can otherwise drift through
+        /// extended sRGB on Shape fills, causing the cells to appear washed out.
+        enum Heatmap {
+            static let lightTier0 = Color(hex: "#7ef8c8")
+            static let lightTier1 = Color(hex: "#27e99f")
+            static let lightTier2 = Color(hex: "#15d38a")
+            static let lightTier3 = Color(hex: "#0ab171")
+            static let darkTier0 = Color(hex: "#183327")
+            static let darkTier1 = Color(hex: "#0e895a")
+            static let darkTier2 = Color(hex: "#15d38a")
+            static let darkTier3 = Color(hex: "#7ef8c8")
+        }
+
         /// Dotted marketing background (`EmptyStateBackgroundPattern`).
         static let patternDot = semantic(
             UIColor(red: 179 / 255, green: 179 / 255, blue: 195 / 255, alpha: 0.10),
@@ -382,6 +397,18 @@ enum AppTheme {
         static let calendarDayChipSelected = ShadowToken(color: shadowNeutral(0.4, 0.35), radius: 2, x: 0, y: 1)
         /// Calendar empty-state collage photo tile (Figma `0px 1.68px 60.471px rgba(0,0,0,0.12)`).
         static let calendarCollagePhoto = ShadowToken(color: Color.black.opacity(0.12), radius: 60.471, x: 0, y: 1.68)
+        /// Contribution graph card shadow (Figma 483:2160 — `0px 2px 72px rgba(94,94,114,0.32)`).
+        static let contributionGraphCard = ShadowToken(
+            color: Color(UIColor { tc in
+                if tc.userInterfaceStyle == .dark {
+                    return UIColor.black.withAlphaComponent(0.32)
+                }
+                return UIColor(red: 94 / 255, green: 94 / 255, blue: 114 / 255, alpha: 0.32)
+            }),
+            radius: 72,
+            x: 0,
+            y: 2
+        )
     }
 
     // MARK: - z-index (carousel)
@@ -467,6 +494,16 @@ enum AppTheme {
         static let logoInnerBlur: CGFloat = 1
         static let logoInnerOffsetY: CGFloat = -1.5
         static let logoInnerStrokeWidth: CGFloat = 3
+        /// Contribution graph: cell square size (Figma 485:1279 — 20pt).
+        static let heatmapCell: CGFloat = 20
+        /// Contribution graph: cell corner radius (Figma 4pt).
+        static let heatmapCellRadius: CGFloat = 4
+        /// Contribution graph: minimum gap between cells; actual gap is computed to fill card width.
+        static let heatmapMinGap: CGFloat = 4
+        /// Contribution graph: columns per row (12 cells per row, `justify-between`).
+        static let heatmapColumns: Int = 12
+        /// Contribution graph: rows (7 rows of cells stacked vertically with 4pt gap — 84-day rolling window).
+        static let heatmapRows: Int = 7
     }
 
     // MARK: - Liquid glass material opacities
