@@ -98,6 +98,15 @@ enum AppTheme {
         static let calendarDayChipSelectedLabel = semantic("#ffffff", "#16191d")
         /// Calendar header “11 April” title (Figma 465:2017 — white in dark).
         static let calendarDateHeaderText = semantic("#16191d", "#ffffff")
+        /// Weekday header row ("SUN MON TUE …") above the month grid.
+        static let calendarGridWeekdayText = semantic("#8c95a6", "#8e8e93")
+        /// Today ring stroke on the month grid (mirrors selected day chip fill).
+        static let calendarGridTodayRing = semantic("#18191b", "#ffffff")
+        /// Dimmed scrim behind the tap-open calendar card overlay (Figma 365:173 — pairs with blur material).
+        static let calendarOverlayScrim = semantic(
+            UIColor(white: 0, alpha: 0.18),
+            UIColor(white: 0, alpha: 0.32)
+        )
         /// Habit name pill on calendar card (Figma pond-blue-50 / 900).
         static let calendarHabitChipFill = semantic("#eef3ff", "#2e2654")
         static let calendarHabitChipText = semantic("#0e2772", "#c7c0fb")
@@ -133,17 +142,16 @@ enum AppTheme {
         /// Text on photos, gradient CTAs, and dark media (always light).
         static let textInverse = semantic("#ffffff", "#ffffff")
 
-        /// Contribution graph heat-map ramp — 5-tier scale (empty → brightest).
-        /// Raw sRGB (not wrapped in `semantic`) so cell fills render at the exact
-        /// hex values; `UIColor` dynamic resolution can otherwise drift through
-        /// extended sRGB on Shape fills, causing the cells to appear washed out.
-        /// Dark ramp mirrors GitHub's contribution graph.
+        /// Contribution graph heat-map — binary active/inactive for the streak
+        /// card (Figma 510:1864). `tier0` = no entry, `tier4` = entry logged.
+        /// Intermediate tiers retained for future tiered visualisations; keep
+        /// raw sRGB so `UIColor` dynamic resolution does not wash out fills.
         enum Heatmap {
             static let lightTier0 = Color(hex: "#E0E0E0")
             static let lightTier1 = Color(hex: "#DCF3DD")
             static let lightTier2 = Color(hex: "#ADEAB7")
             static let lightTier3 = Color(hex: "#7BDB86")
-            static let lightTier4 = Color(hex: "#00C444")
+            static let lightTier4 = Color(hex: "#15D38A")
             static let darkTier0 = Color(hex: "#262626")
             static let darkTier1 = Color(hex: "#0E4429")
             static let darkTier2 = Color(hex: "#006D32")
@@ -196,6 +204,16 @@ enum AppTheme {
         static let calendarHabitCardShadowBleed: CGFloat = 80
         /// Visible vertical gap between the calendar habit card row and the contribution graph card below it.
         static let calendarHabitCardToGraphGap: CGFloat = 40
+        /// Horizontal gap between cells in the month grid (Figma 510:1543 `gap-x-[4px]`).
+        static let calendarGridCellGap: CGFloat = 4
+        /// Vertical gap between rows in the month grid (Figma 510:1543 `gap-y-[8px]`).
+        static let calendarGridRowGap: CGFloat = 8
+        /// Combined gap from weekday header baseline to first grid row (2pt outer + 8pt inner per Figma 510:1691).
+        static let calendarGridWeekdayToGrid: CGFloat = 10
+        /// Gap from the calendar date title row to the month grid weekday header.
+        static let calendarGridHeaderToGrid: CGFloat = 20
+        /// Gap below the month grid before the contribution graph card.
+        static let calendarGridToGraphGap: CGFloat = 32
 
         static let sectionTop: CGFloat = 40
         static let sectionBottom: CGFloat = 32
@@ -230,6 +248,8 @@ enum AppTheme {
             static let lg: CGFloat = 20
             static let xl: CGFloat = 24
             static let display: CGFloat = 40
+            /// Streak hero digit on contribution card (Figma 510:2100 — Season Mix 64pt).
+            static let streakHero: CGFloat = 64
             /// Upper weekday row on calendar day chips (Figma 389:5150).
             static let calendarDayAbbrev: CGFloat = 10
             /// Plus icon inside calendar add-photo orb (Figma 389:5197).
@@ -447,9 +467,6 @@ enum AppTheme {
         static let emptyHeroAspect: CGFloat = 456.0 / 402.0
         static let minTouchTarget: CGFloat = 44
         static let navIconSize: CGFloat = 48
-        static let homeAddButtonSize: CGFloat = 40
-        /// Vertical gap from home header bottom to card carousel top (Figma 429:943).
-        static let homeHeaderToCard: CGFloat = 56
         static let patternDotSpacing: CGFloat = 22
         static let patternDotRadius: CGFloat = 1.2
         static let patternDotOpacity: Double = 0.10
@@ -499,6 +516,15 @@ enum AppTheme {
         static let logoInnerBlur: CGFloat = 1
         static let logoInnerOffsetY: CGFloat = -1.5
         static let logoInnerStrokeWidth: CGFloat = 3
+        /// Height reserved in the scroll view for the floating calendar date-title row.
+        /// Equals the title content height below `Spacing.md` (`"15 April" 24pt SeasonMix`).
+        static let calendarTitleContentHeight: CGFloat = 32
+        /// Extra fade region below the title for the progressive-blur mask.
+        static let calendarTitleBlurFadeHeight: CGFloat = 24
+        /// Streak hero fire glyph (Figma 510:2099 — 64pt square container).
+        static let streakFireIconSize: CGFloat = 64
+        /// SF Symbol point size inside the 64pt fire container.
+        static let streakFireSymbolSize: CGFloat = 44
         /// Contribution graph: cell square size (Figma 485:1279 — 20pt).
         static let heatmapCell: CGFloat = 20
         /// Contribution graph: cell corner radius (Figma 4pt).
@@ -509,6 +535,16 @@ enum AppTheme {
         static let heatmapColumns: Int = 12
         /// Contribution graph: rows (7 rows of cells stacked vertically with 4pt gap — 84-day rolling window).
         static let heatmapRows: Int = 7
+        /// Month grid columns (Sun…Sat).
+        static let calendarGridColumns: Int = 7
+        /// Corner radius for month grid day cells (matches existing day chip radius).
+        static let calendarGridCellRadius: CGFloat = 12
+        /// Today ring stroke width on the month grid.
+        static let calendarGridTodayRingWidth: CGFloat = 1.5
+        /// Close / menu button size on the tap-open overlay card (Figma 365:178, 365:186 — 48×48).
+        static let calendarOverlayChromeButton: CGFloat = 48
+        /// Top inset from safe-area top for the floating overlay card (Figma 365:173 — `padding-top: 40`).
+        static let calendarOverlayCardTopInset: CGFloat = 40
     }
 
     // MARK: - Liquid glass material opacities
@@ -524,6 +560,8 @@ enum AppTheme {
 
     enum Opacity {
         static let emptyStatePlaceholder: Double = 0.5
+        /// Future month-grid days are read-only — visually muted to signal "not yet available".
+        static let calendarFutureDay: Double = 0.35
     }
 
     /// Standard black/white overlays (maps to rgba patterns in specs).

@@ -7,19 +7,16 @@
 
 import SwiftUI
 import SwiftData
-import UIKit
 
 struct ContentView: View {
-    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
     @State private var activeHabitId: UUID?
-    @State private var selectedTab: AppTab = .home
+    @State private var selectedTab: AppTab = ProcessInfo.processInfo.arguments.contains("--start-calendar") ? .calendar : .home
 
     @State private var showCreateSheet = false
     @State private var showEditSheet = false
-    @State private var homeDays: [String] = DateUtils.generateDays(count: 30)
-    @State private var homeScreenWidth: CGFloat = 393
+    @State private var photoSourceController = PhotoSourceController()
 
     var activeHabit: Habit? {
         // Fallback to the first habit if active is not set or not found
@@ -39,7 +36,8 @@ struct ContentView: View {
                     CalendarTabView(
                         habits: habits,
                         activeHabitId: activeHabitId,
-                        onCreateHabit: { presentCreateSheetAfterCTADelay() }
+                        onCreateHabit: { presentCreateSheetAfterCTADelay() },
+                        onEditHabit: { showEditSheet = true }
                     )
                 } label: {
                     Label(AppTab.calendar.title, systemImage: AppTab.calendar.icon)
@@ -81,6 +79,8 @@ struct ContentView: View {
             }
 
         }
+        .environment(photoSourceController)
+        .photoSourcePickerRoot(photoSourceController)
     }
 
     /// Custom binding that intercepts tab selection so "Habits" and "Add" never
@@ -120,8 +120,6 @@ struct ContentView: View {
                 EmptyState {
                     presentCreateSheetAfterCTADelay()
                 }
-            } else if habits.count == 1, let habit = habits.first {
-                singleHabitHome(habit: habit)
             } else if let habit = activeHabit {
                 VStack(spacing: 0) {
                     HabitSwitcher(
@@ -138,118 +136,6 @@ struct ContentView: View {
                 .padding(.bottom, AppTheme.Spacing.lg)
             }
         }
-    }
-
-    // MARK: - Single-Habit Home
-
-    private var homeHeader: some View {
-        HStack {
-            Text("TrackMyHabbit")
-                .customFont(
-                    .serifsemibold,
-                    size: AppTheme.Typography.Size.xl,
-                    tracking: AppTheme.Typography.Tracking.titleXL
-                )
-                .foregroundColor(AppTheme.Colors.textPrimary)
-
-            Spacer()
-
-            Button(action: { showCreateSheet = true }) {
-                Image(systemName: "plus")
-                    .font(.system(size: AppTheme.Typography.Size.lg, weight: .medium))
-                    .foregroundColor(AppTheme.Colors.textPrimary)
-                    .frame(
-                        width: AppTheme.Layout.navIconSize,
-                        height: AppTheme.Layout.navIconSize
-                    )
-            }
-            .glassEffect(.regular, in: Circle())
-        }
-        .padding(.horizontal, AppTheme.Spacing.lg)
-        .padding(.top, AppTheme.Spacing.tabBarTopInset)
-    }
-
-    @ViewBuilder
-    private func singleHabitHome(habit: Habit) -> some View {
-        let cardWidth = min(
-            AppTheme.Layout.calendarCardWidth,
-            homeScreenWidth - AppTheme.Spacing.lg * 2
-        )
-        let today = Calendar.current.startOfDay(for: Date())
-
-        VStack(spacing: 0) {
-            homeHeader
-
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(spacing: AppTheme.Spacing.horizontalHabitCardGap) {
-                    ForEach(homeDays, id: \.self) { dateStr in
-                        HomeDayCard(
-                            habit: habit,
-                            dateStr: dateStr,
-                            cardWidth: cardWidth,
-                            effectiveToday: today,
-                            onImagePicked: { data in
-                                saveHomeEntryImage(data, habit: habit, dateStr: dateStr)
-                            }
-                        )
-                    }
-                }
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.calendarHabitCardShadowBleed)
-                .scrollTargetLayout()
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .scrollBounceBehavior(.basedOnSize)
-            .scrollClipDisabled()
-            .padding(.top, AppTheme.Layout.homeHeaderToCard)
-
-            Spacer(minLength: 0)
-        }
-        .onGeometryChange(for: CGFloat.self) { proxy in
-            proxy.size.width
-        } action: { newWidth in
-            homeScreenWidth = newWidth
-        }
-        .onAppear { refreshHomeDays() }
-        .onReceive(
-            NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)
-        ) { _ in
-            refreshHomeDays()
-        }
-    }
-
-    private func saveHomeEntryImage(_ data: Data, habit: Habit, dateStr: String) {
-        let existing = habit.entries.first(where: { $0.dateString == dateStr })
-
-        do {
-            let fileURL = try HabitPhotoFileStore.persistJPEG(
-                data: data,
-                habitID: habit.id,
-                dateString: dateStr
-            )
-            do {
-                if let existing {
-                    existing.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateStr,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-                try modelContext.save()
-            } catch {
-                try? FileManager.default.removeItem(at: fileURL)
-            }
-        } catch {
-            print("Failed to save home photo: \(error.localizedDescription)")
-        }
-    }
-
-    private func refreshHomeDays() {
-        let newDays = DateUtils.generateDays(count: 30)
-        if newDays != homeDays { homeDays = newDays }
     }
 }
 

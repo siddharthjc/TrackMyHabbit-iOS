@@ -38,10 +38,26 @@
       "Bash(grep -E \"\\\\.swift$\")",
       "Bash(grep -r \"isCompleted\\\\|hasEntry\\\\|completion\" /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit/Views/Components/*.swift)",
       "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build -quiet)",
-      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build)"
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' -configuration Debug build)",
+      "mcp__plugin_figma_figma__get_metadata",
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 17' build)",
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -sdk iphonesimulator -destination 'platform=iOS Simulator,id=CD4778D8-FFC0-4910-845F-9257633D6583' build)",
+      "mcp__plugin_figma_figma__use_figma",
+      "Bash(osascript -e 'tell application \"Simulator\" to activate')",
+      "Bash(osascript)",
+      "Bash(curl -sL \"https://www.figma.com/api/mcp/asset/c22474fe-921d-4fd0-8b51-ed9bf56587ad\" -o /tmp/fire/fire.png)",
+      "Bash(identify /tmp/fire/fire.png)",
+      "Bash(sips -g pixelWidth -g pixelHeight /tmp/fire/fire.png)",
+      "Bash(gh repo:*)",
+      "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16 Pro' -configuration Debug build)",
+      "Bash(xcodebuild -project TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17 Pro' build)",
+      "Bash(xcodebuild -project TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16' -configuration Debug build)",
+      "Bash(xcodebuild -project TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 17' -configuration Debug build)",
+      "Bash(xcodebuild -project /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'id=CD4778D8-FFC0-4910-845F-9257633D6583' -configuration Debug build)"
     ],
     "additionalDirectories": [
-      "/Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda"
+      "/Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda",
+      "/tmp"
     ]
   }
 }

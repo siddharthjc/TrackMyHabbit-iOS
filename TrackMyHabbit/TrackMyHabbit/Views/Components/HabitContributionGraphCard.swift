@@ -1,11 +1,11 @@
 import SwiftUI
 
-/// Contribution heat-map for the active habit (Figma 483:2159).
+/// Streak card + binary contribution heat-map (Figma 510:1864).
 ///
-/// Renders a `heatmapRows × heatmapColumns` grid of completion cells ending on
-/// `today`, ordered chronologically left→right, top→bottom. Each cell's tier
-/// is derived from the streak length ending on that day — binary `HabitEntry`
-/// data → 5-tier ramp by rewarding consistency.
+/// Displays the active habit's current streak as a hero (fire + digit + label)
+/// followed by a 7×12 grid of the last 84 days. Each cell is binary: green if a
+/// `HabitEntry` exists for that date, gray otherwise. Tapping a cell forwards
+/// the date to `onSelectDate`.
 struct HabitContributionGraphCard: View {
     @Environment(\.colorScheme) private var colorScheme
 
@@ -59,31 +59,18 @@ struct HabitContributionGraphCard: View {
         return count
     }
 
-    private func tier(forStreak streak: Int) -> Int {
-        switch streak {
-        case 0: return 0
-        case 1...2: return 1
-        case 3...5: return 2
-        case 6...13: return 3
-        default: return 4
-        }
+    private var inactiveColor: Color {
+        colorScheme == .dark ? AppTheme.Colors.Heatmap.darkTier0 : AppTheme.Colors.Heatmap.lightTier0
     }
 
-    private func tierColor(_ tier: Int) -> Color {
-        let isDark = colorScheme == .dark
-        switch tier {
-        case 1: return isDark ? AppTheme.Colors.Heatmap.darkTier1 : AppTheme.Colors.Heatmap.lightTier1
-        case 2: return isDark ? AppTheme.Colors.Heatmap.darkTier2 : AppTheme.Colors.Heatmap.lightTier2
-        case 3: return isDark ? AppTheme.Colors.Heatmap.darkTier3 : AppTheme.Colors.Heatmap.lightTier3
-        case 4: return isDark ? AppTheme.Colors.Heatmap.darkTier4 : AppTheme.Colors.Heatmap.lightTier4
-        default: return isDark ? AppTheme.Colors.Heatmap.darkTier0 : AppTheme.Colors.Heatmap.lightTier0
-        }
+    private var activeColor: Color {
+        colorScheme == .dark ? AppTheme.Colors.Heatmap.darkTier4 : AppTheme.Colors.Heatmap.lightTier4
     }
 
     var body: some View {
         let set = entrySet
         VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-            title
+            streakHero(set: set)
             grid(set: set)
             divider
             legend
@@ -103,16 +90,41 @@ struct HabitContributionGraphCard: View {
         .appShadow(AppTheme.Elevation.contributionGraphCard)
     }
 
-    private var title: some View {
-        Text("Latest trends")
-            .customFont(
-                .semibold,
-                size: AppTheme.Typography.Size.md,
-                lineHeight: AppTheme.Typography.Line.body192,
-                tracking: AppTheme.Typography.Tracking.tight
-            )
-            .foregroundColor(AppTheme.Colors.textPrimary)
-            .padding(.horizontal, AppTheme.Spacing.lg)
+    private func streakHero(set: Set<String>) -> some View {
+        let streakCount = streak(endingAt: todayStart, set: set)
+        let label = streakCount < 2 ? "day streak" : "days streak"
+        return VStack(alignment: .center, spacing: 0) {
+            HStack(spacing: AppTheme.Spacing.xs) {
+                Image("StreakFire")
+                    .renderingMode(.original)
+                    .resizable()
+                    .aspectRatio(contentMode: .fit)
+                    .frame(
+                        width: AppTheme.Layout.streakFireIconSize,
+                        height: AppTheme.Layout.streakFireIconSize
+                    )
+                Text("\(streakCount)")
+                    .customFont(
+                        .serifsemibold,
+                        size: AppTheme.Typography.Size.streakHero,
+                        tracking: AppTheme.Typography.Tracking.tight
+                    )
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .contentTransition(.numericText())
+            }
+            Text(label)
+                .customFont(
+                    .semibold,
+                    size: AppTheme.Typography.Size.lg,
+                    tracking: AppTheme.Typography.Tracking.tight
+                )
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .multilineTextAlignment(.center)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.horizontal, AppTheme.Spacing.lg)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(Text("\(streakCount) \(label)"))
     }
 
     private func grid(set: Set<String>) -> some View {
@@ -131,17 +143,17 @@ struct HabitContributionGraphCard: View {
     private func cellView(row: Int, column: Int, set: Set<String>) -> some View {
         let cellDate = date(row: row, column: column)
         let key = DateUtils.toDateString(date: cellDate)
-        let t = tier(forStreak: streak(endingAt: cellDate, set: set))
+        let isActive = set.contains(key)
         return Button {
             onSelectDate?(cellDate)
         } label: {
             RoundedRectangle(cornerRadius: AppTheme.Layout.heatmapCellRadius, style: .continuous)
-                .fill(tierColor(t))
+                .fill(isActive ? activeColor : inactiveColor)
                 .frame(width: cellSize, height: cellSize)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(Text(DateUtils.formatDateWithOrdinal(key)))
-        .accessibilityValue(Text(set.contains(key) ? "Completed" : "Missed"))
+        .accessibilityValue(Text(isActive ? "Completed" : "Missed"))
     }
 
     private var divider: some View {
@@ -153,7 +165,7 @@ struct HabitContributionGraphCard: View {
     private var legend: some View {
         HStack(spacing: AppTheme.Spacing.sm) {
             Spacer(minLength: 0)
-            Text("Less")
+            Text("No Activity")
                 .customFont(
                     .medium,
                     size: AppTheme.Typography.Size.xs,
@@ -161,12 +173,13 @@ struct HabitContributionGraphCard: View {
                     tracking: AppTheme.Typography.Tracking.calendarHabitChip
                 )
                 .foregroundColor(AppTheme.Colors.textSecondary)
-            ForEach(0..<5, id: \.self) { tier in
-                RoundedRectangle(cornerRadius: AppTheme.Layout.heatmapCellRadius, style: .continuous)
-                    .fill(tierColor(tier))
-                    .frame(width: cellSize, height: cellSize)
-            }
-            Text("More")
+            RoundedRectangle(cornerRadius: AppTheme.Layout.heatmapCellRadius, style: .continuous)
+                .fill(inactiveColor)
+                .frame(width: cellSize, height: cellSize)
+            RoundedRectangle(cornerRadius: AppTheme.Layout.heatmapCellRadius, style: .continuous)
+                .fill(activeColor)
+                .frame(width: cellSize, height: cellSize)
+            Text("Active")
                 .customFont(
                     .medium,
                     size: AppTheme.Typography.Size.xs,

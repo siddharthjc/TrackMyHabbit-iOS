@@ -103,6 +103,24 @@
   --color-calendar-placeholder-pill-green-text: #003221;
   /* Calendar habit card title row meta (Figma 458:1795 — neutral 600). */
   --color-calendar-card-meta-text: #8c95a6;
+  /* Weekday header row ("SUN MON …") above the Instagram-style month grid. */
+  --color-calendar-grid-weekday-text: #8c95a6;
+  /* Today ring stroke on the month grid — mirrors the selected day chip fill. */
+  --color-calendar-grid-today-ring: #18191b;
+  /* Scrim behind the tap-open overlay card (pairs with blur material). */
+  --color-calendar-overlay-scrim: rgba(0, 0, 0, 0.18);
+  /* Month grid day cell corner radius + gap (mirrors AppTheme.Layout.calendarGridCell*). */
+  --radius-calendar-grid-cell: var(--radius-md, 12px);
+  --space-calendar-grid-cell-gap: var(--space-1);
+  --space-calendar-grid-row-gap: var(--space-2);
+  --space-calendar-grid-weekday-to-grid: 10px;
+  --space-calendar-grid-header-to-grid: var(--space-5);
+  --space-calendar-grid-to-graph-gap: var(--space-7);
+  --layout-calendar-grid-columns: 7;
+  --layout-calendar-grid-today-ring-width: 1.5px;
+  /* Tap-open overlay card chrome (Figma 365:178, 365:186 — 48×48 close/menu buttons). */
+  --layout-calendar-overlay-chrome-button: var(--space-14);
+  --layout-calendar-overlay-card-top-inset: var(--space-8);
   /* Calendar placeholder pills — selected (Figma 410:7611). */
   --color-calendar-placeholder-pill-blue-fill-selected: #c5d9ff;
   --color-calendar-placeholder-pill-orange-fill-selected: #ffe0d0;
@@ -120,12 +138,12 @@
   --color-shadow-neutral: var(--ds-neutral-700, #5e5e72);
   --color-stroke-logo: var(--ds-neutral-600, #8a8a9f);
 
-  /* Contribution heat-map ramp — 5-tier scale (empty → brightest); mirrors AppTheme.Colors.Heatmap.*. */
+  /* Contribution heat-map — binary active/inactive (Figma 510:1864); intermediate tiers retained for future tiered visualisations. Mirrors AppTheme.Colors.Heatmap.*. */
   --color-heatmap-tier-0: #e0e0e0;
   --color-heatmap-tier-1: #dcf3dd;
   --color-heatmap-tier-2: #adeab7;
   --color-heatmap-tier-3: #7bdb86;
-  --color-heatmap-tier-4: #00c444;
+  --color-heatmap-tier-4: #15d38a;
   /* Contribution heat-map cell (Figma 20×20pt, 4pt radius); mirrors AppTheme.Layout.heatmap*. */
   --layout-heatmap-cell: var(--space-5);
   --radius-heatmap-cell: var(--space-1);
@@ -195,6 +213,14 @@
   --font-size-lg: 20px;
   --font-size-xl: 24px;
   --font-size-display: 40px;
+  /* Calendar floating title row — reserved scroll inset + blur fade extension. */
+  --layout-calendar-title-content-height: 32px;
+  --layout-calendar-title-blur-fade-height: 24px;
+  /* Streak hero digit on contribution card (Figma 510:2100). */
+  --font-size-streak-hero: 64px;
+  /* Streak hero fire glyph container (Figma 510:2099). */
+  --layout-streak-fire-icon: 64px;
+  --layout-streak-fire-symbol: 44px;
 
   --font-weight-regular: 400;
   --font-weight-medium: 500;
@@ -316,6 +342,9 @@
     --color-calendar-placeholder-pill-tag-inner-shadow: rgba(255, 255, 255, 0.42);
     --color-calendar-photo-selected-inner-shadow: rgba(255, 255, 255, 0.26);
     --color-calendar-card-meta-text: #53555c;
+    --color-calendar-grid-weekday-text: #8e8e93;
+    --color-calendar-grid-today-ring: #ffffff;
+    --color-calendar-overlay-scrim: rgba(0, 0, 0, 0.32);
 
     --color-shadow-neutral: #000000;
     --color-stroke-logo: #8e8e93;

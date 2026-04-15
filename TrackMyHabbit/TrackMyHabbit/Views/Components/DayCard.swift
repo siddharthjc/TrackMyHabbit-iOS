@@ -1,4 +1,3 @@
-import PhotosUI
 import SwiftUI
 import SwiftData
 
@@ -14,8 +13,7 @@ struct DayCard: View {
     let onImagePicked: (Data) -> Void
 
     var isEmpty: Bool { entry?.imageUri == nil }
-    @State private var selectedPhoto: PhotosPickerItem?
-    @State private var showPhotoPicker = false
+    @Environment(PhotoSourceController.self) private var photoSource
 
     private var cardShadow: AppTheme.ShadowToken {
         if colorScheme == .dark {
@@ -44,21 +42,9 @@ struct DayCard: View {
             .contentShape(Rectangle())
             .onTapGesture {
                 if isActive {
-                    showPhotoPicker = true
+                    photoSource.present(onImagePicked: onImagePicked)
                 } else {
                     tapAction()
-                }
-            }
-            .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
-            .task(id: selectedPhoto) {
-                guard let selectedPhoto else { return }
-
-                defer {
-                    self.selectedPhoto = nil
-                }
-
-                if let data = try? await selectedPhoto.loadTransferable(type: Data.self) {
-                    onImagePicked(data)
                 }
             }
     }

@@ -392,6 +392,78 @@ struct MonthPickerBottomSheet: View {
     }
 }
 
+// MARK: - Photo Source Bottom Sheet (Gallery vs. Camera)
+
+struct PhotoSourceBottomSheet: View {
+    @Binding var isPresented: Bool
+    var onSelectGallery: () -> Void
+    var onSelectCamera: () -> Void
+
+    @State private var sheetOffset: CGFloat = UIWindow.isLandscape ? 100 : 300
+    @State private var backdropOpacity: Double = 0
+
+    var body: some View {
+        ZStack {
+            if isPresented {
+                Color.black.opacity(0.3)
+                    .opacity(backdropOpacity)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        closeSheet()
+                    }
+
+                VStack(spacing: AppTheme.Spacing.xxl - 8) {
+                    Button(action: {
+                        closeSheet(then: onSelectGallery)
+                    }) {
+                        Text("Upload from gallery")
+                            .customFont(.semibold, size: AppTheme.Spacing.md, tracking: -0.32)
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                    Button(action: {
+                        closeSheet(then: onSelectCamera)
+                    }) {
+                        Text("Take a photo")
+                            .customFont(.semibold, size: AppTheme.Spacing.md, tracking: -0.32)
+                            .foregroundColor(AppTheme.Colors.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                .padding(AppTheme.Spacing.lg)
+                .background(AppTheme.Colors.bgSecondary)
+                .cornerRadius(AppTheme.Radius.xl)
+                .appShadow(AppTheme.Elevation.sheet)
+                .padding(.horizontal, AppTheme.Spacing.lg)
+                .padding(.bottom, AppTheme.Spacing.lg)
+                .offset(y: sheetOffset)
+                .frame(maxHeight: .infinity, alignment: .bottom)
+                .onAppear {
+                    withAnimation(AppTheme.Motion.easeSheetIn) {
+                        backdropOpacity = 1.0
+                    }
+                    withAnimation(AppTheme.Motion.springSheetOverlay) {
+                        sheetOffset = 0
+                    }
+                }
+            }
+        }
+    }
+
+    private func closeSheet(then completion: (() -> Void)? = nil) {
+        withAnimation(AppTheme.Motion.easeSheetOut) {
+            backdropOpacity = 0.0
+        }
+        withAnimation(.spring(response: 0.3, dampingFraction: 1.0, blendDuration: 0)) {
+            sheetOffset = 300
+        }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.25) {
+            isPresented = false
+            completion?()
+        }
+    }
+}
+
 // MARK: - Landscape Helper
 
 extension UIWindow {

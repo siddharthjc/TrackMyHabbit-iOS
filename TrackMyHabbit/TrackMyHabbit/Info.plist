@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>TrackMyHabbit uses the camera so you can capture today's habit photo.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SeasonMix-SemiBold-TRIAL.ttf</string>

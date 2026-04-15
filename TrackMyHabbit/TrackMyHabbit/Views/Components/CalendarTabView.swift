@@ -3,14 +3,6 @@ import SwiftData
 import SwiftUI
 import UIKit
 
-private enum DayChipStripScrollOffsetKey: PreferenceKey {
-    static var defaultValue: CGFloat { 0 }
-
-    static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
-        value = nextValue()
-    }
-}
-
 struct CalendarTabView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var colorScheme
@@ -22,24 +14,32 @@ struct CalendarTabView: View {
     var todayOverride: Date? = nil
     /// Called when the user taps “Add habit” in the empty state.
     var onCreateHabit: (() -> Void)? = nil
+    /// Called when the user taps the 3-dot menu on the tap-open card screen —
+    /// opens the edit-habit sheet in the parent for the active habit.
+    var onEditHabit: (() -> Void)? = nil
 
     @State private var selectedDate: Date
     @State private var showDateSheet = false
-    @State private var dayStripScrollHapticBucket: Int?
-    /// Which day card is aligned in the horizontal strip; drives header + chip highlight.
-    @State private var dayCardScrollPosition = ScrollPosition(idType: String.self)
+    /// Non-nil when a day cell has been tapped — drives the full-screen cover.
+    @State private var tappedDate: Date?
+    /// Set when the 3-dot menu is tapped so the edit sheet fires after the
+    /// full-screen cover finishes dismissing (prevents modal-on-modal conflicts).
+    @State private var pendingEditAfterDismiss = false
+    @Namespace private var overlayCardNamespace
 
     init(
         habits: [Habit],
         activeHabitId: UUID? = nil,
         todayOverride: Date? = nil,
         initialSelectedDate: Date? = nil,
-        onCreateHabit: (() -> Void)? = nil
+        onCreateHabit: (() -> Void)? = nil,
+        onEditHabit: (() -> Void)? = nil
     ) {
         self.habits = habits
         self.activeHabitId = activeHabitId
         self.todayOverride = todayOverride
         self.onCreateHabit = onCreateHabit
+        self.onEditHabit = onEditHabit
         let seed = initialSelectedDate ?? todayOverride ?? Date()
         _selectedDate = State(initialValue: seed)
     }
@@ -67,18 +67,10 @@ struct CalendarTabView: View {
         DateUtils.toDateString(date: selectedDayStart)
     }
 
-    /// Day shown in the title + chip row — follows whichever day card is scrolled into view.
-    private var calendarDisplayDayStart: Date {
-        if let key = dayCardScrollPosition.viewID(type: String.self),
-           let date = DateUtils.parseDate(key) {
-            return calendar.startOfDay(for: date)
-        }
-        return selectedDayStart
-    }
+    /// Day shown in the title row — mirrors `selectedDate` (user picks via date sheet or tapping a grid cell).
+    private var calendarDisplayDayStart: Date { selectedDayStart }
 
-    private var displayedDateKey: String {
-        DateUtils.toDateString(date: calendarDisplayDayStart)
-    }
+    private var displayedDateKey: String { selectedDateKey }
 
     /// Figma 465:2017 (dark): Geist semibold; light: existing Season Mix display.
     private var calendarDateTitleFont: CustomFont {
@@ -106,80 +98,103 @@ struct CalendarTabView: View {
                 if geo.size.width > 0 {
                     return geo.size.width
                 }
-                // Derive the screen from the current window scene through UIKit bridge to avoid UIScreen.main
-                // We use a tiny helper view to capture the window at render time if needed
                 if let windowScene = UIApplication.shared.connectedScenes
                     .compactMap({ $0 as? UIWindowScene })
                     .first,
                    let screen = windowScene.screen as UIScreen? {
                     return screen.bounds.width
                 }
-                return geo.size.width // fallback (should be 0 only during first pass)
+                return geo.size.width
             }()
-            let cardWidth = min(AppTheme.Layout.calendarCardWidth, effectiveWidth - AppTheme.Spacing.lg * 2)
+            let horizontalInset = AppTheme.Spacing.lg
+            let availableContentWidth = max(effectiveWidth - horizontalInset * 2, 0)
+            let cardWidth = min(AppTheme.Layout.calendarCardWidth, availableContentWidth)
 
-            ScrollView(.vertical, showsIndicators: false) {
-                VStack(alignment: .leading, spacing: 0) {
-                    VStack(alignment: .leading, spacing: AppTheme.Spacing.calendarHeaderInner) {
-                        dateTitleRow
-                        dayChipStrip
-                    }
+            ZStack(alignment: .top) {
+                ScrollView(.vertical, showsIndicators: false) {
+                    VStack(alignment: .leading, spacing: 0) {
+                        Color.clear.frame(height: AppTheme.Layout.calendarTitleContentHeight)
 
-                    if habits.isEmpty {
-                        emptyHabitsPlaceholder
-                            .padding(.top, AppTheme.Spacing.calendarDayStripToCard)
-                    } else if let habit = resolvedHabit {
-                        ScrollView(.horizontal, showsIndicators: false) {
-                            HStack(spacing: AppTheme.Spacing.horizontalHabitCardGap) {
-                                ForEach(daysInSelectedMonth, id: \.timeIntervalSince1970) { day in
-                                    let dayStart = calendar.startOfDay(for: day)
-                                    let dateKey = DateUtils.toDateString(date: dayStart)
-                                    CalendarHabitDayCard(
-                                        habit: habit,
-                                        selectedDate: dayStart,
-                                        cardWidth: cardWidth,
-                                        calendar: calendar,
-                                        effectiveToday: effectiveToday,
-                                        onImagePicked: { data in
-                                            saveEntryImage(data, habit: habit, date: dayStart)
-                                        }
-                                    )
-                                    .id(dateKey)
+                        if habits.isEmpty {
+                            emptyHabitsPlaceholder
+                                .padding(.top, AppTheme.Spacing.calendarGridHeaderToGrid)
+                        } else if let habit = resolvedHabit {
+                            CalendarMonthGrid(
+                                habit: habit,
+                                monthAnchor: selectedDayStart,
+                                effectiveToday: effectiveToday,
+                                calendar: calendar,
+                                gridWidth: availableContentWidth,
+                                namespace: overlayCardNamespace,
+                                tappedDateKey: tappedDate.map { DateUtils.toDateString(date: calendar.startOfDay(for: $0)) },
+                                onTapDay: { date in
+                                    let dayStart = calendar.startOfDay(for: date)
+                                    guard dayStart <= effectiveToday else { return }
+                                    selectedDate = dayStart
+                                    withAnimation(AppTheme.Motion.springSheetOverlay) {
+                                        tappedDate = dayStart
+                                    }
+                                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                 }
-                            }
-                            .padding(.bottom, AppTheme.Spacing.calendarHabitCardShadowBleed)
-                            .scrollTargetLayout()
-                        }
-                        .contentMargins(.horizontal, (effectiveWidth - cardWidth) / 2)
-                        .scrollTargetBehavior(.viewAligned)
-                        .scrollBounceBehavior(.basedOnSize)
-                        .scrollPosition($dayCardScrollPosition)
-                        .onAppear {
-                            scrollToSelectedDay()
-                        }
-                        .padding(.top, AppTheme.Spacing.calendarDayStripToCard)
-                        .scrollClipDisabled()
+                            )
+                            .padding(.horizontal, horizontalInset)
+                            .padding(.top, AppTheme.Spacing.calendarGridHeaderToGrid)
 
-                        HabitContributionGraphCard(
+                            HabitContributionGraphCard(
+                                habit: habit,
+                                calendar: calendar,
+                                today: effectiveToday,
+                                cardWidth: cardWidth,
+                                onSelectDate: { date in
+                                    withAnimation(AppTheme.Motion.easeTab) {
+                                        selectedDate = calendar.startOfDay(for: date)
+                                    }
+                                }
+                            )
+                            .frame(maxWidth: .infinity, alignment: .center)
+                            .padding(.top, AppTheme.Spacing.calendarGridToGraphGap)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.top, AppTheme.Spacing.md)
+                    .padding(.bottom, AppTheme.Spacing.xxl)
+                }
+                .scrollClipDisabled()
+                .overlay {
+                    if let tapped = tappedDate, let habit = resolvedHabit {
+                        CalendarCardOverlay(
                             habit: habit,
-                            calendar: calendar,
-                            today: effectiveToday,
+                            selectedDate: tapped,
                             cardWidth: cardWidth,
-                            onSelectDate: { date in
-                                withAnimation(AppTheme.Motion.easeTab) {
-                                    applyAbsoluteDisplayedDay(date)
+                            calendar: calendar,
+                            effectiveToday: effectiveToday,
+                            onImagePicked: { data in
+                                saveEntryImage(data, habit: habit, date: tapped)
+                            },
+                            onDismiss: dismissOverlay,
+                            onMenu: onCreateHabit.map { handler in
+                                {
+                                    dismissOverlay()
+                                    handler()
                                 }
                             }
                         )
-                        .frame(maxWidth: .infinity, alignment: .center)
-                        .padding(.top, AppTheme.Spacing.calendarHabitCardToGraphGap - AppTheme.Spacing.calendarHabitCardShadowBleed)
+                        .transition(.opacity)
                     }
                 }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(.top, AppTheme.Spacing.md)
-                .padding(.bottom, AppTheme.Spacing.xxl + AppTheme.Spacing.calendarHabitCardShadowBleed)
+
+                CalendarProgressiveBlurHeader(
+                    safeAreaTopInset: geo.safeAreaInsets.top,
+                    titlePadding: AppTheme.Spacing.md,
+                    titleContentHeight: AppTheme.Layout.calendarTitleContentHeight,
+                    fadeExtension: AppTheme.Layout.calendarTitleBlurFadeHeight
+                )
+                .ignoresSafeArea(edges: .top)
+                .allowsHitTesting(false)
+
+                dateTitleRow
+                    .padding(.top, AppTheme.Spacing.md)
             }
-            .scrollClipDisabled()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(AppTheme.Colors.emptyStateBackground.ignoresSafeArea())
@@ -192,7 +207,7 @@ struct CalendarTabView: View {
                             get: { calendarDisplayDayStart },
                             set: { newValue in
                                 withAnimation(AppTheme.Motion.easeTab) {
-                                    applyAbsoluteDisplayedDay(calendar.startOfDay(for: newValue))
+                                    selectedDate = calendar.startOfDay(for: newValue)
                                 }
                             }
                         ),
@@ -225,171 +240,43 @@ struct CalendarTabView: View {
     }
 
     private var dateTitleRow: some View {
-        HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
-            Button {
-                showDateSheet = true
-            } label: {
-                HStack(alignment: .firstTextBaseline, spacing: AppTheme.Spacing.sm) {
-                    HStack(alignment: .firstTextBaseline, spacing: 0) {
-                        Text(String(calendar.component(.day, from: calendarDisplayDayStart)))
-                            .customFont(
-                                calendarDateTitleFont,
-                                size: AppTheme.Typography.Size.xl,
-                                lineHeight: AppTheme.Typography.Line.title288,
-                                tracking: AppTheme.Typography.Tracking.titleXL
-                            )
-                            .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
-                            .contentTransition(.numericText())
-                        Text(" \(DateUtils.monthName(for: calendarDisplayDayStart))")
-                            .customFont(
-                                calendarDateTitleFont,
-                                size: AppTheme.Typography.Size.xl,
-                                lineHeight: AppTheme.Typography.Line.title288,
-                                tracking: AppTheme.Typography.Tracking.titleXL
-                            )
-                            .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
-                    }
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: AppTheme.Typography.Size.md, weight: .semibold))
+        Button {
+            showDateSheet = true
+        } label: {
+            HStack(alignment: .firstTextBaseline, spacing: AppTheme.Spacing.sm) {
+                HStack(alignment: .firstTextBaseline, spacing: 0) {
+                    Text(String(calendar.component(.day, from: calendarDisplayDayStart)))
+                        .customFont(
+                            calendarDateTitleFont,
+                            size: AppTheme.Typography.Size.xl,
+                            lineHeight: AppTheme.Typography.Line.title288,
+                            tracking: AppTheme.Typography.Tracking.titleXL
+                        )
+                        .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
+                        .contentTransition(.numericText())
+                    Text(" \(DateUtils.monthName(for: calendarDisplayDayStart))")
+                        .customFont(
+                            calendarDateTitleFont,
+                            size: AppTheme.Typography.Size.xl,
+                            lineHeight: AppTheme.Typography.Line.title288,
+                            tracking: AppTheme.Typography.Tracking.titleXL
+                        )
                         .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
                 }
+                Image(systemName: "chevron.down")
+                    .font(.system(size: AppTheme.Typography.Size.md, weight: .semibold))
+                    .foregroundColor(AppTheme.Colors.calendarDateHeaderText)
             }
-            .buttonStyle(.plain)
-            .animation(AppTheme.Motion.easeTab, value: calendarDisplayDayStart)
-
-            Spacer(minLength: 0)
-
-            Color.clear
-                .frame(width: AppTheme.Spacing.xxl, height: AppTheme.Spacing.xxl)
-                .accessibilityHidden(true)
         }
+        .buttonStyle(.plain)
+        .animation(AppTheme.Motion.easeTab, value: calendarDisplayDayStart)
+        .frame(maxWidth: .infinity, alignment: .center)
         .padding(.horizontal, AppTheme.Spacing.lg)
     }
 
-    /// Figma `389:5141`: day chips in a row with horizontal padding 20; full month scrolls horizontally (shadow bleed inside scroll content).
-    private var dayChipStrip: some View {
-        ScrollViewReader { proxy in
-            ScrollView(.horizontal, showsIndicators: false) {
-                HStack(alignment: .center, spacing: AppTheme.Spacing.calendarDayChipGap) {
-                    ForEach(daysInSelectedMonth, id: \.timeIntervalSince1970) { day in
-                        let start = calendar.startOfDay(for: day)
-                        let dayKey = DateUtils.toDateString(date: start)
-                        let isSelected = calendar.isDate(start, inSameDayAs: calendarDisplayDayStart)
-                        let isToday = calendar.isDate(start, inSameDayAs: effectiveToday)
-                        CalendarDayChip(
-                            date: start,
-                            calendar: calendar,
-                            isSelected: isSelected,
-                            isToday: isToday
-                        ) {
-                            withAnimation(AppTheme.Motion.easeTab) {
-                                applyAbsoluteDisplayedDay(start)
-                            }
-                        }
-                        .id(dayKey)
-                    }
-                }
-                .background {
-                    GeometryReader { geo in
-                        Color.clear.preference(
-                            key: DayChipStripScrollOffsetKey.self,
-                            value: geo.frame(in: .named("dayChipStripScroll")).minX
-                        )
-                    }
-                }
-                .scrollTargetLayout()
-                .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.vertical, AppTheme.Spacing.calendarChipStripShadowBleed)
-            }
-            .scrollTargetBehavior(.viewAligned)
-            .scrollBounceBehavior(.basedOnSize)
-            .coordinateSpace(name: "dayChipStripScroll")
-            .onPreferenceChange(DayChipStripScrollOffsetKey.self) { minX in
-                let stridePx = AppTheme.Layout.calendarDayChipWidth + AppTheme.Spacing.calendarDayChipGap
-                guard stridePx > 0 else { return }
-                let scrolled = max(0, -minX)
-                let bucket = Int(floor(scrolled / stridePx))
-                if dayStripScrollHapticBucket == nil {
-                    dayStripScrollHapticBucket = bucket
-                    return
-                }
-                if bucket != dayStripScrollHapticBucket! {
-                    dayStripScrollHapticBucket = bucket
-                    UIImpactFeedbackGenerator(style: .light).impactOccurred()
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .onAppear {
-                scrollDayStripToSelection(proxy: proxy, animated: false)
-            }
-            .onChange(of: displayedDateKey) { _, _ in
-                dayStripScrollHapticBucket = nil
-                scrollDayStripToSelection(proxy: proxy, animated: true)
-            }
-            .overlay(alignment: .leading) {
-                dayChipStripEdgeFade(leading: true)
-                    .allowsHitTesting(false)
-            }
-            .overlay(alignment: .trailing) {
-                dayChipStripEdgeFade(leading: false)
-                    .allowsHitTesting(false)
-            }
-        }
-    }
-
-    /// Progressive fade overlay for left/right edges of the day chip strip.
-    private func dayChipStripEdgeFade(leading: Bool) -> some View {
-        let fadeWidth: CGFloat = 32
-        return LinearGradient(
-            stops: [
-                .init(color: AppTheme.Colors.emptyStateBackground, location: 0),
-                .init(color: AppTheme.Colors.emptyStateBackground.opacity(0.6), location: 0.4),
-                .init(color: AppTheme.Colors.emptyStateBackground.opacity(0), location: 1),
-            ],
-            startPoint: leading ? .leading : .trailing,
-            endPoint: leading ? .trailing : .leading
-        )
-        .frame(width: fadeWidth)
-        .ignoresSafeArea()
-    }
-
-    /// Navigates to an absolute day: updates the month anchor if needed, then scrolls the card strip.
-    private func applyAbsoluteDisplayedDay(_ absoluteDayStart: Date) {
-        let abs = calendar.startOfDay(for: absoluteDayStart)
-        let key = DateUtils.toDateString(date: abs)
-
-        if !calendar.isDate(abs, equalTo: selectedDayStart, toGranularity: .month) {
-            // Different month — regenerate cards first, then scroll after layout.
-            selectedDate = abs
-            DispatchQueue.main.async {
-                withAnimation(AppTheme.Motion.easeTab) {
-                    dayCardScrollPosition.scrollTo(id: key, anchor: .center)
-                }
-            }
-        } else {
-            // Same month — scroll directly with animation.
-            withAnimation(AppTheme.Motion.easeTab) {
-                dayCardScrollPosition.scrollTo(id: key, anchor: .center)
-            }
-        }
-    }
-
-    private func scrollToSelectedDay() {
-        let key = selectedDateKey
-        dayCardScrollPosition.scrollTo(id: key, anchor: .center)
-    }
-
-    private func scrollDayStripToSelection(proxy: ScrollViewProxy, animated: Bool) {
-        guard !daysInSelectedMonth.isEmpty else { return }
-        let key = displayedDateKey
-        DispatchQueue.main.async {
-            if animated {
-                withAnimation(AppTheme.Motion.easeTab) {
-                    proxy.scrollTo(key, anchor: .center)
-                }
-            } else {
-                proxy.scrollTo(key, anchor: .center)
-            }
+    private func dismissOverlay() {
+        withAnimation(AppTheme.Motion.springSheetOverlay) {
+            tappedDate = nil
         }
     }
 
@@ -476,81 +363,259 @@ struct CalendarTabView: View {
     }
 }
 
-// MARK: - Day chip
+// MARK: - Month grid (Instagram-style stories archive)
 
-private struct CalendarDayChip: View {
-    @Environment(\.colorScheme) private var colorScheme
-
-    let date: Date
+/// Full-month grid of day cells (Sun…Sat). Days with a photo entry render
+/// the photo; other days render an empty rounded-rect chip with the day number.
+/// Today is marked with an outline ring. Tapping a cell calls `onTapDay`.
+private struct CalendarMonthGrid: View {
+    let habit: Habit
+    /// Any date inside the month to display.
+    let monthAnchor: Date
+    let effectiveToday: Date
     let calendar: Calendar
-    let isSelected: Bool
-    let isToday: Bool
-    let action: () -> Void
+    let gridWidth: CGFloat
+    let namespace: Namespace.ID
+    /// Key of the currently tapped-open day (hidden from grid so `matchedGeometryEffect` can move it).
+    let tappedDateKey: String?
+    let onTapDay: (Date) -> Void
 
-    /// Figma 465:2014 (dark): Geist for all chip numerals; light keeps serif accent on “today” when unselected.
-    private var dayNumberFont: CustomFont {
-        if colorScheme == .dark {
-            return .semibold
+    private var columns: Int { AppTheme.Layout.calendarGridColumns }
+    private var cellGap: CGFloat { AppTheme.Spacing.calendarGridCellGap }
+    private var rowGap: CGFloat { AppTheme.Spacing.calendarGridRowGap }
+
+    /// Fixed 48×48 cells per Figma 510:1543; shrinks only if the container
+    /// is too narrow to fit the preferred size + gaps.
+    private var cellSize: CGFloat {
+        let preferred: CGFloat = AppTheme.Layout.calendarDayChipWidth
+        let cols = CGFloat(columns)
+        let totalGap = cellGap * (cols - 1)
+        let maxFit = (gridWidth - totalGap) / cols
+        return min(preferred, maxFit)
+    }
+
+    private var monthInterval: DateInterval {
+        calendar.dateInterval(of: .month, for: monthAnchor) ?? DateInterval(start: monthAnchor, duration: 0)
+    }
+
+    /// Sun=0 … Sat=6, regardless of `calendar.firstWeekday`.
+    private var leadingBlankCount: Int {
+        let first = calendar.startOfDay(for: monthInterval.start)
+        return calendar.component(.weekday, from: first) - 1
+    }
+
+    private var daysInMonth: [Date] {
+        var result: [Date] = []
+        var day = calendar.startOfDay(for: monthInterval.start)
+        let end = monthInterval.end
+        while day < end {
+            result.append(day)
+            guard let next = calendar.date(byAdding: .day, value: 1, to: day) else { break }
+            day = calendar.startOfDay(for: next)
         }
-        return isToday ? .serifsemibold : .semibold
+        return result
+    }
+
+    /// Photo entries keyed by `YYYY-MM-DD` so cells do a single dictionary lookup.
+    private var entriesByDate: [String: HabitEntry] {
+        Dictionary(uniqueKeysWithValues: habit.entries.compactMap { entry in
+            entry.imageUri != nil ? (entry.dateString, entry) : nil
+        })
+    }
+
+    private var weekdaySymbols: [String] {
+        let base = calendar.shortStandaloneWeekdaySymbols
+        return base.map { $0.uppercased() }
     }
 
     var body: some View {
-        Button(action: action) {
-            VStack(spacing: 0) {
-                Text(DateUtils.weekdayAbbrevUppercased(for: date))
+        let byDate = entriesByDate
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.calendarGridWeekdayToGrid) {
+            weekdayHeader
+            gridBody(entriesByDate: byDate)
+        }
+        .frame(width: gridWidth, alignment: .leading)
+    }
+
+    private var weekdayHeader: some View {
+        HStack(spacing: cellGap) {
+            ForEach(Array(weekdaySymbols.enumerated()), id: \.offset) { _, symbol in
+                Text(symbol)
                     .customFont(
                         .medium,
                         size: AppTheme.Typography.Size.calendarDayAbbrev,
                         lineHeight: AppTheme.Typography.Line.calendarDayAbbrev,
                         tracking: AppTheme.Typography.Tracking.calendarDayAbbrev
                     )
-                Text(String(calendar.component(.day, from: date)))
-                    .customFont(
-                        dayNumberFont,
-                        size: AppTheme.Typography.Size.md,
-                        lineHeight: AppTheme.Typography.Line.title288,
-                        tracking: AppTheme.Typography.Tracking.calendarDayNumber
-                    )
-                    .contentTransition(.numericText())
+                    .foregroundColor(AppTheme.Colors.calendarGridWeekdayText)
+                    .frame(width: cellSize, alignment: .center)
             }
-            .multilineTextAlignment(.center)
-            .foregroundColor(
-                isSelected ? AppTheme.Colors.calendarDayChipSelectedLabel : AppTheme.Colors.calendarDayChipRestText
-            )
-            .padding(.horizontal, AppTheme.Spacing.sm3)
-            .frame(
-                width: AppTheme.Layout.calendarDayChipWidth,
-                height: AppTheme.Layout.calendarDayChipHeight,
-                alignment: .center
-            )
-            .background(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
-                    .fill(isSelected ? AppTheme.Colors.calendarDaySelectedFill : AppTheme.Colors.calendarDayChipRestFill)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous)
-                    .stroke(isSelected ? AppTheme.Colors.calendarDaySelectedStroke : Color.clear, lineWidth: AppTheme.Spacing.hairline)
-            )
-            .overlay(alignment: .bottom) {
-                if isSelected && colorScheme == .dark {
-                    Rectangle()
-                        .fill(
-                            LinearGradient(
-                                colors: [.clear, Color.white.opacity(0.1)],
-                                startPoint: .top,
-                                endPoint: .bottom
+        }
+    }
+
+    private func gridBody(entriesByDate: [String: HabitEntry]) -> some View {
+        let leading = leadingBlankCount
+        let days = daysInMonth
+        let total = leading + days.count
+        let rows = Int((Double(total) / Double(columns)).rounded(.up))
+
+        return VStack(spacing: rowGap) {
+            ForEach(0..<rows, id: \.self) { row in
+                HStack(spacing: cellGap) {
+                    ForEach(0..<columns, id: \.self) { column in
+                        let cellIndex = row * columns + column
+                        if cellIndex < leading || cellIndex >= leading + days.count {
+                            Color.clear
+                                .frame(width: cellSize, height: cellSize)
+                        } else {
+                            let day = days[cellIndex - leading]
+                            let key = DateUtils.toDateString(date: day)
+                            let isFuture = day > effectiveToday
+                            CalendarMonthDayCell(
+                                date: day,
+                                dayNumber: calendar.component(.day, from: day),
+                                entry: entriesByDate[key],
+                                size: cellSize,
+                                isToday: calendar.isDate(day, inSameDayAs: effectiveToday),
+                                isFuture: isFuture,
+                                namespace: namespace,
+                                isHidden: tappedDateKey == key,
+                                action: { onTapDay(day) }
                             )
-                        )
-                        .frame(height: 3)
-                        .allowsHitTesting(false)
+                        }
+                    }
                 }
             }
-            .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.md, style: .continuous))
-            .modifier(CalendarChipShadowModifier(isSelected: isSelected))
+        }
+    }
+}
+
+// MARK: - Month grid day cell
+
+private struct CalendarMonthDayCell: View {
+    @Environment(\.colorScheme) private var colorScheme
+
+    let date: Date
+    let dayNumber: Int
+    let entry: HabitEntry?
+    let size: CGFloat
+    let isToday: Bool
+    /// Dates after `effectiveToday` are read-only: cannot be tapped to log a photo.
+    let isFuture: Bool
+    let namespace: Namespace.ID
+    /// Hide while the overlay is animating to / from this cell.
+    let isHidden: Bool
+    let action: () -> Void
+
+    private var dateKey: String { DateUtils.toDateString(date: date) }
+
+    private var hasPhoto: Bool { entry?.imageUri != nil }
+
+    var body: some View {
+        Button(action: action) {
+            ZStack {
+                if hasPhoto {
+                    photoBody
+                } else {
+                    emptyBody
+                }
+            }
+            .frame(width: size, height: size)
+            .clipShape(cellShape)
+            .overlay {
+                if isToday {
+                    cellShape
+                        .stroke(
+                            AppTheme.Colors.calendarGridTodayRing,
+                            lineWidth: AppTheme.Layout.calendarGridTodayRingWidth
+                        )
+                }
+            }
+            .matchedGeometryEffect(id: dateKey, in: namespace)
+            .opacity(isHidden ? 0 : (isFuture ? AppTheme.Opacity.calendarFutureDay : 1))
         }
         .buttonStyle(.plain)
-        .animation(AppTheme.Motion.easeTab, value: isSelected)
+        .disabled(isFuture)
+        .accessibilityLabel(Text(DateUtils.formatDateWithOrdinal(dateKey)))
+        .accessibilityValue(Text(hasPhoto ? "Photo logged" : (isFuture ? "Not yet available" : "No entry")))
+    }
+
+    private var cellShape: RoundedRectangle {
+        RoundedRectangle(cornerRadius: AppTheme.Layout.calendarGridCellRadius, style: .continuous)
+    }
+
+    @ViewBuilder
+    private var photoBody: some View {
+        if let uri = entry?.imageUri, let url = URL(string: uri) {
+            AsyncImage(url: url) { phase in
+                switch phase {
+                case let .success(image):
+                    image
+                        .resizable()
+                        .scaledToFill()
+                default:
+                    AppTheme.Overlay.grayPhotoPlaceholder
+                }
+            }
+            .frame(width: size, height: size)
+            .clipped()
+        } else {
+            emptyBody
+        }
+    }
+
+    private var emptyBody: some View {
+        Text(String(dayNumber))
+            .customFont(
+                .semibold,
+                size: AppTheme.Typography.Size.md,
+                lineHeight: AppTheme.Typography.Line.title288,
+                tracking: AppTheme.Typography.Tracking.calendarDayNumber
+            )
+            .foregroundColor(AppTheme.Colors.calendarDayChipRestText)
+    }
+}
+
+// MARK: - Progressive blur header backdrop
+
+/// Translucent material strip rendered at the top of the calendar tab.
+/// The material provides a fixed-radius system blur; the gradient mask fades
+/// it out toward the bottom, approximating a variable blur without depending
+/// on private APIs. Sized to cover the safe area + floating title row + a
+/// short fade region beneath it.
+private struct CalendarProgressiveBlurHeader: View {
+    let safeAreaTopInset: CGFloat
+    let titlePadding: CGFloat
+    let titleContentHeight: CGFloat
+    let fadeExtension: CGFloat
+
+    private var totalHeight: CGFloat {
+        safeAreaTopInset + titlePadding + titleContentHeight + fadeExtension
+    }
+
+    private var solidStop: CGFloat {
+        guard totalHeight > 0 else { return 0 }
+        return (safeAreaTopInset + titlePadding + titleContentHeight) / totalHeight
+    }
+
+    var body: some View {
+        VStack(spacing: 0) {
+            Rectangle()
+                .fill(.ultraThinMaterial)
+                .frame(height: totalHeight)
+                .mask(
+                    LinearGradient(
+                        stops: [
+                            .init(color: .black, location: 0),
+                            .init(color: .black, location: max(solidStop - 0.15, 0)),
+                            .init(color: .clear, location: 1)
+                        ],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            Spacer(minLength: 0)
+        }
     }
 }
 
@@ -565,9 +630,10 @@ private struct CalendarHabitDayCard: View {
     let calendar: Calendar
     let effectiveToday: Date
     let onImagePicked: (Data) -> Void
+    /// When set, the title row shows a `…` menu button on the right (Figma 522:3251).
+    var onMenu: (() -> Void)? = nil
 
-    @State private var selectedPhoto: PhotosPickerItem?
-    @State private var showPhotoPicker = false
+    @Environment(PhotoSourceController.self) private var photoSource
     /// Selected marketing tag on the placeholder row (Figma 410:7611); drives darker chip + radial overlay.
     @State private var selectedPlaceholderTagID: String?
 
@@ -614,54 +680,52 @@ private struct CalendarHabitDayCard: View {
         )
         .clipShape(RoundedRectangle(cornerRadius: AppTheme.Radius.calendarShell, style: .continuous))
         .appShadow(AppTheme.Elevation.calendarShellCard)
-        .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
-        .task(id: selectedPhoto) {
-            guard let selectedPhoto else { return }
-            defer { self.selectedPhoto = nil }
-            if let data = try? await selectedPhoto.loadTransferable(type: Data.self) {
-                onImagePicked(data)
-            }
-        }
     }
 
-    // MARK: - Title (Figma 458:1791–458:1797)
+    // MARK: - Title (Figma 522:3241 — left-aligned name + meta row, optional 3-dot menu)
 
     private var titleSection: some View {
-        VStack(spacing: AppTheme.Spacing.sm) {
-            Text(habit.name)
-                .customFont(
-                    .serifsemibold,
-                    size: AppTheme.Typography.Size.lg,
-                    lineHeight: AppTheme.Typography.Line.body24,
-                    tracking: AppTheme.Typography.Tracking.nav
-                )
-                .foregroundColor(AppTheme.Colors.textPrimary)
-
-            HStack(spacing: AppTheme.Spacing.sm) {
-                Text(DateUtils.formatDateWithOrdinal(dateString))
+        HStack(alignment: .center, spacing: AppTheme.Spacing.sm) {
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+                Text(habit.name)
                     .customFont(
-                        .semibold,
-                        size: AppTheme.Typography.Size.sm,
-                        tracking: AppTheme.Typography.Tracking.uppercaseLabel
+                        .serifsemibold,
+                        size: AppTheme.Typography.Size.lg,
+                        lineHeight: AppTheme.Typography.Line.body24,
+                        tracking: AppTheme.Typography.Tracking.nav
                     )
-                    .foregroundColor(AppTheme.Colors.calendarCardMetaText)
-                    .textCase(.uppercase)
+                    .foregroundColor(AppTheme.Colors.textPrimary)
 
-                Circle()
-                    .fill(AppTheme.Colors.calendarCardMetaText)
-                    .frame(width: 4, height: 4)
+                HStack(spacing: AppTheme.Spacing.sm) {
+                    Text(DateUtils.formatDateWithOrdinal(dateString))
+                        .customFont(
+                            .semibold,
+                            size: AppTheme.Typography.Size.sm,
+                            tracking: AppTheme.Typography.Tracking.uppercaseLabel
+                        )
+                        .foregroundColor(AppTheme.Colors.calendarCardMetaText)
+                        .textCase(.uppercase)
 
-                Text("DAY \(dayNumber)")
-                    .customFont(
-                        .semibold,
-                        size: AppTheme.Typography.Size.sm,
-                        tracking: AppTheme.Typography.Tracking.uppercaseLabel
-                    )
-                    .foregroundColor(AppTheme.Colors.calendarCardMetaText)
-                    .textCase(.uppercase)
+                    Circle()
+                        .fill(AppTheme.Colors.calendarCardMetaText)
+                        .frame(width: 4, height: 4)
+
+                    Text("DAY \(dayNumber)")
+                        .customFont(
+                            .semibold,
+                            size: AppTheme.Typography.Size.sm,
+                            tracking: AppTheme.Typography.Tracking.uppercaseLabel
+                        )
+                        .foregroundColor(AppTheme.Colors.calendarCardMetaText)
+                        .textCase(.uppercase)
+                }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+
+            if let onMenu {
+                CalendarOverlayChromeButton(symbol: "ellipsis", action: onMenu)
             }
         }
-        .frame(maxWidth: .infinity, alignment: .center)
     }
 
     private var footerContent: some View {
@@ -760,7 +824,7 @@ private struct CalendarHabitDayCard: View {
         .appShadow(AppTheme.Elevation.calendarPhotoFrame)
         .contentShape(Rectangle())
         .onTapGesture {
-            showPhotoPicker = true
+            photoSource.present(onImagePicked: onImagePicked)
         }
     }
 
@@ -969,16 +1033,79 @@ private struct CalendarAddPhotoGlyph: View {
     }
 }
 
-private struct CalendarChipShadowModifier: ViewModifier {
-    let isSelected: Bool
+// MARK: - Tap-open card screen (Figma 522:3016)
 
-    @ViewBuilder
-    func body(content: Content) -> some View {
-        if isSelected {
-            content.appShadow(AppTheme.Elevation.calendarDayChipSelected)
-        } else {
-            content
+/// Standalone screen presented as a full-screen cover when a calendar day is tapped.
+/// Renders the floating X close button above a `CalendarHabitDayCard`. Background
+/// matches the calendar tab page color — the iOS modal slide-up provides the
+/// transition (no manual scrim/blur needed).
+private struct CalendarCardOverlay: View {
+    let habit: Habit
+    let selectedDate: Date
+    let cardWidth: CGFloat
+    let calendar: Calendar
+    let effectiveToday: Date
+    let onImagePicked: (Data) -> Void
+    let onDismiss: () -> Void
+    /// Invoked when the card's 3-dot menu is tapped (Figma 522:3250 — opens the
+    /// edit-habit sheet in the parent after this cover dismisses).
+    var onMenu: (() -> Void)? = nil
+
+    var body: some View {
+        ZStack(alignment: .topLeading) {
+            AppTheme.Colors.emptyStateBackground
+                .ignoresSafeArea()
+
+            VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
+                CalendarOverlayChromeButton(symbol: "xmark", action: onDismiss)
+                    .padding(.leading, AppTheme.Spacing.lg)
+
+                CalendarHabitDayCard(
+                    habit: habit,
+                    selectedDate: selectedDate,
+                    cardWidth: cardWidth,
+                    calendar: calendar,
+                    effectiveToday: effectiveToday,
+                    onImagePicked: onImagePicked,
+                    onMenu: onMenu
+                )
+                .frame(maxWidth: .infinity, alignment: .center)
+
+                Spacer(minLength: 0)
+            }
+            .padding(.top, AppTheme.Spacing.md)
         }
+    }
+}
+
+// MARK: - Overlay chrome button (Figma 522:3265 / 522:3250)
+
+/// Circular 48×48 white button with floating shadow. Used for the overlay
+/// close (X) glyph above the card and the 3-dot menu inside the card title.
+private struct CalendarOverlayChromeButton: View {
+    let symbol: String
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: AppTheme.Typography.Size.md, weight: .semibold))
+                .foregroundColor(AppTheme.Colors.textPrimary)
+                .frame(
+                    width: AppTheme.Layout.calendarOverlayChromeButton,
+                    height: AppTheme.Layout.calendarOverlayChromeButton
+                )
+                .background(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
+                        .fill(AppTheme.Colors.dayCardFill)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
+                        .stroke(AppTheme.Colors.dayCardFill, lineWidth: AppTheme.Spacing.hairline)
+                )
+                .appShadow(AppTheme.Elevation.floatingCircularButton)
+        }
+        .buttonStyle(.plain)
     }
 }
 
@@ -1157,6 +1284,7 @@ private struct CalendarEmptyCTAButtonStyle: ButtonStyle {
         onCreateHabit: {}
     )
     .modelContainer(container)
+    .environment(PhotoSourceController())
 }
 
 #Preview("Calendar — 11 Apr 2026") {
@@ -1179,6 +1307,7 @@ private struct CalendarEmptyCTAButtonStyle: ButtonStyle {
         initialSelectedDate: april11
     )
     .modelContainer(container)
+    .environment(PhotoSourceController())
 }
 
 #Preview("Calendar — 11 Apr 2026 Dark") {
@@ -1199,4 +1328,5 @@ private struct CalendarEmptyCTAButtonStyle: ButtonStyle {
     )
     .modelContainer(container)
     .environment(\.colorScheme, .dark)
+    .environment(PhotoSourceController())
 }
