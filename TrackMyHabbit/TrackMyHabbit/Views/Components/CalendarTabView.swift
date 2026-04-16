@@ -233,7 +233,7 @@ struct CalendarTabView: View {
                     }
                 }
             }
-            .background(AppTheme.Colors.bgSecondary)
+            .presentationBackground(AppTheme.Colors.bgSecondary)
             .presentationDetents([.height(AppTheme.Layout.calendarDateSheetDetentHeight)])
             .presentationDragIndicator(.visible)
         }
@@ -584,6 +584,8 @@ private struct CalendarMonthDayCell: View {
 /// on private APIs. Sized to cover the safe area + floating title row + a
 /// short fade region beneath it.
 private struct CalendarProgressiveBlurHeader: View {
+    @Environment(\.colorScheme) private var colorScheme
+
     let safeAreaTopInset: CGFloat
     let titlePadding: CGFloat
     let titleContentHeight: CGFloat
@@ -600,8 +602,7 @@ private struct CalendarProgressiveBlurHeader: View {
 
     var body: some View {
         VStack(spacing: 0) {
-            Rectangle()
-                .fill(.ultraThinMaterial)
+            headerFill
                 .frame(height: totalHeight)
                 .mask(
                     LinearGradient(
@@ -615,6 +616,18 @@ private struct CalendarProgressiveBlurHeader: View {
                     )
                 )
             Spacer(minLength: 0)
+        }
+    }
+
+    // `.ultraThinMaterial` reads as a lighter gray band against the near-black
+    // page bg in dark mode, producing a visible seam. Falling back to the page
+    // background colour preserves the fade illusion without the washed tint.
+    @ViewBuilder
+    private var headerFill: some View {
+        if colorScheme == .dark {
+            Rectangle().fill(AppTheme.Colors.emptyStateBackground)
+        } else {
+            Rectangle().fill(.ultraThinMaterial)
         }
     }
 }
@@ -1327,6 +1340,6 @@ private struct CalendarEmptyCTAButtonStyle: ButtonStyle {
         initialSelectedDate: april11
     )
     .modelContainer(container)
-    .environment(\.colorScheme, .dark)
+    .preferredColorScheme(.dark)
     .environment(PhotoSourceController())
 }

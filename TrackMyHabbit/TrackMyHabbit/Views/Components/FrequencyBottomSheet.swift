@@ -435,7 +435,6 @@ struct PhotoSourceBottomSheet: View {
                 .cornerRadius(AppTheme.Radius.xl)
                 .appShadow(AppTheme.Elevation.sheet)
                 .padding(.horizontal, AppTheme.Spacing.lg)
-                .padding(.bottom, AppTheme.Spacing.lg)
                 .offset(y: sheetOffset)
                 .frame(maxHeight: .infinity, alignment: .bottom)
                 .onAppear {
