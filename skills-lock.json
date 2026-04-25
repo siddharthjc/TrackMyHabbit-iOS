@@ -10,6 +10,11 @@
       "source": "rudrankriyam/app-store-connect-cli-skills",
       "sourceType": "github",
       "computedHash": "eff3d21b26cc20b7e09445953c50c09885777b8cda1797493bb10cf9aa24d851"
+    },
+    "make-interfaces-feel-better": {
+      "source": "jakubkrehel/make-interfaces-feel-better",
+      "sourceType": "github",
+      "computedHash": "54b6e221bbe4e2d1a8461c3f9ecabe69daf891f964e9ee5e699c323daa018f2e"
     }
   }
 }
