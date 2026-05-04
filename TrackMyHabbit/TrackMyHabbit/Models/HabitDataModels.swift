@@ -44,3 +44,21 @@ final class HabitEntry {
         self.habit = habit
     }
 }
+
+extension Habit {
+    func photoEntriesByDate() -> [String: HabitEntry] {
+        entries.reduce(into: [:]) { result, entry in
+            guard entry.imageUri != nil, result[entry.dateString] == nil else { return }
+            result[entry.dateString] = entry
+        }
+    }
+}
+
+extension HabitEntry {
+    static func photoEntriesByDate(_ entries: [HabitEntry]) -> [String: HabitEntry] {
+        entries.reduce(into: [:]) { result, entry in
+            guard entry.imageUri != nil else { return }
+            result[entry.dateString] = result[entry.dateString] ?? entry
+        }
+    }
+}

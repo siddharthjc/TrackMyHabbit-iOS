@@ -418,9 +418,7 @@ private struct CalendarMonthGrid: View {
 
     /// Photo entries keyed by `YYYY-MM-DD` so cells do a single dictionary lookup.
     private var entriesByDate: [String: HabitEntry] {
-        Dictionary(uniqueKeysWithValues: habit.entries.compactMap { entry in
-            entry.imageUri != nil ? (entry.dateString, entry) : nil
-        })
+        HabitEntry.photoEntriesByDate(habit.entries)
     }
 
     private var weekdaySymbols: [String] {
