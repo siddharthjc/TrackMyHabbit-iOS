@@ -632,6 +632,12 @@ enum AppTheme {
         static let walletDragDismissThreshold: CGFloat = 120
         /// Predicted-translation threshold for flick-to-dismiss on the pinned wallet card.
         static let walletDragFlickThreshold: CGFloat = 240
+        /// Transient blur applied to unselected wallet cards during the expand
+        /// /dismiss transition. Animates with the same scope as opacity so it
+        /// reads as a motion blur while cards fade out (expand) or fade in
+        /// (dismiss). Only visible while opacity > 0; in the settled expanded
+        /// state the cards are fully transparent so the blur incurs no cost.
+        static let walletCardTransitionBlur: CGFloat = 16
     }
 
     // MARK: - Liquid glass material opacities

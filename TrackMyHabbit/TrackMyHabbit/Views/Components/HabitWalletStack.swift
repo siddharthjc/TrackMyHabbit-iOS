@@ -84,7 +84,11 @@ struct HabitWalletStack: View {
         // faster than the spring carries them off-screen — the spec requires
         // opacity to hit 0 while they're still mid-flight. On dismiss the
         // slower easeIn lets them re-appear right as they settle into the stack.
+        // Blur shares the same scope so it reads as a motion blur while the
+        // cards are visible during the transition; once opacity hits 0 the
+        // blur becomes invisible regardless of radius.
         .opacity((isCardSelected && !isCurrent) ? 0 : 1)
+        .blur(radius: (isCardSelected && !isCurrent) ? AppTheme.Layout.walletCardTransitionBlur : 0)
         .animation(
             isCardSelected ? AppTheme.Motion.easeWalletCardFadeOut : AppTheme.Motion.easeWalletCardFadeIn,
             value: isCardSelected
@@ -259,7 +263,6 @@ private struct WalletDayCard: View {
                 }
             }
             .appShadow(AppTheme.Elevation.walletPhotoFrame)
-            .padding(.horizontal, AppTheme.Spacing.sm3)
             .contentShape(RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous))
             .onTapGesture { onPickPhoto() }
     }
