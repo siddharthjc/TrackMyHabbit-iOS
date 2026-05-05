@@ -736,7 +736,7 @@ private struct CalendarHabitDayCard: View {
             .frame(maxWidth: .infinity, alignment: .leading)
 
             if let onMenu {
-                CalendarOverlayChromeButton(symbol: "ellipsis", action: onMenu)
+                OverlayChromeButton(systemName: "ellipsis", action: onMenu)
             }
         }
     }
@@ -897,7 +897,7 @@ private struct CalendarHabitDayCard: View {
             Color.clear
                 .frame(height: AppTheme.Spacing.calendarPlaceholderTopInset)
             VStack(spacing: AppTheme.Spacing.calendarAddOrbTitle) {
-                CalendarAddPhotoOrb()
+                AddPhotoOrb()
                     .frame(
                         width: AppTheme.Layout.calendarAddOrbSize,
                         height: AppTheme.Layout.calendarAddOrbSize
@@ -954,98 +954,6 @@ private struct CalendarPlaceholderPill: Identifiable {
     var id: String { title }
 }
 
-/// Matches `EmptyStateCTA` chrome (gradient, inset rims, hairline, outer shadow) on a circle (`EmptyState.swift`).
-private struct CalendarAddPhotoOrb: View {
-    private let navyRimY: CGFloat = 3.45
-    private let navyRimLineWidth: CGFloat = 5.5
-    private let navyRimAccentY: CGFloat = 0.42
-    private let navyRimAccentWidth: CGFloat = 2.2
-    private let lightRimOffsetY: CGFloat = 2.05
-    private let bottomLightRimWidth: CGFloat = 2.4
-    private let bottomLightRimOpacity: Double = 0.36
-    private let hairline: CGFloat = 0.5
-
-    var body: some View {
-        ZStack {
-            ctaCircleBackground
-            CalendarAddPhotoGlyph()
-        }
-        .compositingGroup()
-        .appShadow(AppTheme.Elevation.ctaOuter)
-    }
-
-    private var ctaCircleBackground: some View {
-        let shape = Circle()
-        return shape
-            .fill(figmaGradient)
-            .innerInsetRim(
-                shape: shape,
-                color: AppTheme.Colors.ctaInsetNavy.opacity(0.2),
-                lineWidth: navyRimLineWidth,
-                blur: 0,
-                offsetX: 0,
-                offsetY: -navyRimY
-            )
-            .innerInsetRim(
-                shape: shape,
-                color: AppTheme.Overlay.black020,
-                lineWidth: navyRimAccentWidth,
-                blur: 0,
-                offsetX: 0,
-                offsetY: -navyRimAccentY
-            )
-            .innerInsetRim(
-                shape: shape,
-                color: Color.white.opacity(bottomLightRimOpacity),
-                lineWidth: bottomLightRimWidth,
-                blur: 0,
-                offsetX: 0,
-                offsetY: lightRimOffsetY
-            )
-            .overlay(
-                shape.stroke(
-                    AppTheme.Colors.ctaHairline,
-                    lineWidth: hairline
-                )
-            )
-    }
-
-    private var figmaGradient: LinearGradient {
-        LinearGradient(
-            stops: [
-                .init(color: AppTheme.Colors.emptyStateCTAStart, location: 0),
-                .init(color: AppTheme.Colors.emptyStateCTAMid, location: 0.85222),
-                .init(color: AppTheme.Colors.emptyStateCTAEnd, location: 1)
-            ],
-            startPoint: UnitPoint(x: 0.5, y: 0),
-            endPoint: UnitPoint(x: 0.5, y: 1.5556)
-        )
-    }
-}
-
-private struct CalendarAddPhotoGlyph: View {
-    var body: some View {
-        ZStack {
-            Capsule(style: .continuous)
-                .fill(AppTheme.Colors.textInverse)
-                .frame(
-                    width: AppTheme.Layout.calendarAddGlyphLength,
-                    height: AppTheme.Layout.calendarAddGlyphThickness
-                )
-            Capsule(style: .continuous)
-                .fill(AppTheme.Colors.textInverse)
-                .frame(
-                    width: AppTheme.Layout.calendarAddGlyphThickness,
-                    height: AppTheme.Layout.calendarAddGlyphLength
-                )
-        }
-        .frame(
-            width: AppTheme.Typography.Size.calendarPlusGlyph,
-            height: AppTheme.Typography.Size.calendarPlusGlyph
-        )
-    }
-}
-
 // MARK: - Tap-open card screen (Figma 522:3016)
 
 /// Standalone screen presented as a full-screen cover when a calendar day is tapped.
@@ -1070,7 +978,7 @@ private struct CalendarCardOverlay: View {
                 .ignoresSafeArea()
 
             VStack(alignment: .leading, spacing: AppTheme.Spacing.md) {
-                CalendarOverlayChromeButton(symbol: "xmark", action: onDismiss)
+                OverlayChromeButton(systemName: "xmark", action: onDismiss)
                     .padding(.leading, AppTheme.Spacing.lg)
 
                 CalendarHabitDayCard(
@@ -1088,37 +996,6 @@ private struct CalendarCardOverlay: View {
             }
             .padding(.top, AppTheme.Spacing.md)
         }
-    }
-}
-
-// MARK: - Overlay chrome button (Figma 522:3265 / 522:3250)
-
-/// Circular 48×48 white button with floating shadow. Used for the overlay
-/// close (X) glyph above the card and the 3-dot menu inside the card title.
-private struct CalendarOverlayChromeButton: View {
-    let symbol: String
-    let action: () -> Void
-
-    var body: some View {
-        Button(action: action) {
-            Image(systemName: symbol)
-                .font(.system(size: AppTheme.Typography.Size.md, weight: .semibold))
-                .foregroundColor(AppTheme.Colors.textPrimary)
-                .frame(
-                    width: AppTheme.Layout.calendarOverlayChromeButton,
-                    height: AppTheme.Layout.calendarOverlayChromeButton
-                )
-                .background(
-                    RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
-                        .fill(AppTheme.Colors.dayCardFill)
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous)
-                        .stroke(AppTheme.Colors.dayCardFill, lineWidth: AppTheme.Spacing.hairline)
-                )
-                .appShadow(AppTheme.Elevation.floatingCircularButton)
-        }
-        .buttonStyle(.plain)
     }
 }
 

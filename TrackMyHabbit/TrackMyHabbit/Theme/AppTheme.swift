@@ -159,6 +159,9 @@ enum AppTheme {
             static let darkTier4 = Color(hex: "#39D353")
         }
 
+        /// Home wallet day-card border (Figma 604:2497 — `var(--neutral/neutral-[200], #eee)`).
+        static let walletCardBorder = semantic("#eeeeee", "#212121")
+
         /// Dotted marketing background (`EmptyStateBackgroundPattern`).
         static let patternDot = semantic(
             UIColor(red: 179 / 255, green: 179 / 255, blue: 195 / 255, alpha: 0.10),
@@ -267,6 +270,10 @@ enum AppTheme {
             static let suggestion: CGFloat = -0.07
             static let caption: CGFloat = -0.14
             static let uppercaseLabel: CGFloat = 0.28
+            /// Home wallet day-card date row "20TH MARCH, 2026" (Figma 604:2504 — `+0.24`).
+            static let walletCardDate: CGFloat = 0.24
+            /// Home wallet day-card status pill "UPCOMING / TOMORROW / TODAY" (Figma 604:2528 — `+1.44`).
+            static let walletStatusPill: CGFloat = 1.44
         }
 
         enum Line {
@@ -314,6 +321,32 @@ enum AppTheme {
         static var easeTagline: Animation { .easeOut(duration: durationReveal) }
         static var easeSplashDismiss: Animation { .easeInOut(duration: durationSlow) }
         static var easeFrequencyPress: Animation { .easeOut(duration: durationInstant) }
+
+        /// Wallet expand spring (enter). Slightly slower than the dismiss so the
+        /// expansion reads as deliberate; Apple's `duration:bounce:` form is
+        /// preferred per design-eng for being easier to reason about.
+        static let springWalletPin = Animation.spring(duration: 0.7, bounce: 0.2)
+        /// Wallet dismiss spring (exit). Snappier than `springWalletPin` so the
+        /// system feels responsive to the user leaving the detail state — the
+        /// asymmetric enter/exit pattern (exit faster than enter) per design-eng.
+        static let springWalletUnpin = Animation.spring(duration: 0.55, bounce: 0.18)
+        /// Snap-back spring when a drag-to-dismiss release falls short of the
+        /// threshold. Short and crisp so the card re-pins immediately.
+        static let springWalletDragCancel = Animation.spring(duration: 0.35, bounce: 0.15)
+        /// Strong ease-out (cubic-bezier(0.23, 1, 0.32, 1) per design-eng).
+        /// Built-in `.easeOut` is too weak — this curve has the punch that
+        /// makes UI animations feel intentional. Used for the unselected-card
+        /// fade-out on expand: opacity must hit 0 well before the spring
+        /// carries the card past the screen edge.
+        static var easeWalletCardFadeOut: Animation { .timingCurve(0.23, 1, 0.32, 1, duration: 0.22) }
+        /// Same strong ease-out, duration matched to `springWalletUnpin` so
+        /// unselected cards become fully visible right as they settle back
+        /// into the stack. Note: deliberately ease-out, NOT ease-in — ease-in
+        /// is sluggish and forbidden by the design-eng guidelines.
+        static var easeWalletCardFadeIn: Animation { .timingCurve(0.23, 1, 0.32, 1, duration: 0.55) }
+        /// Backdrop opacity fade (enter and exit). Strong custom ease-out for
+        /// instant perceived feedback on both directions of the transition.
+        static var easeWalletBackdrop: Animation { .timingCurve(0.23, 1, 0.32, 1, duration: 0.4) }
     }
 
     // MARK: - Gradients
@@ -422,6 +455,33 @@ enum AppTheme {
         static let calendarDayChipSelected = ShadowToken(color: shadowNeutral(0.4, 0.35), radius: 2, x: 0, y: 1)
         /// Calendar empty-state collage photo tile (Figma `0px 1.68px 60.471px rgba(0,0,0,0.12)`).
         static let calendarCollagePhoto = ShadowToken(color: Color.black.opacity(0.12), radius: 60.471, x: 0, y: 1.68)
+        /// Home wallet day-card outer shadow — deliberately softer than Figma's
+        /// web-export blur so expanded cards do not grow a gray bottom shelf.
+        static let walletDayCard = ShadowToken(
+            color: shadowNeutral(0.05, 0.18),
+            radius: 24,
+            x: 0,
+            y: 2
+        )
+        /// Pinned (detail-view) wallet card — Apple Wallet-style ambient drop
+        /// shadow that lifts the card off the flat backdrop. Wider radius and
+        /// larger Y offset than the stack-state shadow to give the "floating"
+        /// feel of a Wallet pass on its detail screen.
+        static let walletDayCardPinned = ShadowToken(
+            color: shadowNeutral(0.18, 0.42),
+            radius: 32,
+            x: 0,
+            y: 10
+        )
+
+        /// Home wallet empty photo frame (Figma 604:2704 — `0 1.534 27.615 rgba(94,94,114,0.08)`).
+        static let walletPhotoFrame = ShadowToken(
+            color: shadowNeutral(0.08, 0.14),
+            radius: 27.615,
+            x: 0,
+            y: 2
+        )
+
         /// Contribution graph card shadow (Figma 483:2160 — `0px 2px 72px rgba(94,94,114,0.32)`).
         static let contributionGraphCard = ShadowToken(
             color: Color(UIColor { tc in
@@ -545,6 +605,33 @@ enum AppTheme {
         static let calendarOverlayChromeButton: CGFloat = 48
         /// Top inset from safe-area top for the floating overlay card (Figma 365:173 — `padding-top: 40`).
         static let calendarOverlayCardTopInset: CGFloat = 40
+
+        /// Home wallet stack — Apple Wallet-style stacked day cards (Figma 604:1934).
+        /// Negative VStack spacing so peeking cards show only ~51pt of their header.
+        static let walletDayCardOverlap: CGFloat = -400
+        /// Off-screen push padding when a card is selected (others slide away).
+        static let walletPushPadding: CGFloat = 300
+        /// Vertical offset of the pinned (selected) card from the scroll view top.
+        static let walletSelectedTopInset: CGFloat = 20
+        /// Bottom inset reserved below the stack so the last card isn't clipped
+        /// by the tab bar / frosted blur strip.
+        static let walletBottomInset: CGFloat = 200
+        /// Bottom progressive-blur strip height — short enough to cover only the
+        /// tab bar zone so it doesn't fade the bottom of today's card.
+        static let walletBottomBlurHeight: CGFloat = 60
+        /// Top progressive-blur strip height (sits behind the HabitSwitcher and
+        /// feathers content scrolling underneath the safe area).
+        static let walletTopBlurHeight: CGFloat = 60
+        /// Number of upcoming days rendered above today in the home wallet stack.
+        static let walletUpcomingDayCount: Int = 6
+        /// Status pill horizontal padding (Figma 604:2525 — px 8).
+        static let walletStatusPillHPadding: CGFloat = 8
+        /// Status pill vertical padding (Figma 604:2525 — py 4).
+        static let walletStatusPillVPadding: CGFloat = 4
+        /// Drag distance below which the pinned wallet card snaps back instead of dismissing.
+        static let walletDragDismissThreshold: CGFloat = 120
+        /// Predicted-translation threshold for flick-to-dismiss on the pinned wallet card.
+        static let walletDragFlickThreshold: CGFloat = 240
     }
 
     // MARK: - Liquid glass material opacities

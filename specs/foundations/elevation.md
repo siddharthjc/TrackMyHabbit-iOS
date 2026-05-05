@@ -7,6 +7,8 @@ Shadows are expressed in `tokens.css` as logical blur, Y offset, and opacity. Sw
 | Sheet / bottom sheet | `--shadow-sheet-*` — soft lift under rounded sheet |
 | Floating circular actions | `--shadow-floating-*` — nav icon circles |
 | Cards (day stack) | `--shadow-card-*` — active vs inactive depth |
+| Wallet day card | `--shadow-wallet-day-card-*` — Figma-matched floating day-card depth |
+| Wallet photo frame | `--shadow-wallet-photo-frame-*` — tighter empty-photo well depth |
 | CTA (empty state) | `--shadow-cta-*` — tight outer shadow |
 | Liquid glass bar | `--shadow-glass-*` — dark + light rim |
 | Photo label on card | `--shadow-photo-label-*` — text legibility |

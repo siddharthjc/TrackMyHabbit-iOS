@@ -9,10 +9,12 @@ import SwiftUI
 import SwiftData
 
 struct ContentView: View {
+    @Environment(\.modelContext) private var modelContext
     @Query(sort: \Habit.createdAt) private var habits: [Habit]
 
     @State private var activeHabitId: UUID?
     @State private var selectedTab: AppTab = ProcessInfo.processInfo.arguments.contains("--start-calendar") ? .calendar : .home
+    @State private var selectedHabitDate: String?
 
     @State private var showCreateSheet = false
     @State private var showEditSheet = false
@@ -28,6 +30,7 @@ struct ContentView: View {
             TabView(selection: tabSelection) {
                 Tab(value: AppTab.home) {
                     homeScreen
+                        .toolbar(selectedHabitDate == nil ? .visible : .hidden, for: .tabBar)
                 } label: {
                     Label(AppTab.home.title, systemImage: AppTab.home.icon)
                 }
@@ -102,6 +105,96 @@ struct ContentView: View {
         )
     }
 
+    @ViewBuilder
+    private func walletChromeRow(for habit: Habit) -> some View {
+        HStack {
+            OverlayChromeButton(systemName: "xmark") {
+                withAnimation(AppTheme.Motion.springWalletUnpin) {
+                    selectedHabitDate = nil
+                }
+            }
+            Spacer()
+            Menu {
+                Button {
+                    selectedHabitDate = nil
+                    showEditSheet = true
+                } label: {
+                    Label("Edit habit", systemImage: "pencil")
+                }
+                if let dateStr = selectedHabitDate,
+                   habit.entries.contains(where: { $0.dateString == dateStr && $0.imageUri != nil }) {
+                    Button(role: .destructive) {
+                        deleteEntry(for: habit, dateStr: dateStr)
+                    } label: {
+                        Label("Delete entry", systemImage: "trash")
+                    }
+                }
+            } label: {
+                Image(systemName: "ellipsis")
+                    .font(.system(size: AppTheme.Typography.Size.md, weight: .semibold))
+                    .foregroundColor(AppTheme.Colors.textPrimary)
+                    .overlayChromeShape()
+            }
+        }
+        .frame(height: AppTheme.Layout.calendarOverlayChromeButton)
+    }
+
+    private func deleteEntry(for habit: Habit, dateStr: String) {
+        guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
+        if let uri = entry.imageUri, let url = URL(string: uri) {
+            try? FileManager.default.removeItem(at: url)
+        }
+        modelContext.delete(entry)
+        try? modelContext.save()
+    }
+
+    private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
+        let dateString = dateStr
+        do {
+            let fileURL = try HabitPhotoFileStore.persistJPEG(
+                data: data,
+                habitID: habit.id,
+                dateString: dateString
+            )
+            do {
+                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                    existing.imageUri = fileURL.absoluteString
+                } else {
+                    let newEntry = HabitEntry(
+                        dateString: dateString,
+                        imageUri: fileURL.absoluteString,
+                        habit: habit
+                    )
+                    modelContext.insert(newEntry)
+                }
+                try modelContext.save()
+            } catch {
+                try? FileManager.default.removeItem(at: fileURL)
+                throw error
+            }
+        } catch {
+            print("Failed to save today's photo for \(habit.name): \(error.localizedDescription)")
+        }
+    }
+
+    /// Solid backdrop shown behind the pinned wallet card. Matches the home
+    /// background so the area reads as a clean flat surface; the layer stays
+    /// active to receive tap-to-dismiss while a card is pinned. Fades in on
+    /// expand and reverses out on dismiss via the same opacity binding.
+    @ViewBuilder
+    private var walletBackdrop: some View {
+        AppTheme.Colors.emptyStateBackground
+            .ignoresSafeArea()
+            .opacity(selectedHabitDate != nil ? 1 : 0)
+            .allowsHitTesting(selectedHabitDate != nil)
+            .onTapGesture {
+                withAnimation(AppTheme.Motion.springWalletUnpin) {
+                    selectedHabitDate = nil
+                }
+            }
+            .animation(AppTheme.Motion.easeWalletBackdrop, value: selectedHabitDate)
+    }
+
     /// Lets the CTA finish its press animation before the sheet appears.
     private func presentCreateSheetAfterCTADelay() {
         Task { @MainActor in
@@ -112,9 +205,11 @@ struct ContentView: View {
 
     @ViewBuilder
     private var homeScreen: some View {
-        ZStack {
+        ZStack(alignment: .bottom) {
             AppTheme.Colors.emptyStateBackground
                 .ignoresSafeArea()
+
+            walletBackdrop
 
             if habits.isEmpty {
                 EmptyState {
@@ -122,18 +217,47 @@ struct ContentView: View {
                 }
             } else if let habit = activeHabit {
                 VStack(spacing: 0) {
-                    HabitSwitcher(
-                        habits: habits,
-                        activeHabitId: activeHabitId,
-                        onSelect: { id in activeHabitId = id }
-                    )
-                    .padding(.top, AppTheme.Spacing.tabBarTopInset)
+                    if selectedHabitDate != nil {
+                        walletChromeRow(for: habit)
+                            .padding(.horizontal, AppTheme.Spacing.sm3)
+                            .padding(.top, AppTheme.Spacing.tabBarTopInset)
+                    } else {
+                        HabitSwitcher(
+                            habits: habits,
+                            activeHabitId: activeHabitId,
+                            onSelect: { id in activeHabitId = id }
+                        )
+                        .padding(.top, AppTheme.Spacing.tabBarTopInset)
+                    }
 
-                    Spacer()
-                    HabitCarousel(habit: habit)
-                    Spacer()
+                    HabitWalletStack(
+                        habit: habit,
+                        selectedDate: $selectedHabitDate,
+                        onPickPhoto: { dateStr in
+                            photoSourceController.present { data in
+                                savePhoto(for: habit, dateStr: dateStr, data: data)
+                            }
+                        }
+                    )
+                    .padding(.top, AppTheme.Spacing.sm3)
                 }
-                .padding(.bottom, AppTheme.Spacing.lg)
+
+                VStack(spacing: 0) {
+                    if selectedHabitDate == nil {
+                        ProgressiveBlurEdge(
+                            edge: .top,
+                            height: AppTheme.Layout.walletTopBlurHeight
+                        )
+                    }
+                    Spacer(minLength: 0)
+                    if selectedHabitDate == nil {
+                        ProgressiveBlurEdge(
+                            edge: .bottom,
+                            height: AppTheme.Layout.walletBottomBlurHeight
+                        )
+                    }
+                }
+                .ignoresSafeArea(edges: [.top, .bottom])
             }
         }
     }

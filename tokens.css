@@ -167,6 +167,13 @@
   --space-calendar-chip-shadow-bleed: var(--space-4);
   /* Calendar habit shell card: horizontal scroll inset so blur 72 shell shadow is not clipped (mirrors AppTheme.Spacing.calendarHabitCardShadowBleed). */
   --space-calendar-habit-card-shadow-bleed: var(--space-9);
+  /* Home wallet day card (Figma 604:2690). */
+  --shadow-wallet-day-card-blur: 24px;
+  --shadow-wallet-day-card-y: 2px;
+  --shadow-wallet-day-card-opacity: 0.05;
+  --shadow-wallet-photo-frame-blur: 27.615px;
+  --shadow-wallet-photo-frame-y: 2px;
+  --shadow-wallet-photo-frame-opacity: 0.08;
   /* Day-chip row bottom → habit card top (Figma 397:6240). */
   --space-calendar-day-strip-to-card: var(--space-6);
   /* Horizontal gap between day chips (mirrors AppTheme.Spacing.calendarDayChipGap). */
@@ -345,6 +352,8 @@
     --color-calendar-grid-weekday-text: #8e8e93;
     --color-calendar-grid-today-ring: #ffffff;
     --color-calendar-overlay-scrim: rgba(0, 0, 0, 0.32);
+    --shadow-wallet-day-card-opacity: 0.18;
+    --shadow-wallet-photo-frame-opacity: 0.14;
 
     --color-shadow-neutral: #000000;
     --color-stroke-logo: #8e8e93;
