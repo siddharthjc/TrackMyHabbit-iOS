@@ -263,6 +263,7 @@ private struct WalletDayCard: View {
                 }
             }
             .appShadow(AppTheme.Elevation.walletPhotoFrame)
+            .padding(.horizontal, AppTheme.Spacing.sm3)
             .contentShape(RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous))
             .onTapGesture { onPickPhoto() }
     }
