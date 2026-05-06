@@ -204,28 +204,30 @@ private struct WalletDayCard: View {
         .appShadow(isPinned ? AppTheme.Elevation.walletDayCardPinned : AppTheme.Elevation.walletDayCard)
     }
 
+    /// Home wallet day-card header (Figma 669:1806 — `Task details` 669:1807;
+    /// horizontal inset `walletCardHeaderHorizontal`).
     private var header: some View {
-        HStack(spacing: AppTheme.Spacing.lg) {
-            VStack(alignment: .leading, spacing: AppTheme.Spacing.sm) {
+        VStack(alignment: .leading, spacing: AppTheme.Spacing.sm3) {
+            HStack(alignment: .center, spacing: 0) {
                 Text("Day \(dayNumber)")
                     .customFont(.serifsemibold,
                                 size: AppTheme.Typography.Size.lg,
                                 tracking: AppTheme.Typography.Tracking.nav)
                     .foregroundColor(AppTheme.Colors.textPrimary)
 
-                Text(dateLine)
-                    .customFont(.semibold,
-                                size: AppTheme.Typography.Size.xs,
-                                tracking: AppTheme.Typography.Tracking.walletCardDate)
-                    .foregroundColor(AppTheme.Colors.textDisabled)
+                Spacer(minLength: 0)
+
+                statusPill
             }
-            .padding(.leading, AppTheme.Spacing.lg)
 
-            Spacer(minLength: 0)
-
-            statusPill
+            Text(dateLine)
+                .customFont(.semibold,
+                            size: AppTheme.Typography.Size.xs,
+                            tracking: AppTheme.Typography.Tracking.walletCardDate)
+                .foregroundColor(AppTheme.Colors.textDisabled)
         }
-        .padding(.trailing, AppTheme.Spacing.lg)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, AppTheme.Spacing.walletCardHeaderHorizontal)
     }
 
     private var statusPill: some View {

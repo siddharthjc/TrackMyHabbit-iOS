@@ -44,4 +44,5 @@ Animated logo (vector shape + gradient + inner treatments) and tagline on splash
 
 ## Cross-references
 
+- [liquid-glass-intro.md](./liquid-glass-intro.md)
 - [content-view.md](./content-view.md)

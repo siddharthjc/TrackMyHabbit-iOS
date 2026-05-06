@@ -10,7 +10,13 @@ import SwiftData
 
 @main
 struct TrackMyHabbitApp: App {
-    @State private var showSplash = true
+    private enum RootPhase {
+        case splash
+        case liquidIntro
+        case main
+    }
+
+    @State private var rootPhase: RootPhase = .splash
 
     init() {
         FontRegistration.registerBundledFonts()
@@ -44,13 +50,31 @@ struct TrackMyHabbitApp: App {
     var body: some Scene {
         WindowGroup {
             // Inherits `UIUserInterfaceStyle` from the system (Light / Dark); no forced appearance.
-            if showSplash {
-                SplashScreenView {
-                    showSplash = false
-                }
-            } else {
-                ContentView()
+            Group {
+                switch rootPhase {
+                case .splash:
+                    SplashScreenView {
+                        if LiquidGlassIntroLaunch.shouldSkipForTesting || LiquidGlassIntroLaunch.hasUserCompletedIntro {
+                            rootPhase = .main
+                        } else {
+                            rootPhase = .liquidIntro
+                        }
+                    }
+                case .liquidIntro:
+                    LiquidGlassIntroView(
+                        revealBackground: AppTheme.Colors.emptyStateBackground,
+                        destination: { ContentView() },
+                        onComplete: {
+                            // Visual handoff already happened inside the intro;
+                            // just commit the phase change without an outer animation.
+                            rootPhase = .main
+                        }
+                    )
                     .transition(.opacity)
+                case .main:
+                    ContentView()
+                        .transition(.opacity)
+                }
             }
         }
         .modelContainer(sharedModelContainer)

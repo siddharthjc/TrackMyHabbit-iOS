@@ -69,6 +69,17 @@ enum AppTheme {
         static let emptyStateCTAMid = Color(hex: "#4d6fea")
         static let emptyStateCTAEnd = Color(hex: "#5778f1")
 
+        /// Apple-Intelligence iridescent burst — angular gradient stops for the intro→main transition.
+        /// Closed loop (purple → … → purple) so the rotating angular gradient does not show a seam.
+        static let appleIntelligenceBurstStops: [Gradient.Stop] = [
+            .init(color: Color(hex: "#A855F7"), location: 0.00),
+            .init(color: Color(hex: "#EC4899"), location: 0.20),
+            .init(color: Color(hex: "#F97316"), location: 0.40),
+            .init(color: Color(hex: "#06B6D4"), location: 0.60),
+            .init(color: Color(hex: "#3B82F6"), location: 0.80),
+            .init(color: Color(hex: "#A855F7"), location: 1.00)
+        ]
+
         static let destructive = semantic("#e53935", "#ff453a")
         static let surfaceSelected = semantic("#e1e5ea", "#53555c")
         static let gradientDayCardStart = semantic("#e2e8ff", "#171717")
@@ -222,6 +233,10 @@ enum AppTheme {
         static let sectionBottom: CGFloat = 32
         static let tabBarBottomInset: CGFloat = 20
         static let tabBarTopInset: CGFloat = 8
+        /// Wallet day-card header inset (home stack; 20pt = `--space-5` / `Spacing.lg`).
+        static let walletCardHeaderHorizontal: CGFloat = lg
+        /// Bottom inset for “swipe up” hint on liquid glass intro.
+        static let liquidIntroSwipeHintBottom: CGFloat = 75
         static let emptyStateMinSpacer: CGFloat = 18
         static let emptyStateBottomSpacer: CGFloat = 8
     }
@@ -251,6 +266,8 @@ enum AppTheme {
             static let lg: CGFloat = 20
             static let xl: CGFloat = 24
             static let display: CGFloat = 40
+            /// Liquid glass intro title ("Proof you showed up.").
+            static let liquidIntroTitle: CGFloat = 32
             /// Streak hero digit on contribution card (Figma 510:2100 — Season Mix 64pt).
             static let streakHero: CGFloat = 64
             /// Upper weekday row on calendar day chips (Figma 389:5150).
@@ -304,6 +321,30 @@ enum AppTheme {
         static let durationSplashDismissDelay: Double = 0.45
         /// Time before splash begins dismiss sequence (logo + tagline).
         static let durationSplashBeforeDismiss: Double = 1.8
+
+        /// Haptic pulse interval while dragging the liquid intro bubble.
+        static let durationLiquidIntroHapticPulse: Double = 0.085
+        /// Angular speed factor for the swipe hint bob animation.
+        static let liquidIntroSwipeHintOscillationSpeed: Double = 1.8
+        /// Shader refraction strength passed to `tmhLiquidGlass`.
+        static let liquidIntroGlassRefraction: Double = 1.25
+
+        /// Hold time after the ball reaches centre before the burst kicks off.
+        /// Encompasses the snap-spring visual settle + a brief pause for emphasis.
+        static let durationIntroSettlePause: Double = 0.75
+        /// Apple-Intelligence radial burst total duration.
+        static let durationIntroBurst: Double = 0.6
+        /// Circular reveal mask growth duration (overlaps the burst tail).
+        static let durationIntroReveal: Double = 0.45
+        /// Destination content opacity 0 → 1 once the reveal mask completes.
+        static let durationIntroDestinationFade: Double = 0.3
+
+        /// Snap-to-centre spring used when the user releases above the snap threshold (or taps to toggle up).
+        /// Tuned for a deliberate, natural settle — slower than a typical UI snap so the ball
+        /// reads as gliding into place, but well clear of the slow `springLiquidIntroDragSettle`.
+        static let springIntroSnap = Animation.spring(response: 0.55, dampingFraction: 0.88)
+        static let springLiquidIntroDragSettle = Animation.interactiveSpring(response: 1.45, dampingFraction: 0.94)
+        static let springLiquidIntroTapToggle = Animation.interactiveSpring(response: 1.6, dampingFraction: 0.94)
 
         /// Nanoseconds matching `durationNormal` (empty-state CTA → create sheet).
         static let createSheetDelayNanoseconds: UInt64 = 250_000_000
@@ -532,6 +573,41 @@ enum AppTheme {
         static let patternDotOpacity: Double = 0.10
         static let splashLogoSize: CGFloat = 120
         static let glassBarHeight: CGFloat = 56
+
+        // MARK: Liquid glass intro (first-launch swipe screen)
+
+        /// Vertical offset of the welcome title stack from center.
+        static let liquidIntroTitleStackOffsetY: CGFloat = 50
+        /// Drag distance as a fraction of screen height to fully collapse the glass bubble.
+        static let liquidIntroSwipeTravelRatio: CGFloat = 0.48
+        /// `dragProgress` cutoff at release: above this, the bubble snaps to centre and
+        /// triggers the transition; below this, it springs back to the bottom.
+        static let liquidIntroSnapThreshold: CGFloat = 0.5
+        /// Collapsed bubble radius.
+        static let liquidIntroBubbleCollapsedRadius: CGFloat = 68
+        /// Bottom inset for expanded bubble anchor from the screen bottom.
+        static let liquidIntroBubbleExpandedBottomInset: CGFloat = 210
+        /// Collapsed bubble vertical offset above geometric screen center.
+        static let liquidIntroBubbleCollapsedCenterOffsetY: CGFloat = 92
+        /// Expanded bubble radius multiplier vs width.
+        static let liquidIntroBubbleExpandedWidthMultiplier: CGFloat = 1.08
+        /// Minimum expanded bubble radius (small devices).
+        static let liquidIntroBubbleMinExpandedRadius: CGFloat = 220
+        /// Base emoji font size before scale animation.
+        static let liquidIntroEmojiFontSize: CGFloat = 90
+        /// Emoji spawn animation vertical lift from bubble origin.
+        static let liquidIntroEmojiSpawnLift: CGFloat = 70
+        /// Vertical oscillation amplitude for the swipe hint label.
+        static let liquidIntroSwipeHintOscillation: CGFloat = 7
+        /// Upper bound for `layerEffect` sampling kernel during intro.
+        static let liquidIntroLayerEffectMaxSampleOffset: CGFloat = 960
+        /// Lower floor for sampling kernel (`max(radius * 2, this)`).
+        static let liquidIntroLayerEffectMinSampleFloor: CGFloat = 240
+        /// Shadow blur from bubble radius (`radius * factor`, clamped).
+        static let liquidIntroBubbleShadowBlurFactor: CGFloat = 0.20
+        static let liquidIntroBubbleShadowBlurMin: CGFloat = 28
+        static let liquidIntroBubbleShadowBlurMax: CGFloat = 90
+
         /// Calendar habit card width on 402pt artboard (Figma 386:3156).
         static let calendarCardWidth: CGFloat = 362
         /// Day chip row cell height and width (Figma — fixed 48×48 cells).

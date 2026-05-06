@@ -57,7 +57,10 @@
       "Bash(xcodebuild -project TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'generic/platform=iOS Simulator' -configuration Debug build)",
       "WebFetch(domain:youtu.be)",
       "WebFetch(domain:www.youtube.com)",
-      "Bash(xcodebuild -scheme TrackMyHabbit -project TrackMyHabbit/TrackMyHabbit.xcodeproj -destination 'generic/platform=iOS Simulator' build)"
+      "Bash(xcodebuild -scheme TrackMyHabbit -project TrackMyHabbit/TrackMyHabbit.xcodeproj -destination 'generic/platform=iOS Simulator' build)",
+      "Bash(xcodebuild -scheme TrackMyHabbit -destination 'platform=iOS Simulator,name=iPhone 16' -configuration Debug build)",
+      "Bash(xargs ls -lh)",
+      "Bash(xcodebuild -project /Users/siddharthchhatpar/Developer/TrackMyHabbit-iOS/TrackMyHabbit/TrackMyHabbit.xcodeproj -scheme TrackMyHabbit -destination 'generic/platform=iOS Simulator' -configuration Debug build)"
     ],
     "additionalDirectories": [
       "/Users/siddharthchhatpar/Library/Developer/Xcode/DerivedData/TrackMyHabbit-avvyxzdyrigblqgxqzdjvcuamxda",
