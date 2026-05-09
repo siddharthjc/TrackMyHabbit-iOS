@@ -172,10 +172,9 @@ struct CalendarTabView: View {
                                 saveEntryImage(data, habit: habit, date: tapped)
                             },
                             onDismiss: dismissOverlay,
-                            onMenu: onCreateHabit.map { handler in
+                            onMenu: onEditHabit.map { _ in
                                 {
-                                    dismissOverlay()
-                                    handler()
+                                    requestEditAfterOverlayDismiss()
                                 }
                             }
                         )
@@ -237,6 +236,13 @@ struct CalendarTabView: View {
             .presentationDetents([.height(AppTheme.Layout.calendarDateSheetDetentHeight)])
             .presentationDragIndicator(.visible)
         }
+        .onChange(of: tappedDate) { _, newValue in
+            guard newValue == nil, pendingEditAfterDismiss else { return }
+            pendingEditAfterDismiss = false
+            DispatchQueue.main.asyncAfter(deadline: .now() + AppTheme.Motion.durationNormal) {
+                onEditHabit?()
+            }
+        }
     }
 
     private var dateTitleRow: some View {
@@ -278,6 +284,11 @@ struct CalendarTabView: View {
         withAnimation(AppTheme.Motion.springSheetOverlay) {
             tappedDate = nil
         }
+    }
+
+    private func requestEditAfterOverlayDismiss() {
+        pendingEditAfterDismiss = true
+        dismissOverlay()
     }
 
     private var emptyHabitsPlaceholder: some View {
