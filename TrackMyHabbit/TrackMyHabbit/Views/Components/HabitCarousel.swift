@@ -175,7 +175,8 @@ struct HabitCarousel: View {
         let resolvedEntry = existingEntry ?? resolveEntry(for: dateString)
 
         do {
-            let fileURL = try storeImage(data, for: dateString)
+            let persistedPhoto = try HabitPhotoFileStore.persistJPEGTransaction(data: data, habitID: habit.id, dateString: dateString)
+            let fileURL = persistedPhoto.fileURL
 
             do {
                 if let resolvedEntry {
@@ -190,8 +191,9 @@ struct HabitCarousel: View {
                 }
 
                 try modelContext.save()
+                persistedPhoto.commit()
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                persistedPhoto.rollback()
                 throw error
             }
         } catch {
@@ -233,7 +235,4 @@ struct HabitCarousel: View {
         }
     }
 
-    private func storeImage(_ data: Data, for dateString: String) throws -> URL {
-        try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
-    }
 }

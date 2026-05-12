@@ -331,7 +331,8 @@ struct CalendarTabView: View {
         let existing = resolveEntry(habit: habit, dateString: dateString)
 
         do {
-            let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
+            let persistedPhoto = try HabitPhotoFileStore.persistJPEGTransaction(data: data, habitID: habit.id, dateString: dateString)
+            let fileURL = persistedPhoto.fileURL
             do {
                 if let existing {
                     existing.imageUri = fileURL.absoluteString
@@ -344,8 +345,10 @@ struct CalendarTabView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                persistedPhoto.commit()
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                persistedPhoto.rollback()
+                print("Failed to save calendar photo: \(error.localizedDescription)")
             }
         } catch {
             print("Failed to save calendar photo: \(error.localizedDescription)")
