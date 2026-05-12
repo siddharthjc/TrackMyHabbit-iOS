@@ -151,11 +151,12 @@ struct ContentView: View {
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
         do {
-            let fileURL = try HabitPhotoFileStore.persistJPEG(
+            let persistedPhoto = try HabitPhotoFileStore.persistJPEGTransaction(
                 data: data,
                 habitID: habit.id,
                 dateString: dateString
             )
+            let fileURL = persistedPhoto.fileURL
             do {
                 if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
                     existing.imageUri = fileURL.absoluteString
@@ -168,8 +169,9 @@ struct ContentView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                persistedPhoto.commit()
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                persistedPhoto.rollback()
                 throw error
             }
         } catch {
