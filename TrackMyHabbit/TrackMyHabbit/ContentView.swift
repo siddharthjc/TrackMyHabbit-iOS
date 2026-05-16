@@ -141,11 +141,15 @@ struct ContentView: View {
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
         guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
-        }
+        let imageURI = entry.imageUri
         modelContext.delete(entry)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            HabitPhotoFileStore.removePhoto(at: imageURI)
+        } catch {
+            modelContext.rollback()
+            print("Failed to delete entry for \(habit.name): \(error.localizedDescription)")
+        }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
@@ -156,8 +160,11 @@ struct ContentView: View {
                 habitID: habit.id,
                 dateString: dateString
             )
+            var previousImageURI: String?
+            var insertedEntry: HabitEntry?
             do {
                 if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                    previousImageURI = existing.imageUri
                     existing.imageUri = fileURL.absoluteString
                 } else {
                     let newEntry = HabitEntry(
@@ -165,11 +172,17 @@ struct ContentView: View {
                         imageUri: fileURL.absoluteString,
                         habit: habit
                     )
+                    insertedEntry = newEntry
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                HabitPhotoFileStore.removePhoto(at: previousImageURI)
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                if let insertedEntry {
+                    modelContext.delete(insertedEntry)
+                }
+                modelContext.rollback()
+                HabitPhotoFileStore.removePhoto(at: fileURL.absoluteString)
                 throw error
             }
         } catch {

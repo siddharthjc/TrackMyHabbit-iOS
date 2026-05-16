@@ -176,9 +176,12 @@ struct HabitCarousel: View {
 
         do {
             let fileURL = try storeImage(data, for: dateString)
+            var previousImageURI: String?
+            var insertedEntry: HabitEntry?
 
             do {
                 if let resolvedEntry {
+                    previousImageURI = resolvedEntry.imageUri
                     resolvedEntry.imageUri = fileURL.absoluteString
                 } else {
                     let newEntry = HabitEntry(
@@ -186,12 +189,18 @@ struct HabitCarousel: View {
                         imageUri: fileURL.absoluteString,
                         habit: habit
                     )
+                    insertedEntry = newEntry
                     modelContext.insert(newEntry)
                 }
 
                 try modelContext.save()
+                HabitPhotoFileStore.removePhoto(at: previousImageURI)
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                if let insertedEntry {
+                    modelContext.delete(insertedEntry)
+                }
+                modelContext.rollback()
+                HabitPhotoFileStore.removePhoto(at: fileURL.absoluteString)
                 throw error
             }
         } catch {
