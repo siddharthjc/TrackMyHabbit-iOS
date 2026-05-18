@@ -16,10 +16,18 @@ enum HabitPhotoFileStore {
 
         try fileManager.createDirectory(at: photoDirectory, withIntermediateDirectories: true)
 
-        let fileURL = photoDirectory.appendingPathComponent("\(dateString).jpg")
+        let fileURL = photoDirectory.appendingPathComponent("\(dateString)-\(UUID().uuidString).jpg")
         let encodedData = normalizedJPEGData(from: data) ?? data
         try encodedData.write(to: fileURL, options: .atomic)
         return fileURL
+    }
+
+    static func removePhotoFile(at uri: String?, preserving preservedURL: URL? = nil) {
+        guard let uri, let url = URL(string: uri), url.isFileURL else { return }
+        if let preservedURL, url.standardizedFileURL == preservedURL.standardizedFileURL {
+            return
+        }
+        try? FileManager.default.removeItem(at: url)
     }
 
     private static func normalizedJPEGData(from data: Data) -> Data? {

@@ -141,15 +141,17 @@ struct ContentView: View {
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
         guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
-        }
+        let imageUri = entry.imageUri
         modelContext.delete(entry)
-        try? modelContext.save()
+        if (try? modelContext.save()) != nil {
+            HabitPhotoFileStore.removePhotoFile(at: imageUri)
+        }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
+        let existing = habit.entries.first(where: { $0.dateString == dateString })
+        let supersededImageUri = existing?.imageUri
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(
                 data: data,
@@ -157,8 +159,10 @@ struct ContentView: View {
                 dateString: dateString
             )
             do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                if let existing {
                     existing.imageUri = fileURL.absoluteString
+                    try modelContext.save()
+                    HabitPhotoFileStore.removePhotoFile(at: supersededImageUri, preserving: fileURL)
                 } else {
                     let newEntry = HabitEntry(
                         dateString: dateString,
@@ -166,9 +170,10 @@ struct ContentView: View {
                         habit: habit
                     )
                     modelContext.insert(newEntry)
+                    try modelContext.save()
                 }
-                try modelContext.save()
             } catch {
+                existing?.imageUri = supersededImageUri
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }

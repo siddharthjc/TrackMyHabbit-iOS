@@ -329,6 +329,7 @@ struct CalendarTabView: View {
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
         let dateString = DateUtils.toDateString(date: date)
         let existing = resolveEntry(habit: habit, dateString: dateString)
+        let supersededImageUri = existing?.imageUri
 
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
@@ -344,7 +345,9 @@ struct CalendarTabView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                HabitPhotoFileStore.removePhotoFile(at: supersededImageUri, preserving: fileURL)
             } catch {
+                existing?.imageUri = supersededImageUri
                 try? FileManager.default.removeItem(at: fileURL)
             }
         } catch {

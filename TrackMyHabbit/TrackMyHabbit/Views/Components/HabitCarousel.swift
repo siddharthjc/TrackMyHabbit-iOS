@@ -173,6 +173,7 @@ struct HabitCarousel: View {
 
     private func saveImage(_ data: Data, for dateString: String, existingEntry: HabitEntry?) {
         let resolvedEntry = existingEntry ?? resolveEntry(for: dateString)
+        let supersededImageUri = resolvedEntry?.imageUri
 
         do {
             let fileURL = try storeImage(data, for: dateString)
@@ -190,7 +191,9 @@ struct HabitCarousel: View {
                 }
 
                 try modelContext.save()
+                HabitPhotoFileStore.removePhotoFile(at: supersededImageUri, preserving: fileURL)
             } catch {
+                resolvedEntry?.imageUri = supersededImageUri
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
