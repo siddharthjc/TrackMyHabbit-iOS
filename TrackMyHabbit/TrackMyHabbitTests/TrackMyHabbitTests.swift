@@ -51,6 +51,21 @@ struct TrackMyHabbitTests {
         #expect(firstName != secondName)
     }
 
+    @Test func photoSourceControllerIgnoresStalePickerSessions() {
+        let controller = PhotoSourceController()
+        var pickedTargets: [String] = []
+        let imageData = Data([0x1])
+
+        let firstSession = controller.present { _ in pickedTargets.append("first") }
+        let secondSession = controller.present { _ in pickedTargets.append("second") }
+
+        controller.imagePicked(imageData, for: firstSession)
+        #expect(pickedTargets.isEmpty)
+
+        controller.imagePicked(imageData, for: secondSession)
+        #expect(pickedTargets == ["second"])
+    }
+
     @MainActor
     @Test func upsertPhotoDeduplicatesRowsAndReportsOldPhotosAfterSave() throws {
         let schema = Schema([Habit.self, HabitEntry.self])
