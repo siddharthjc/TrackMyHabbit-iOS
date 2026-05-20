@@ -34,16 +34,7 @@ struct TrackMyHabbitApp: App {
             let persistentConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
             return try ModelContainer(for: schema, configurations: [persistentConfig])
         } catch {
-            // Avoid hard-crashing the app on launch due to a transient/migration issue.
-            // Fallback to in-memory so the app can still run.
-            print("⚠️ SwiftData ModelContainer init failed, falling back to in-memory: \(error)")
-            do {
-                let inMemoryConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true)
-                return try ModelContainer(for: schema, configurations: [inMemoryConfig])
-            } catch {
-                // If even in-memory fails, crash with context (should be extremely rare).
-                fatalError("Could not create in-memory ModelContainer: \(error)")
-            }
+            fatalError("Could not create persistent ModelContainer: \(error)")
         }
     }
 

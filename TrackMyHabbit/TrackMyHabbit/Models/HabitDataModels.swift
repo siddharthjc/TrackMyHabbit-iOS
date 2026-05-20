@@ -58,7 +58,8 @@ extension HabitEntry {
     static func photoEntriesByDate(_ entries: [HabitEntry]) -> [String: HabitEntry] {
         entries.reduce(into: [:]) { result, entry in
             guard entry.imageUri != nil else { return }
-            result[entry.dateString] = result[entry.dateString] ?? entry
+            let candidates = [result[entry.dateString], entry].compactMap { $0 }
+            result[entry.dateString] = HabitEntryStore.preferredEntry(from: candidates)
         }
     }
 }

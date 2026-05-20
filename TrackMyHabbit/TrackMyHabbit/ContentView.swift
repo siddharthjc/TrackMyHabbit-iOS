@@ -140,12 +140,17 @@ struct ContentView: View {
     }
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
-        guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
+        do {
+            let deletedPhotoURIs = try HabitEntryStore.deleteEntries(
+                habit: habit,
+                dateString: dateStr,
+                in: modelContext
+            )
+            HabitPhotoFileStore.removePhotos(at: deletedPhotoURIs)
+        } catch {
+            modelContext.rollback()
+            print("Failed to delete entry for \(habit.name) on \(dateStr): \(error.localizedDescription)")
         }
-        modelContext.delete(entry)
-        try? modelContext.save()
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
@@ -157,19 +162,16 @@ struct ContentView: View {
                 dateString: dateString
             )
             do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
-                    existing.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-                try modelContext.save()
+                let stalePhotoURIs = try HabitEntryStore.upsertPhoto(
+                    habit: habit,
+                    dateString: dateString,
+                    imageUri: fileURL.absoluteString,
+                    in: modelContext
+                )
+                HabitPhotoFileStore.removePhotos(at: stalePhotoURIs)
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                modelContext.rollback()
+                HabitPhotoFileStore.removePhoto(at: fileURL)
                 throw error
             }
         } catch {
