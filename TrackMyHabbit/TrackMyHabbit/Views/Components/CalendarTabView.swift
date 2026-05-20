@@ -328,48 +328,24 @@ struct CalendarTabView: View {
 
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
         let dateString = DateUtils.toDateString(date: date)
-        let existing = resolveEntry(habit: habit, dateString: dateString)
 
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
             do {
-                if let existing {
-                    existing.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-                try modelContext.save()
+                let stalePhotoURIs = try HabitEntryStore.upsertPhoto(
+                    habit: habit,
+                    dateString: dateString,
+                    imageUri: fileURL.absoluteString,
+                    in: modelContext
+                )
+                HabitPhotoFileStore.removePhotos(at: stalePhotoURIs)
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                modelContext.rollback()
+                HabitPhotoFileStore.removePhoto(at: fileURL)
+                throw error
             }
         } catch {
             print("Failed to save calendar photo: \(error.localizedDescription)")
-        }
-    }
-
-    private func resolveEntry(habit: Habit, dateString: String) -> HabitEntry? {
-        do {
-            let habitId = habit.id
-            let predicate = #Predicate<HabitEntry> { entry in
-                entry.dateString == dateString && entry.habit?.id == habitId
-            }
-            var descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
-            descriptor.fetchLimit = 2
-            let results = try modelContext.fetch(descriptor)
-            if results.count > 1 {
-                for dup in results.dropFirst() {
-                    modelContext.delete(dup)
-                }
-                try? modelContext.save()
-            }
-            return results.first
-        } catch {
-            return habit.entries.first(where: { $0.dateString == dateString })
         }
     }
 }
@@ -664,7 +640,7 @@ private struct CalendarHabitDayCard: View {
     }
 
     private var entry: HabitEntry? {
-        habit.entries.first(where: { $0.dateString == dateString })
+        HabitEntryStore.preferredEntry(from: habit.entries.filter { $0.dateString == dateString })
     }
 
     private var hasPhoto: Bool {

@@ -415,11 +415,14 @@ struct CreateHabitSheet: View {
     
     private func deleteHabit() {
         guard let habit = editingHabit else { return }
+        let habitID = habit.id
         modelContext.delete(habit)
         do {
             try modelContext.save()
+            HabitPhotoFileStore.removePhotoDirectory(for: habitID)
             dismiss()
         } catch {
+            modelContext.rollback()
             persistenceErrorMessage = error.localizedDescription
             showPersistenceErrorAlert = true
         }
