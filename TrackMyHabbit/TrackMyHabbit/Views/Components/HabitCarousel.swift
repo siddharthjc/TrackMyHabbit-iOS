@@ -175,25 +175,13 @@ struct HabitCarousel: View {
         let resolvedEntry = existingEntry ?? resolveEntry(for: dateString)
 
         do {
-            let fileURL = try storeImage(data, for: dateString)
-
-            do {
-                if let resolvedEntry {
-                    resolvedEntry.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-
-                try modelContext.save()
-            } catch {
-                try? FileManager.default.removeItem(at: fileURL)
-                throw error
-            }
+            try HabitPhotoPersistence.saveJPEG(
+                data: data,
+                habit: habit,
+                dateString: dateString,
+                existingEntry: resolvedEntry,
+                modelContext: modelContext
+            )
         } catch {
             print("Failed to save image for \(dateString): \(error.localizedDescription)")
         }
@@ -231,9 +219,5 @@ struct HabitCarousel: View {
         } else {
             currentIndex = 0
         }
-    }
-
-    private func storeImage(_ data: Data, for dateString: String) throws -> URL {
-        try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
     }
 }
