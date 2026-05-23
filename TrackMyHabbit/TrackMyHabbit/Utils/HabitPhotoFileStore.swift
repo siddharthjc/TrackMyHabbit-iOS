@@ -1,4 +1,5 @@
 import Foundation
+import SwiftData
 import UIKit
 
 enum HabitPhotoFileStore {
@@ -16,10 +17,15 @@ enum HabitPhotoFileStore {
 
         try fileManager.createDirectory(at: photoDirectory, withIntermediateDirectories: true)
 
-        let fileURL = photoDirectory.appendingPathComponent("\(dateString).jpg")
+        let fileURL = photoDirectory.appendingPathComponent("\(dateString)-\(UUID().uuidString).jpg")
         let encodedData = normalizedJPEGData(from: data) ?? data
         try encodedData.write(to: fileURL, options: .atomic)
         return fileURL
+    }
+
+    static func removePhoto(at uri: String?) {
+        guard let uri, let url = URL(string: uri), url.isFileURL else { return }
+        try? FileManager.default.removeItem(at: url)
     }
 
     private static func normalizedJPEGData(from data: Data) -> Data? {
@@ -27,5 +33,48 @@ enum HabitPhotoFileStore {
             return nil
         }
         return image.jpegData(compressionQuality: 0.9)
+    }
+}
+
+enum HabitPhotoPersistence {
+    static func saveJPEG(
+        data: Data,
+        habit: Habit,
+        dateString: String,
+        existingEntry: HabitEntry?,
+        modelContext: ModelContext
+    ) throws {
+        let fileURL = try HabitPhotoFileStore.persistJPEG(
+            data: data,
+            habitID: habit.id,
+            dateString: dateString
+        )
+        let replacementImageUri = existingEntry?.imageUri
+        var insertedEntry: HabitEntry?
+
+        do {
+            if let existingEntry {
+                existingEntry.imageUri = fileURL.absoluteString
+            } else {
+                let newEntry = HabitEntry(
+                    dateString: dateString,
+                    imageUri: fileURL.absoluteString,
+                    habit: habit
+                )
+                insertedEntry = newEntry
+                modelContext.insert(newEntry)
+            }
+
+            try modelContext.save()
+            HabitPhotoFileStore.removePhoto(at: replacementImageUri)
+        } catch {
+            try? FileManager.default.removeItem(at: fileURL)
+            if let existingEntry {
+                existingEntry.imageUri = replacementImageUri
+            } else if let insertedEntry {
+                modelContext.delete(insertedEntry)
+            }
+            throw error
+        }
     }
 }

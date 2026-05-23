@@ -141,37 +141,26 @@ struct ContentView: View {
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
         guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
-        }
+        let imageUri = entry.imageUri
         modelContext.delete(entry)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            HabitPhotoFileStore.removePhoto(at: imageUri)
+        } catch {
+            print("Failed to delete entry for \(habit.name): \(error.localizedDescription)")
+        }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
         do {
-            let fileURL = try HabitPhotoFileStore.persistJPEG(
+            try HabitPhotoPersistence.saveJPEG(
                 data: data,
-                habitID: habit.id,
-                dateString: dateString
+                habit: habit,
+                dateString: dateString,
+                existingEntry: habit.entries.first(where: { $0.dateString == dateString }),
+                modelContext: modelContext
             )
-            do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
-                    existing.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-                try modelContext.save()
-            } catch {
-                try? FileManager.default.removeItem(at: fileURL)
-                throw error
-            }
         } catch {
             print("Failed to save today's photo for \(habit.name): \(error.localizedDescription)")
         }
