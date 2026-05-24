@@ -122,7 +122,7 @@ struct ContentView: View {
                     Label("Edit habit", systemImage: "pencil")
                 }
                 if let dateStr = selectedHabitDate,
-                   habit.entries.contains(where: { $0.dateString == dateStr && $0.imageUri != nil }) {
+                   HabitEntryPersistence.photoEntry(from: habit.entries, dateString: dateStr) != nil {
                     Button(role: .destructive) {
                         deleteEntry(for: habit, dateStr: dateStr)
                     } label: {
@@ -140,38 +140,26 @@ struct ContentView: View {
     }
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
-        guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
+        do {
+            try HabitEntryPersistence.deleteEntries(
+                for: habit,
+                dateString: dateStr,
+                modelContext: modelContext
+            )
+            selectedHabitDate = nil
+        } catch {
+            print("Failed to delete entry for \(habit.name): \(error.localizedDescription)")
         }
-        modelContext.delete(entry)
-        try? modelContext.save()
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
-        let dateString = dateStr
         do {
-            let fileURL = try HabitPhotoFileStore.persistJPEG(
+            try HabitEntryPersistence.savePhoto(
                 data: data,
-                habitID: habit.id,
-                dateString: dateString
+                habit: habit,
+                dateString: dateStr,
+                modelContext: modelContext
             )
-            do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
-                    existing.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-                try modelContext.save()
-            } catch {
-                try? FileManager.default.removeItem(at: fileURL)
-                throw error
-            }
         } catch {
             print("Failed to save today's photo for \(habit.name): \(error.localizedDescription)")
         }
