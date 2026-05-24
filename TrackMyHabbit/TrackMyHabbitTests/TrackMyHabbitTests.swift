@@ -11,6 +11,7 @@ import Testing
 
 struct TrackMyHabbitTests {
 
+    @MainActor
     @Test func photoEntriesByDateIgnoresMissingPhotosAndKeepsFirstDuplicate() {
         let firstPhoto = HabitEntry(dateString: "2026-04-11", imageUri: "file:///first.jpg")
         let duplicatePhoto = HabitEntry(dateString: "2026-04-11", imageUri: "file:///duplicate.jpg")
@@ -27,6 +28,7 @@ struct TrackMyHabbitTests {
         #expect(entriesByDate["2026-04-12"] == nil)
     }
 
+    @MainActor
     @Test func displayPhotoEntryPrefersPhotoOverEmptyDuplicate() {
         let emptyEntry = HabitEntry(dateString: "2026-04-11")
         let photoEntry = HabitEntry(dateString: "2026-04-11", imageUri: "file:///photo.jpg")
@@ -39,6 +41,7 @@ struct TrackMyHabbitTests {
         #expect(entry === photoEntry)
     }
 
+    @MainActor
     @Test func photoStoreUsesUniqueFilenamesForRepeatedSaves() throws {
         let habitID = UUID()
         let dateString = "2026-04-11"

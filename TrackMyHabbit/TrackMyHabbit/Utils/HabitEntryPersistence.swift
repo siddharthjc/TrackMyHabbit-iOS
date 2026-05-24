@@ -32,6 +32,7 @@ enum HabitEntryPersistence {
             }
             try modelContext.save()
         } catch {
+            modelContext.rollback()
             try? FileManager.default.removeItem(at: fileURL)
             throw error
         }
@@ -47,7 +48,12 @@ enum HabitEntryPersistence {
         for entry in entries {
             modelContext.delete(entry)
         }
-        try modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
 
         removePhotoFiles(photoURLs)
     }
@@ -65,7 +71,12 @@ enum HabitEntryPersistence {
         for entry in entries where entry.id != keeper.id {
             modelContext.delete(entry)
         }
-        try modelContext.save()
+        do {
+            try modelContext.save()
+        } catch {
+            modelContext.rollback()
+            throw error
+        }
 
         removePhotoFiles(removedPhotoURLs, excluding: keeperURL)
         return keeper
