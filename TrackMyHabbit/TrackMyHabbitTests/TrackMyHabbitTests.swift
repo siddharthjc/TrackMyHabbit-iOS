@@ -6,6 +6,7 @@
 //
 
 import Testing
+import Foundation
 @testable import TrackMyHabbit
 
 struct TrackMyHabbitTests {
@@ -24,6 +25,32 @@ struct TrackMyHabbitTests {
         #expect(entriesByDate.count == 1)
         #expect(entriesByDate["2026-04-11"] === firstPhoto)
         #expect(entriesByDate["2026-04-12"] == nil)
+    }
+
+    @Test func photoStoreCreatesUniqueFilesForSameHabitAndDate() throws {
+        let habitID = UUID()
+        let dateString = "2026-04-11"
+
+        let firstURL = try HabitPhotoFileStore.persistJPEG(
+            data: Data([0x01]),
+            habitID: habitID,
+            dateString: dateString
+        )
+        let secondURL = try HabitPhotoFileStore.persistJPEG(
+            data: Data([0x02]),
+            habitID: habitID,
+            dateString: dateString
+        )
+        defer {
+            try? FileManager.default.removeItem(at: firstURL)
+            try? FileManager.default.removeItem(at: secondURL)
+        }
+
+        #expect(firstURL != secondURL)
+        #expect(firstURL.lastPathComponent.hasPrefix("\(dateString)-"))
+        #expect(secondURL.lastPathComponent.hasPrefix("\(dateString)-"))
+        #expect(FileManager.default.fileExists(atPath: firstURL.path))
+        #expect(FileManager.default.fileExists(atPath: secondURL.path))
     }
 
 }

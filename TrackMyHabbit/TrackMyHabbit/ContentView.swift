@@ -141,15 +141,24 @@ struct ContentView: View {
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
         guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
-        }
+        let photoURL = entry.imageUri.flatMap(URL.init(string:))
         modelContext.delete(entry)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            if let photoURL {
+                try? FileManager.default.removeItem(at: photoURL)
+            }
+        } catch {
+            modelContext.rollback()
+            print("Failed to delete entry for \(habit.name): \(error.localizedDescription)")
+        }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
+        let existing = habit.entries.first(where: { $0.dateString == dateString })
+        let replacedPhotoURL = existing?.imageUri.flatMap(URL.init(string:))
+
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(
                 data: data,
@@ -157,7 +166,7 @@ struct ContentView: View {
                 dateString: dateString
             )
             do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                if let existing {
                     existing.imageUri = fileURL.absoluteString
                 } else {
                     let newEntry = HabitEntry(
@@ -168,7 +177,11 @@ struct ContentView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                if let replacedPhotoURL, replacedPhotoURL != fileURL {
+                    try? FileManager.default.removeItem(at: replacedPhotoURL)
+                }
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
