@@ -141,11 +141,15 @@ struct ContentView: View {
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
         guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
-        }
+        let deletedPhotoURI = entry.imageUri
         modelContext.delete(entry)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            HabitPhotoFileStore.removePhoto(uri: deletedPhotoURI)
+        } catch {
+            modelContext.rollback()
+            print("Failed to delete entry for \(habit.name) on \(dateStr): \(error.localizedDescription)")
+        }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
@@ -158,7 +162,10 @@ struct ContentView: View {
             )
             do {
                 if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                    let replacedPhotoURI = existing.imageUri
                     existing.imageUri = fileURL.absoluteString
+                    try modelContext.save()
+                    HabitPhotoFileStore.removeReplacedPhoto(uri: replacedPhotoURI, keeping: fileURL)
                 } else {
                     let newEntry = HabitEntry(
                         dateString: dateString,
@@ -166,10 +173,11 @@ struct ContentView: View {
                         habit: habit
                     )
                     modelContext.insert(newEntry)
+                    try modelContext.save()
                 }
-                try modelContext.save()
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                modelContext.rollback()
+                HabitPhotoFileStore.removePhoto(at: fileURL)
                 throw error
             }
         } catch {
