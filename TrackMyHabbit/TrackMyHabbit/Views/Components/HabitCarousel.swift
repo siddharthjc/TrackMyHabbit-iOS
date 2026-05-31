@@ -176,6 +176,7 @@ struct HabitCarousel: View {
 
         do {
             let fileURL = try storeImage(data, for: dateString)
+            let previousURI = resolvedEntry?.imageUri
 
             do {
                 if let resolvedEntry {
@@ -190,7 +191,13 @@ struct HabitCarousel: View {
                 }
 
                 try modelContext.save()
+                if let previousURI,
+                   let previousURL = URL(string: previousURI),
+                   previousURL != fileURL {
+                    try? FileManager.default.removeItem(at: previousURL)
+                }
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
