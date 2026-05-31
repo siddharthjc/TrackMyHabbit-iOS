@@ -332,6 +332,7 @@ struct CalendarTabView: View {
 
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
+            let previousURI = existing?.imageUri
             do {
                 if let existing {
                     existing.imageUri = fileURL.absoluteString
@@ -344,7 +345,13 @@ struct CalendarTabView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                if let previousURI,
+                   let previousURL = URL(string: previousURI),
+                   previousURL != fileURL {
+                    try? FileManager.default.removeItem(at: previousURL)
+                }
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
             }
         } catch {

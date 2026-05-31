@@ -141,11 +141,17 @@ struct ContentView: View {
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
         guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
-        }
+        let imageURL = entry.imageUri.flatMap(URL.init(string:))
         modelContext.delete(entry)
-        try? modelContext.save()
+        do {
+            try modelContext.save()
+            if let imageURL {
+                try? FileManager.default.removeItem(at: imageURL)
+            }
+        } catch {
+            modelContext.rollback()
+            print("Failed to delete entry for \(habit.name) on \(dateStr): \(error.localizedDescription)")
+        }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
@@ -156,8 +162,10 @@ struct ContentView: View {
                 habitID: habit.id,
                 dateString: dateString
             )
+            let existing = habit.entries.first(where: { $0.dateString == dateString })
+            let previousURI = existing?.imageUri
             do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                if let existing {
                     existing.imageUri = fileURL.absoluteString
                 } else {
                     let newEntry = HabitEntry(
@@ -168,7 +176,13 @@ struct ContentView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                if let previousURI,
+                   let previousURL = URL(string: previousURI),
+                   previousURL != fileURL {
+                    try? FileManager.default.removeItem(at: previousURL)
+                }
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
