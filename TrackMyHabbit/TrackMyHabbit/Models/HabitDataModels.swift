@@ -46,6 +46,11 @@ final class HabitEntry {
 }
 
 extension Habit {
+    func entry(for dateString: String) -> HabitEntry? {
+        let sameDayEntries = entries.filter { $0.dateString == dateString }
+        return sameDayEntries.first(where: { $0.imageUri != nil }) ?? sameDayEntries.first
+    }
+
     func photoEntriesByDate() -> [String: HabitEntry] {
         entries.reduce(into: [:]) { result, entry in
             guard entry.imageUri != nil, result[entry.dateString] == nil else { return }
