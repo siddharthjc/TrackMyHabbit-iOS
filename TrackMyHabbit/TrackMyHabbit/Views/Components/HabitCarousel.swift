@@ -80,7 +80,7 @@ struct HabitCarousel: View {
     private func cardLayer(at index: Int, depth: Int) -> some View {
         let dateStr = orderedDays[index]
         let isActive = depth == 0
-        let entry = habit.entries.first(where: { $0.dateString == dateStr })
+        let entry = habit.entry(for: dateStr)
 
         let leftProgress: CGFloat = dragOffset < 0
             ? min(-dragOffset / (cardWidth * AppTheme.Layout.carouselProgressDivisor), 1.0)
@@ -173,6 +173,7 @@ struct HabitCarousel: View {
 
     private func saveImage(_ data: Data, for dateString: String, existingEntry: HabitEntry?) {
         let resolvedEntry = existingEntry ?? resolveEntry(for: dateString)
+        let previousFileURL = resolvedEntry?.imageUri.flatMap(URL.init(string:))
 
         do {
             let fileURL = try storeImage(data, for: dateString)
@@ -190,6 +191,9 @@ struct HabitCarousel: View {
                 }
 
                 try modelContext.save()
+                if let previousFileURL, previousFileURL != fileURL {
+                    try? FileManager.default.removeItem(at: previousFileURL)
+                }
             } catch {
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
@@ -206,17 +210,10 @@ struct HabitCarousel: View {
                 entry.dateString == dateString && entry.habit?.id == habitId
             }
             var descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
-            descriptor.fetchLimit = 2
             let results = try modelContext.fetch(descriptor)
-            if results.count > 1 {
-                for dup in results.dropFirst() {
-                    modelContext.delete(dup)
-                }
-                try? modelContext.save()
-            }
-            return results.first
+            return results.first(where: { $0.imageUri != nil }) ?? results.first
         } catch {
-            return habit.entries.first(where: { $0.dateString == dateString })
+            return habit.entry(for: dateString)
         }
     }
 
