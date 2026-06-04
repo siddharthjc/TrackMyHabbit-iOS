@@ -181,7 +181,7 @@ private struct WalletDayCard: View {
     }
 
     private var entry: HabitEntry? {
-        habit.entries.first(where: { $0.dateString == dateStr })
+        HabitEntryStore.preferredEntry(for: habit, dateString: dateStr)
     }
 
     var body: some View {
