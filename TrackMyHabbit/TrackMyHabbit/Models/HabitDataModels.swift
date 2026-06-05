@@ -55,6 +55,14 @@ extension Habit {
 }
 
 extension HabitEntry {
+    static func preferredEntry(from entries: [HabitEntry]) -> HabitEntry? {
+        entries.first(where: { $0.imageUri != nil }) ?? entries.first
+    }
+
+    static func preferredEntry(in entries: [HabitEntry], dateString: String) -> HabitEntry? {
+        preferredEntry(from: entries.filter { $0.dateString == dateString })
+    }
+
     static func photoEntriesByDate(_ entries: [HabitEntry]) -> [String: HabitEntry] {
         entries.reduce(into: [:]) { result, entry in
             guard entry.imageUri != nil else { return }

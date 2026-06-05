@@ -80,7 +80,7 @@ struct HabitCarousel: View {
     private func cardLayer(at index: Int, depth: Int) -> some View {
         let dateStr = orderedDays[index]
         let isActive = depth == 0
-        let entry = habit.entries.first(where: { $0.dateString == dateStr })
+        let entry = HabitEntry.preferredEntry(in: habit.entries, dateString: dateStr)
 
         let leftProgress: CGFloat = dragOffset < 0
             ? min(-dragOffset / (cardWidth * AppTheme.Layout.carouselProgressDivisor), 1.0)
@@ -172,7 +172,14 @@ struct HabitCarousel: View {
     // MARK: - Data helpers
 
     private func saveImage(_ data: Data, for dateString: String, existingEntry: HabitEntry?) {
-        let resolvedEntry = existingEntry ?? resolveEntry(for: dateString)
+        let entriesForDate = entries(for: dateString)
+        let resolvedEntry = HabitEntry.preferredEntry(from: entriesForDate) ?? existingEntry
+        let entriesToDelete = entriesForDate.filter { entry in
+            guard let resolvedEntry else { return false }
+            return entry !== resolvedEntry
+        }
+        let replacedPhotoURL = HabitPhotoFileStore.fileURL(from: resolvedEntry?.imageUri)
+        let duplicatePhotoURLs = entriesToDelete.compactMap { HabitPhotoFileStore.fileURL(from: $0.imageUri) }
 
         do {
             let fileURL = try storeImage(data, for: dateString)
@@ -188,9 +195,12 @@ struct HabitCarousel: View {
                     )
                     modelContext.insert(newEntry)
                 }
+                entriesToDelete.forEach { modelContext.delete($0) }
 
                 try modelContext.save()
+                HabitPhotoFileStore.removeFiles(at: [replacedPhotoURL].compactMap { $0 } + duplicatePhotoURLs, preserving: fileURL)
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
@@ -199,24 +209,16 @@ struct HabitCarousel: View {
         }
     }
 
-    private func resolveEntry(for dateString: String) -> HabitEntry? {
+    private func entries(for dateString: String) -> [HabitEntry] {
         do {
             let habitId = habit.id
             let predicate = #Predicate<HabitEntry> { entry in
                 entry.dateString == dateString && entry.habit?.id == habitId
             }
-            var descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
-            descriptor.fetchLimit = 2
-            let results = try modelContext.fetch(descriptor)
-            if results.count > 1 {
-                for dup in results.dropFirst() {
-                    modelContext.delete(dup)
-                }
-                try? modelContext.save()
-            }
-            return results.first
+            let descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
+            return try modelContext.fetch(descriptor)
         } catch {
-            return habit.entries.first(where: { $0.dateString == dateString })
+            return habit.entries.filter { $0.dateString == dateString }
         }
     }
 
