@@ -328,7 +328,14 @@ struct CalendarTabView: View {
 
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
         let dateString = DateUtils.toDateString(date: date)
-        let existing = resolveEntry(habit: habit, dateString: dateString)
+        let entriesForDate = entries(habit: habit, dateString: dateString)
+        let existing = HabitEntry.preferredEntry(from: entriesForDate)
+        let entriesToDelete = entriesForDate.filter { entry in
+            guard let existing else { return false }
+            return entry !== existing
+        }
+        let replacedPhotoURL = HabitPhotoFileStore.fileURL(from: existing?.imageUri)
+        let duplicatePhotoURLs = entriesToDelete.compactMap { HabitPhotoFileStore.fileURL(from: $0.imageUri) }
 
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
@@ -343,33 +350,29 @@ struct CalendarTabView: View {
                     )
                     modelContext.insert(newEntry)
                 }
+                entriesToDelete.forEach { modelContext.delete($0) }
                 try modelContext.save()
+                HabitPhotoFileStore.removeFiles(at: [replacedPhotoURL].compactMap { $0 } + duplicatePhotoURLs, preserving: fileURL)
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
+                throw error
             }
         } catch {
             print("Failed to save calendar photo: \(error.localizedDescription)")
         }
     }
 
-    private func resolveEntry(habit: Habit, dateString: String) -> HabitEntry? {
+    private func entries(habit: Habit, dateString: String) -> [HabitEntry] {
         do {
             let habitId = habit.id
             let predicate = #Predicate<HabitEntry> { entry in
                 entry.dateString == dateString && entry.habit?.id == habitId
             }
-            var descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
-            descriptor.fetchLimit = 2
-            let results = try modelContext.fetch(descriptor)
-            if results.count > 1 {
-                for dup in results.dropFirst() {
-                    modelContext.delete(dup)
-                }
-                try? modelContext.save()
-            }
-            return results.first
+            let descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
+            return try modelContext.fetch(descriptor)
         } catch {
-            return habit.entries.first(where: { $0.dateString == dateString })
+            return habit.entries.filter { $0.dateString == dateString }
         }
     }
 }
@@ -664,7 +667,7 @@ private struct CalendarHabitDayCard: View {
     }
 
     private var entry: HabitEntry? {
-        habit.entries.first(where: { $0.dateString == dateString })
+        HabitEntry.preferredEntry(in: habit.entries, dateString: dateString)
     }
 
     private var hasPhoto: Bool {

@@ -122,7 +122,7 @@ struct ContentView: View {
                     Label("Edit habit", systemImage: "pencil")
                 }
                 if let dateStr = selectedHabitDate,
-                   habit.entries.contains(where: { $0.dateString == dateStr && $0.imageUri != nil }) {
+                   HabitEntry.preferredEntry(in: habit.entries, dateString: dateStr)?.imageUri != nil {
                     Button(role: .destructive) {
                         deleteEntry(for: habit, dateStr: dateStr)
                     } label: {
@@ -140,16 +140,32 @@ struct ContentView: View {
     }
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
-        guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
+        let entries = habit.entries.filter { $0.dateString == dateStr }
+        guard !entries.isEmpty else { return }
+
+        let photoURLs = entries.compactMap { HabitPhotoFileStore.fileURL(from: $0.imageUri) }
+        entries.forEach { modelContext.delete($0) }
+
+        do {
+            try modelContext.save()
+            HabitPhotoFileStore.removeFiles(at: photoURLs)
+        } catch {
+            modelContext.rollback()
+            print("Failed to delete entry for \(habit.name): \(error.localizedDescription)")
         }
-        modelContext.delete(entry)
-        try? modelContext.save()
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
+        let entriesForDate = habit.entries.filter { $0.dateString == dateString }
+        let existing = HabitEntry.preferredEntry(from: entriesForDate)
+        let entriesToDelete = entriesForDate.filter { entry in
+            guard let existing else { return false }
+            return entry !== existing
+        }
+        let replacedPhotoURL = HabitPhotoFileStore.fileURL(from: existing?.imageUri)
+        let duplicatePhotoURLs = entriesToDelete.compactMap { HabitPhotoFileStore.fileURL(from: $0.imageUri) }
+
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(
                 data: data,
@@ -157,7 +173,7 @@ struct ContentView: View {
                 dateString: dateString
             )
             do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                if let existing {
                     existing.imageUri = fileURL.absoluteString
                 } else {
                     let newEntry = HabitEntry(
@@ -167,8 +183,11 @@ struct ContentView: View {
                     )
                     modelContext.insert(newEntry)
                 }
+                entriesToDelete.forEach { modelContext.delete($0) }
                 try modelContext.save()
+                HabitPhotoFileStore.removeFiles(at: [replacedPhotoURL].compactMap { $0 } + duplicatePhotoURLs, preserving: fileURL)
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
