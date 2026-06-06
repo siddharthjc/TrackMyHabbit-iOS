@@ -48,17 +48,30 @@ final class HabitEntry {
 extension Habit {
     func photoEntriesByDate() -> [String: HabitEntry] {
         entries.reduce(into: [:]) { result, entry in
-            guard entry.imageUri != nil, result[entry.dateString] == nil else { return }
-            result[entry.dateString] = entry
+            guard entry.imageUri != nil else { return }
+            if let current = result[entry.dateString] {
+                result[entry.dateString] = HabitEntry.preferredEntry(for: entry.dateString, in: [current, entry])
+            } else {
+                result[entry.dateString] = entry
+            }
         }
     }
 }
 
 extension HabitEntry {
+    static func preferredEntry(for dateString: String, in entries: [HabitEntry]) -> HabitEntry? {
+        let datedEntries = entries.filter { $0.dateString == dateString }
+        return datedEntries.first(where: { $0.imageUri != nil }) ?? datedEntries.first
+    }
+
     static func photoEntriesByDate(_ entries: [HabitEntry]) -> [String: HabitEntry] {
         entries.reduce(into: [:]) { result, entry in
             guard entry.imageUri != nil else { return }
-            result[entry.dateString] = result[entry.dateString] ?? entry
+            if let current = result[entry.dateString] {
+                result[entry.dateString] = preferredEntry(for: entry.dateString, in: [current, entry])
+            } else {
+                result[entry.dateString] = entry
+            }
         }
     }
 }

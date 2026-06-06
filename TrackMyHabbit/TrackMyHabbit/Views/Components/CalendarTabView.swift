@@ -22,6 +22,8 @@ struct CalendarTabView: View {
     @State private var showDateSheet = false
     /// Non-nil when a day cell has been tapped — drives the full-screen cover.
     @State private var tappedDate: Date?
+    /// Habit that owned the tapped day when the overlay opened.
+    @State private var tappedHabitId: UUID?
     /// Set when the 3-dot menu is tapped so the edit sheet fires after the
     /// full-screen cover finishes dismissing (prevents modal-on-modal conflicts).
     @State private var pendingEditAfterDismiss = false
@@ -46,6 +48,11 @@ struct CalendarTabView: View {
 
     private var resolvedHabit: Habit? {
         habits.first(where: { $0.id == activeHabitId }) ?? habits.first
+    }
+
+    private var overlayHabit: Habit? {
+        guard let tappedHabitId else { return nil }
+        return habits.first(where: { $0.id == tappedHabitId })
     }
 
     private var calendar: Calendar {
@@ -131,6 +138,7 @@ struct CalendarTabView: View {
                                     let dayStart = calendar.startOfDay(for: date)
                                     guard dayStart <= effectiveToday else { return }
                                     selectedDate = dayStart
+                                    tappedHabitId = habit.id
                                     withAnimation(AppTheme.Motion.springSheetOverlay) {
                                         tappedDate = dayStart
                                     }
@@ -161,7 +169,7 @@ struct CalendarTabView: View {
                 }
                 .scrollClipDisabled()
                 .overlay {
-                    if let tapped = tappedDate, let habit = resolvedHabit {
+                    if let tapped = tappedDate, let habit = overlayHabit {
                         CalendarCardOverlay(
                             habit: habit,
                             selectedDate: tapped,
@@ -283,6 +291,7 @@ struct CalendarTabView: View {
     private func dismissOverlay() {
         withAnimation(AppTheme.Motion.springSheetOverlay) {
             tappedDate = nil
+            tappedHabitId = nil
         }
     }
 
@@ -328,48 +337,11 @@ struct CalendarTabView: View {
 
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
         let dateString = DateUtils.toDateString(date: date)
-        let existing = resolveEntry(habit: habit, dateString: dateString)
 
         do {
-            let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
-            do {
-                if let existing {
-                    existing.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-                try modelContext.save()
-            } catch {
-                try? FileManager.default.removeItem(at: fileURL)
-            }
+            try HabitEntryStore.savePhoto(data: data, habit: habit, dateString: dateString, in: modelContext)
         } catch {
             print("Failed to save calendar photo: \(error.localizedDescription)")
-        }
-    }
-
-    private func resolveEntry(habit: Habit, dateString: String) -> HabitEntry? {
-        do {
-            let habitId = habit.id
-            let predicate = #Predicate<HabitEntry> { entry in
-                entry.dateString == dateString && entry.habit?.id == habitId
-            }
-            var descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
-            descriptor.fetchLimit = 2
-            let results = try modelContext.fetch(descriptor)
-            if results.count > 1 {
-                for dup in results.dropFirst() {
-                    modelContext.delete(dup)
-                }
-                try? modelContext.save()
-            }
-            return results.first
-        } catch {
-            return habit.entries.first(where: { $0.dateString == dateString })
         }
     }
 }
@@ -664,7 +636,7 @@ private struct CalendarHabitDayCard: View {
     }
 
     private var entry: HabitEntry? {
-        habit.entries.first(where: { $0.dateString == dateString })
+        HabitEntry.preferredEntry(for: dateString, in: habit.entries)
     }
 
     private var hasPhoto: Bool {
