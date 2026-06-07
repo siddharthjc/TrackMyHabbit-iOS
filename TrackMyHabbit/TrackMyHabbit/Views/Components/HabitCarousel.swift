@@ -80,7 +80,7 @@ struct HabitCarousel: View {
     private func cardLayer(at index: Int, depth: Int) -> some View {
         let dateStr = orderedDays[index]
         let isActive = depth == 0
-        let entry = habit.entries.first(where: { $0.dateString == dateStr })
+        let entry = HabitEntry.preferredEntry(for: dateStr, in: habit.entries)
 
         let leftProgress: CGFloat = dragOffset < 0
             ? min(-dragOffset / (cardWidth * AppTheme.Layout.carouselProgressDivisor), 1.0)
@@ -200,24 +200,7 @@ struct HabitCarousel: View {
     }
 
     private func resolveEntry(for dateString: String) -> HabitEntry? {
-        do {
-            let habitId = habit.id
-            let predicate = #Predicate<HabitEntry> { entry in
-                entry.dateString == dateString && entry.habit?.id == habitId
-            }
-            var descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
-            descriptor.fetchLimit = 2
-            let results = try modelContext.fetch(descriptor)
-            if results.count > 1 {
-                for dup in results.dropFirst() {
-                    modelContext.delete(dup)
-                }
-                try? modelContext.save()
-            }
-            return results.first
-        } catch {
-            return habit.entries.first(where: { $0.dateString == dateString })
-        }
+        HabitEntry.resolvedEntry(for: habit, dateString: dateString, in: modelContext)
     }
 
     private func refreshDaysIfNeeded() {

@@ -61,4 +61,45 @@ extension HabitEntry {
             result[entry.dateString] = result[entry.dateString] ?? entry
         }
     }
+
+    static func entries(for habit: Habit, dateString: String, in modelContext: ModelContext) throws -> [HabitEntry] {
+        let habitId = habit.id
+        let predicate = #Predicate<HabitEntry> { entry in
+            entry.dateString == dateString && entry.habit?.id == habitId
+        }
+        let descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
+        return try modelContext.fetch(descriptor)
+    }
+
+    static func entries(for dateString: String, in entries: [HabitEntry]) -> [HabitEntry] {
+        entries.filter { $0.dateString == dateString }
+    }
+
+    static func preferredEntry(for dateString: String, in entries: [HabitEntry]) -> HabitEntry? {
+        preferredEntry(in: Self.entries(for: dateString, in: entries))
+    }
+
+    static func preferredEntry(in entries: [HabitEntry]) -> HabitEntry? {
+        entries.first(where: { $0.imageUri != nil }) ?? entries.first
+    }
+
+    static func deleteDuplicates(in entries: [HabitEntry], keeping retainedEntry: HabitEntry, from modelContext: ModelContext) {
+        for entry in entries where entry !== retainedEntry {
+            modelContext.delete(entry)
+        }
+    }
+
+    static func resolvedEntry(for habit: Habit, dateString: String, in modelContext: ModelContext) -> HabitEntry? {
+        do {
+            let matchingEntries = try entries(for: habit, dateString: dateString, in: modelContext)
+            guard let retainedEntry = preferredEntry(in: matchingEntries) else { return nil }
+            if matchingEntries.count > 1 {
+                deleteDuplicates(in: matchingEntries, keeping: retainedEntry, from: modelContext)
+                try? modelContext.save()
+            }
+            return retainedEntry
+        } catch {
+            return preferredEntry(for: dateString, in: habit.entries)
+        }
+    }
 }

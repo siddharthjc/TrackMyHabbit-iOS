@@ -140,12 +140,26 @@ struct ContentView: View {
     }
 
     private func deleteEntry(for habit: Habit, dateStr: String) {
-        guard let entry = habit.entries.first(where: { $0.dateString == dateStr }) else { return }
-        if let uri = entry.imageUri, let url = URL(string: uri) {
-            try? FileManager.default.removeItem(at: url)
+        let matchingEntries = entries(for: habit, dateString: dateStr)
+        guard !matchingEntries.isEmpty else { return }
+
+        let photoURLs = Set(matchingEntries.compactMap { entry -> URL? in
+            guard let uri = entry.imageUri else { return nil }
+            return URL(string: uri)
+        })
+
+        for entry in matchingEntries {
+            modelContext.delete(entry)
         }
-        modelContext.delete(entry)
-        try? modelContext.save()
+
+        do {
+            try modelContext.save()
+            for url in photoURLs {
+                try? FileManager.default.removeItem(at: url)
+            }
+        } catch {
+            print("Failed to delete entry for \(habit.name) on \(dateStr): \(error.localizedDescription)")
+        }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
@@ -156,9 +170,18 @@ struct ContentView: View {
                 habitID: habit.id,
                 dateString: dateString
             )
+            let matchingEntries = entries(for: habit, dateString: dateString)
+            let existing = HabitEntry.preferredEntry(in: matchingEntries)
+            let fileWasAlreadyReferenced = matchingEntries.contains { $0.imageUri == fileURL.absoluteString }
+            let orphanedPhotoURLs = Set(matchingEntries.compactMap { entry -> URL? in
+                guard let uri = entry.imageUri, uri != fileURL.absoluteString else { return nil }
+                return URL(string: uri)
+            })
+
             do {
-                if let existing = habit.entries.first(where: { $0.dateString == dateString }) {
+                if let existing {
                     existing.imageUri = fileURL.absoluteString
+                    HabitEntry.deleteDuplicates(in: matchingEntries, keeping: existing, from: modelContext)
                 } else {
                     let newEntry = HabitEntry(
                         dateString: dateString,
@@ -168,12 +191,25 @@ struct ContentView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                for url in orphanedPhotoURLs {
+                    try? FileManager.default.removeItem(at: url)
+                }
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                if !fileWasAlreadyReferenced {
+                    try? FileManager.default.removeItem(at: fileURL)
+                }
                 throw error
             }
         } catch {
             print("Failed to save today's photo for \(habit.name): \(error.localizedDescription)")
+        }
+    }
+
+    private func entries(for habit: Habit, dateString: String) -> [HabitEntry] {
+        do {
+            return try HabitEntry.entries(for: habit, dateString: dateString, in: modelContext)
+        } catch {
+            return HabitEntry.entries(for: dateString, in: habit.entries)
         }
     }
 
