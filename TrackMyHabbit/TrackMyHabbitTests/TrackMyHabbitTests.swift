@@ -6,6 +6,7 @@
 //
 
 import Testing
+import SwiftData
 @testable import TrackMyHabbit
 
 struct TrackMyHabbitTests {
@@ -24,6 +25,44 @@ struct TrackMyHabbitTests {
         #expect(entriesByDate.count == 1)
         #expect(entriesByDate["2026-04-11"] === firstPhoto)
         #expect(entriesByDate["2026-04-12"] == nil)
+    }
+
+    @Test func preferredEntryForDatePrefersPhotoDuplicate() {
+        let emptyDuplicate = HabitEntry(dateString: "2026-04-11")
+        let photoDuplicate = HabitEntry(dateString: "2026-04-11", imageUri: "file:///photo.jpg")
+
+        let preferredEntry = HabitEntry.preferredEntry(for: "2026-04-11", in: [
+            emptyDuplicate,
+            photoDuplicate
+        ])
+
+        #expect(preferredEntry === photoDuplicate)
+    }
+
+    @Test func resolvedEntryRemovesEveryDuplicateAndKeepsPhotoEntry() throws {
+        let container = try ModelContainer(
+            for: Habit.self,
+            HabitEntry.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let modelContext = ModelContext(container)
+        let habit = Habit(name: "Read", frequency: "Daily")
+        let emptyDuplicate = HabitEntry(dateString: "2026-04-11", habit: habit)
+        let photoDuplicate = HabitEntry(dateString: "2026-04-11", imageUri: "file:///photo.jpg", habit: habit)
+        let secondEmptyDuplicate = HabitEntry(dateString: "2026-04-11", habit: habit)
+
+        modelContext.insert(habit)
+        modelContext.insert(emptyDuplicate)
+        modelContext.insert(photoDuplicate)
+        modelContext.insert(secondEmptyDuplicate)
+        try modelContext.save()
+
+        let retainedEntry = HabitEntry.resolvedEntry(for: habit, dateString: "2026-04-11", in: modelContext)
+        let remainingEntries = try HabitEntry.entries(for: habit, dateString: "2026-04-11", in: modelContext)
+
+        #expect(retainedEntry === photoDuplicate)
+        #expect(remainingEntries.count == 1)
+        #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
     }
 
 }

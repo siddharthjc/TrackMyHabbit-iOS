@@ -353,24 +353,7 @@ struct CalendarTabView: View {
     }
 
     private func resolveEntry(habit: Habit, dateString: String) -> HabitEntry? {
-        do {
-            let habitId = habit.id
-            let predicate = #Predicate<HabitEntry> { entry in
-                entry.dateString == dateString && entry.habit?.id == habitId
-            }
-            var descriptor = FetchDescriptor<HabitEntry>(predicate: predicate)
-            descriptor.fetchLimit = 2
-            let results = try modelContext.fetch(descriptor)
-            if results.count > 1 {
-                for dup in results.dropFirst() {
-                    modelContext.delete(dup)
-                }
-                try? modelContext.save()
-            }
-            return results.first
-        } catch {
-            return habit.entries.first(where: { $0.dateString == dateString })
-        }
+        HabitEntry.resolvedEntry(for: habit, dateString: dateString, in: modelContext)
     }
 }
 
@@ -664,7 +647,7 @@ private struct CalendarHabitDayCard: View {
     }
 
     private var entry: HabitEntry? {
-        habit.entries.first(where: { $0.dateString == dateString })
+        HabitEntry.preferredEntry(for: dateString, in: habit.entries)
     }
 
     private var hasPhoto: Bool {
