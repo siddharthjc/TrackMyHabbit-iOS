@@ -89,6 +89,44 @@ extension HabitEntry {
         }
     }
 
+    static func savePhoto(data: Data, for habit: Habit, dateString: String, in modelContext: ModelContext) throws {
+        let fileURL = try HabitPhotoFileStore.persistJPEG(
+            data: data,
+            habitID: habit.id,
+            dateString: dateString
+        )
+        let matchingEntries = entriesForSave(for: habit, dateString: dateString, in: modelContext)
+        let existing = preferredEntry(in: matchingEntries)
+        let fileWasAlreadyReferenced = matchingEntries.contains { $0.imageUri == fileURL.absoluteString }
+        let supersededPhotoURLs = Set(matchingEntries.compactMap { entry -> URL? in
+            guard let uri = entry.imageUri, uri != fileURL.absoluteString else { return nil }
+            return URL(string: uri)
+        })
+
+        do {
+            if let existing {
+                existing.imageUri = fileURL.absoluteString
+                deleteDuplicates(in: matchingEntries, keeping: existing, from: modelContext)
+            } else {
+                let newEntry = HabitEntry(
+                    dateString: dateString,
+                    imageUri: fileURL.absoluteString,
+                    habit: habit
+                )
+                modelContext.insert(newEntry)
+            }
+            try modelContext.save()
+            for url in supersededPhotoURLs {
+                try? FileManager.default.removeItem(at: url)
+            }
+        } catch {
+            if !fileWasAlreadyReferenced {
+                try? FileManager.default.removeItem(at: fileURL)
+            }
+            throw error
+        }
+    }
+
     static func resolvedEntry(for habit: Habit, dateString: String, in modelContext: ModelContext) -> HabitEntry? {
         do {
             let matchingEntries = try entries(for: habit, dateString: dateString, in: modelContext)
@@ -100,6 +138,14 @@ extension HabitEntry {
             return retainedEntry
         } catch {
             return preferredEntry(for: dateString, in: habit.entries)
+        }
+    }
+
+    private static func entriesForSave(for habit: Habit, dateString: String, in modelContext: ModelContext) -> [HabitEntry] {
+        do {
+            return try entries(for: habit, dateString: dateString, in: modelContext)
+        } catch {
+            return entries(for: dateString, in: habit.entries)
         }
     }
 }
