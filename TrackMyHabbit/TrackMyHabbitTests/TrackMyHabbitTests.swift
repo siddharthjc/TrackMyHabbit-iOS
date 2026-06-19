@@ -5,6 +5,7 @@
 //  Created by Siddharth Chhatpar on 16/03/26.
 //
 
+import Foundation
 import Testing
 import SwiftData
 @testable import TrackMyHabbit
@@ -63,6 +64,71 @@ struct TrackMyHabbitTests {
         #expect(retainedEntry === photoDuplicate)
         #expect(remainingEntries.count == 1)
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
+    }
+
+    @Test func photoFileStoreCreatesUniqueFilesForRepeatedSaves() throws {
+        let habitID = UUID()
+        let firstData = Data("first-photo".utf8)
+        let secondData = Data("second-photo".utf8)
+
+        let firstURL = try HabitPhotoFileStore.persistJPEG(
+            data: firstData,
+            habitID: habitID,
+            dateString: "2026-04-11"
+        )
+        let secondURL = try HabitPhotoFileStore.persistJPEG(
+            data: secondData,
+            habitID: habitID,
+            dateString: "2026-04-11"
+        )
+        defer {
+            try? FileManager.default.removeItem(at: firstURL.deletingLastPathComponent())
+        }
+
+        #expect(firstURL != secondURL)
+        #expect(FileManager.default.fileExists(atPath: firstURL.path))
+        #expect(FileManager.default.fileExists(atPath: secondURL.path))
+        let firstStoredData = try Data(contentsOf: firstURL)
+        let secondStoredData = try Data(contentsOf: secondURL)
+        #expect(firstStoredData == firstData)
+        #expect(secondStoredData == secondData)
+    }
+
+    @Test func savePhotoReplacesEntryAndRemovesSupersededFileAfterSave() throws {
+        let container = try ModelContainer(
+            for: Habit.self,
+            HabitEntry.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let modelContext = ModelContext(container)
+        let habit = Habit(name: "Read", frequency: "Daily")
+        let dateString = "2026-04-11"
+        let firstData = Data("first-photo".utf8)
+        let secondData = Data("second-photo".utf8)
+
+        modelContext.insert(habit)
+        try modelContext.save()
+
+        try HabitEntry.savePhoto(data: firstData, for: habit, dateString: dateString, in: modelContext)
+        let savedEntries = try HabitEntry.entries(for: habit, dateString: dateString, in: modelContext)
+        let firstEntry = try #require(savedEntries.first)
+        let firstURI = try #require(firstEntry.imageUri)
+        let firstURL = try #require(URL(string: firstURI))
+        defer {
+            try? FileManager.default.removeItem(at: firstURL.deletingLastPathComponent())
+        }
+
+        try HabitEntry.savePhoto(data: secondData, for: habit, dateString: dateString, in: modelContext)
+        let remainingEntries = try HabitEntry.entries(for: habit, dateString: dateString, in: modelContext)
+        let secondURI = try #require(remainingEntries.first?.imageUri)
+        let secondURL = try #require(URL(string: secondURI))
+
+        #expect(remainingEntries.count == 1)
+        #expect(secondURL != firstURL)
+        #expect(!FileManager.default.fileExists(atPath: firstURL.path))
+        #expect(FileManager.default.fileExists(atPath: secondURL.path))
+        let storedSecondData = try Data(contentsOf: secondURL)
+        #expect(storedSecondData == secondData)
     }
 
 }

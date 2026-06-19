@@ -165,41 +165,12 @@ struct ContentView: View {
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
         do {
-            let fileURL = try HabitPhotoFileStore.persistJPEG(
+            try HabitEntry.savePhoto(
                 data: data,
-                habitID: habit.id,
-                dateString: dateString
+                for: habit,
+                dateString: dateString,
+                in: modelContext
             )
-            let matchingEntries = entries(for: habit, dateString: dateString)
-            let existing = HabitEntry.preferredEntry(in: matchingEntries)
-            let fileWasAlreadyReferenced = matchingEntries.contains { $0.imageUri == fileURL.absoluteString }
-            let orphanedPhotoURLs = Set(matchingEntries.compactMap { entry -> URL? in
-                guard let uri = entry.imageUri, uri != fileURL.absoluteString else { return nil }
-                return URL(string: uri)
-            })
-
-            do {
-                if let existing {
-                    existing.imageUri = fileURL.absoluteString
-                    HabitEntry.deleteDuplicates(in: matchingEntries, keeping: existing, from: modelContext)
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-                try modelContext.save()
-                for url in orphanedPhotoURLs {
-                    try? FileManager.default.removeItem(at: url)
-                }
-            } catch {
-                if !fileWasAlreadyReferenced {
-                    try? FileManager.default.removeItem(at: fileURL)
-                }
-                throw error
-            }
         } catch {
             print("Failed to save today's photo for \(habit.name): \(error.localizedDescription)")
         }

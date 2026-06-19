@@ -100,7 +100,7 @@ struct HabitCarousel: View {
             cardHeight: cardHeight,
             tapAction: {},
             onImagePicked: { data in
-                saveImage(data, for: dateStr, existingEntry: entry)
+                saveImage(data, for: dateStr)
             }
         )
         .scaleEffect(scale, anchor: .center)
@@ -171,36 +171,17 @@ struct HabitCarousel: View {
 
     // MARK: - Data helpers
 
-    private func saveImage(_ data: Data, for dateString: String, existingEntry: HabitEntry?) {
-        let resolvedEntry = existingEntry ?? resolveEntry(for: dateString)
-
+    private func saveImage(_ data: Data, for dateString: String) {
         do {
-            let fileURL = try storeImage(data, for: dateString)
-
-            do {
-                if let resolvedEntry {
-                    resolvedEntry.imageUri = fileURL.absoluteString
-                } else {
-                    let newEntry = HabitEntry(
-                        dateString: dateString,
-                        imageUri: fileURL.absoluteString,
-                        habit: habit
-                    )
-                    modelContext.insert(newEntry)
-                }
-
-                try modelContext.save()
-            } catch {
-                try? FileManager.default.removeItem(at: fileURL)
-                throw error
-            }
+            try HabitEntry.savePhoto(
+                data: data,
+                for: habit,
+                dateString: dateString,
+                in: modelContext
+            )
         } catch {
             print("Failed to save image for \(dateString): \(error.localizedDescription)")
         }
-    }
-
-    private func resolveEntry(for dateString: String) -> HabitEntry? {
-        HabitEntry.resolvedEntry(for: habit, dateString: dateString, in: modelContext)
     }
 
     private func refreshDaysIfNeeded() {
@@ -216,7 +197,4 @@ struct HabitCarousel: View {
         }
     }
 
-    private func storeImage(_ data: Data, for dateString: String) throws -> URL {
-        try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
-    }
 }
