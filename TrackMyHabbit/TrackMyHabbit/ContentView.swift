@@ -172,7 +172,6 @@ struct ContentView: View {
             )
             let matchingEntries = entries(for: habit, dateString: dateString)
             let existing = HabitEntry.preferredEntry(in: matchingEntries)
-            let fileWasAlreadyReferenced = matchingEntries.contains { $0.imageUri == fileURL.absoluteString }
             let orphanedPhotoURLs = Set(matchingEntries.compactMap { entry -> URL? in
                 guard let uri = entry.imageUri, uri != fileURL.absoluteString else { return nil }
                 return URL(string: uri)
@@ -195,9 +194,7 @@ struct ContentView: View {
                     try? FileManager.default.removeItem(at: url)
                 }
             } catch {
-                if !fileWasAlreadyReferenced {
-                    try? FileManager.default.removeItem(at: fileURL)
-                }
+                try? FileManager.default.removeItem(at: fileURL)
                 throw error
             }
         } catch {
