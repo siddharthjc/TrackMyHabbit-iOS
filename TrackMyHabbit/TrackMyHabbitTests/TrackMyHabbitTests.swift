@@ -7,6 +7,7 @@
 
 import Testing
 import SwiftData
+import Foundation
 @testable import TrackMyHabbit
 
 struct TrackMyHabbitTests {
@@ -63,6 +64,34 @@ struct TrackMyHabbitTests {
         #expect(retainedEntry === photoDuplicate)
         #expect(remainingEntries.count == 1)
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
+    }
+
+    @Test func photoFileStorePreservesExistingPhotoWhenWritingSameDate() throws {
+        let habitID = UUID()
+        let firstURL = try HabitPhotoFileStore.persistJPEG(
+            data: Data("first-photo".utf8),
+            habitID: habitID,
+            dateString: "2026-04-11"
+        )
+        defer {
+            try? FileManager.default.removeItem(at: firstURL.deletingLastPathComponent())
+        }
+
+        let secondURL = try HabitPhotoFileStore.persistJPEG(
+            data: Data("replacement-photo".utf8),
+            habitID: habitID,
+            dateString: "2026-04-11"
+        )
+        let firstData = try Data(contentsOf: firstURL)
+        let secondData = try Data(contentsOf: secondURL)
+
+        #expect(firstURL != secondURL)
+        #expect(firstURL.lastPathComponent.hasPrefix("2026-04-11-"))
+        #expect(secondURL.lastPathComponent.hasPrefix("2026-04-11-"))
+        #expect(FileManager.default.fileExists(atPath: firstURL.path))
+        #expect(FileManager.default.fileExists(atPath: secondURL.path))
+        #expect(firstData == Data("first-photo".utf8))
+        #expect(secondData == Data("replacement-photo".utf8))
     }
 
 }
