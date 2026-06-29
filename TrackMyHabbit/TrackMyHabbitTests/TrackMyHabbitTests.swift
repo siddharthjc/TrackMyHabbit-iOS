@@ -65,4 +65,31 @@ struct TrackMyHabbitTests {
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
     }
 
+    @Test func persistedPhotosForSameHabitAndDateUseSeparateFiles() throws {
+        let habitID = UUID()
+        let dateString = "2026-04-11"
+        let firstData = Data("first-photo".utf8)
+        let replacementData = Data("replacement-photo".utf8)
+
+        let firstURL = try HabitPhotoFileStore.persistJPEG(
+            data: firstData,
+            habitID: habitID,
+            dateString: dateString
+        )
+        let replacementURL = try HabitPhotoFileStore.persistJPEG(
+            data: replacementData,
+            habitID: habitID,
+            dateString: dateString
+        )
+
+        defer {
+            try? FileManager.default.removeItem(at: firstURL)
+            try? FileManager.default.removeItem(at: replacementURL)
+        }
+
+        #expect(firstURL != replacementURL)
+        #expect(try Data(contentsOf: firstURL) == firstData)
+        #expect(try Data(contentsOf: replacementURL) == replacementData)
+    }
+
 }
