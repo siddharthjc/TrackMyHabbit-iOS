@@ -87,9 +87,12 @@ struct TrackMyHabbitTests {
             dateString: dateString
         )
 
+        let persistedFirstData = try Data(contentsOf: firstURL)
+        let persistedReplacementData = try Data(contentsOf: replacementURL)
+
         #expect(firstURL != replacementURL)
-        #expect(try Data(contentsOf: firstURL) == firstData)
-        #expect(try Data(contentsOf: replacementURL) == replacementData)
+        #expect(persistedFirstData == firstData)
+        #expect(persistedReplacementData == replacementData)
     }
 
 }
