@@ -5,6 +5,7 @@
 //  Created by Siddharth Chhatpar on 16/03/26.
 //
 
+import Foundation
 import Testing
 import SwiftData
 @testable import TrackMyHabbit
