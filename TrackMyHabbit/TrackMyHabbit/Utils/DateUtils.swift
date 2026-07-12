@@ -33,6 +33,13 @@ struct DateUtils {
     static func getTodayString() -> String {
         return toDateString(date: Date())
     }
+
+    /// Returns true when a persisted day key is after today's local day.
+    static func isFutureDateString(_ dateStr: String, today: Date = Date()) -> Bool {
+        guard let date = parseDayKey(dateStr) else { return false }
+        let calendar = gregorianCalendar
+        return calendar.startOfDay(for: date) > calendar.startOfDay(for: today)
+    }
     
     /// Generates an array of date strings going back `count` days from today.
     /// Index 0 = today, index 1 = yesterday, etc.

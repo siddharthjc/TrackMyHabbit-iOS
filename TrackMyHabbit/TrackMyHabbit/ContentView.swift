@@ -164,6 +164,11 @@ struct ContentView: View {
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
+        guard !DateUtils.isFutureDateString(dateString) else {
+            print("Ignoring photo save for future date \(dateString) on \(habit.name)")
+            return
+        }
+
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(
                 data: data,
