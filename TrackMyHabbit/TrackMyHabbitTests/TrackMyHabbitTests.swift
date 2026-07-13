@@ -5,11 +5,29 @@
 //  Created by Siddharth Chhatpar on 16/03/26.
 //
 
+import Foundation
 import Testing
 import SwiftData
 @testable import TrackMyHabbit
 
 struct TrackMyHabbitTests {
+
+    @Test func persistJPEGCreatesUniqueFilesForSameHabitAndDate() throws {
+        let habitID = UUID()
+        let dateString = "2026-04-11"
+        let firstData = Data("first-photo".utf8)
+        let replacementData = Data("replacement-photo".utf8)
+
+        let firstURL = try HabitPhotoFileStore.persistJPEG(data: firstData, habitID: habitID, dateString: dateString)
+        let replacementURL = try HabitPhotoFileStore.persistJPEG(data: replacementData, habitID: habitID, dateString: dateString)
+        defer {
+            try? FileManager.default.removeItem(at: firstURL.deletingLastPathComponent())
+        }
+
+        #expect(firstURL != replacementURL)
+        #expect(try Data(contentsOf: firstURL) == firstData)
+        #expect(try Data(contentsOf: replacementURL) == replacementData)
+    }
 
     @Test func photoEntriesByDateIgnoresMissingPhotosAndKeepsFirstDuplicate() {
         let firstPhoto = HabitEntry(dateString: "2026-04-11", imageUri: "file:///first.jpg")
