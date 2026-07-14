@@ -5,6 +5,7 @@
 //  Created by Siddharth Chhatpar on 16/03/26.
 //
 
+import Foundation
 import Testing
 import SwiftData
 @testable import TrackMyHabbit
@@ -63,6 +64,37 @@ struct TrackMyHabbitTests {
         #expect(retainedEntry === photoDuplicate)
         #expect(remainingEntries.count == 1)
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
+    }
+
+    @Test func persistJPEGCreatesUniqueFilesForSameHabitAndDate() throws {
+        let habitID = UUID()
+        let dateString = "2026-04-11"
+        let firstData = Data("first photo".utf8)
+        let secondData = Data("second photo".utf8)
+
+        let firstURL = try HabitPhotoFileStore.persistJPEG(
+            data: firstData,
+            habitID: habitID,
+            dateString: dateString
+        )
+        let photoDirectory = firstURL.deletingLastPathComponent()
+        defer {
+            try? FileManager.default.removeItem(at: photoDirectory)
+        }
+
+        let secondURL = try HabitPhotoFileStore.persistJPEG(
+            data: secondData,
+            habitID: habitID,
+            dateString: dateString
+        )
+        let persistedFirstData = try Data(contentsOf: firstURL)
+        let persistedSecondData = try Data(contentsOf: secondURL)
+
+        #expect(firstURL != secondURL)
+        #expect(firstURL.lastPathComponent.hasPrefix("\(dateString)-"))
+        #expect(secondURL.lastPathComponent.hasPrefix("\(dateString)-"))
+        #expect(persistedFirstData == firstData)
+        #expect(persistedSecondData == secondData)
     }
 
 }
