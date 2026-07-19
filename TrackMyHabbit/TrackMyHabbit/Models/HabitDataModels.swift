@@ -95,7 +95,11 @@ extension HabitEntry {
             guard let retainedEntry = preferredEntry(in: matchingEntries) else { return nil }
             if matchingEntries.count > 1 {
                 deleteDuplicates(in: matchingEntries, keeping: retainedEntry, from: modelContext)
-                try? modelContext.save()
+                do {
+                    try modelContext.save()
+                } catch {
+                    modelContext.rollback()
+                }
             }
             return retainedEntry
         } catch {
