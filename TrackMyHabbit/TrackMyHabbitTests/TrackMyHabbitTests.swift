@@ -66,6 +66,40 @@ struct TrackMyHabbitTests {
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
     }
 
+    @Test func rollbackRestoresPhotoMutationAndPendingDuplicateDeletion() throws {
+        let container = try ModelContainer(
+            for: Habit.self,
+            HabitEntry.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let modelContext = ModelContext(container)
+        let habit = Habit(name: "Read", frequency: "Daily")
+        let retainedEntry = HabitEntry(
+            dateString: "2026-04-11",
+            imageUri: "file:///committed.jpg",
+            habit: habit
+        )
+        let duplicateEntry = HabitEntry(dateString: "2026-04-11", habit: habit)
+
+        modelContext.insert(habit)
+        modelContext.insert(retainedEntry)
+        modelContext.insert(duplicateEntry)
+        try modelContext.save()
+
+        retainedEntry.imageUri = "file:///failed-attempt.jpg"
+        modelContext.delete(duplicateEntry)
+        modelContext.rollback()
+
+        let restoredEntries = try HabitEntry.entries(
+            for: habit,
+            dateString: "2026-04-11",
+            in: modelContext
+        )
+
+        #expect(restoredEntries.count == 2)
+        #expect(restoredEntries.contains { $0.imageUri == "file:///committed.jpg" })
+    }
+
     @Test func persistJPEGCreatesUniqueFilesForSameHabitAndDate() throws {
         let habitID = UUID()
         let dateString = "2026-04-11"
