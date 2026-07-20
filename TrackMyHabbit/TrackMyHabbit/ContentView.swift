@@ -158,6 +158,7 @@ struct ContentView: View {
                 try? FileManager.default.removeItem(at: url)
             }
         } catch {
+            modelContext.rollback()
             print("Failed to delete entry for \(habit.name) on \(dateStr): \(error.localizedDescription)")
         }
     }
@@ -195,6 +196,7 @@ struct ContentView: View {
                     try? FileManager.default.removeItem(at: url)
                 }
             } catch {
+                modelContext.rollback()
                 if !fileWasAlreadyReferenced {
                     try? FileManager.default.removeItem(at: fileURL)
                 }
