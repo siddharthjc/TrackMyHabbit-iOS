@@ -345,6 +345,7 @@ struct CalendarTabView: View {
                 }
                 try modelContext.save()
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
             }
         } catch {
