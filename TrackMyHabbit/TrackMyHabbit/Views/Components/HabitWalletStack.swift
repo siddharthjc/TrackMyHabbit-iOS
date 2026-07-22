@@ -11,23 +11,33 @@ private struct WalletScrollInfo: Equatable {
 /// card at the bottom of the stack. Tapping a peeking card pins it to the
 /// top while the rest slide off-screen — same interaction model as Wallet.
 struct HabitWalletStack: View {
+    @Environment(\.scenePhase) private var scenePhase
+
     let habit: Habit
     @Binding var selectedDate: String?
     let onPickPhoto: (String) -> Void
 
     @State private var info = WalletScrollInfo()
+    @State private var referenceDate = Date()
     /// Live drag translation on the pinned card (drag-to-dismiss).
     @State private var dragOffset: CGFloat = 0
 
     /// Days rendered top → bottom. Future days first, today last so it's
     /// drawn on top of the peeking stack.
     private var orderedDays: [String] {
-        let calendar = Calendar(identifier: .gregorian)
-        let upcoming = (1...AppTheme.Layout.walletUpcomingDayCount).reversed().compactMap { offset -> String? in
-            guard let date = calendar.date(byAdding: .day, value: offset, to: Date()) else { return nil }
+        Self.orderedDateStrings(referenceDate: referenceDate)
+    }
+
+    static func orderedDateStrings(
+        referenceDate: Date,
+        calendar: Calendar = Calendar(identifier: .gregorian),
+        upcomingDayCount: Int = AppTheme.Layout.walletUpcomingDayCount
+    ) -> [String] {
+        let upcoming = (1...upcomingDayCount).reversed().compactMap { offset -> String? in
+            guard let date = calendar.date(byAdding: .day, value: offset, to: referenceDate) else { return nil }
             return DateUtils.toDateString(date: date)
         }
-        return upcoming + [DateUtils.getTodayString()]
+        return upcoming + [DateUtils.toDateString(date: referenceDate)]
     }
 
     private var selectedIndex: Int {
@@ -58,6 +68,23 @@ struct HabitWalletStack: View {
         } action: { _, newValue in
             info.containerSize = newValue
         }
+        .onAppear {
+            refreshDateIfNeeded()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            refreshDateIfNeeded()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            refreshDateIfNeeded()
+        }
+    }
+
+    private func refreshDateIfNeeded(now: Date = Date()) {
+        guard DateUtils.toDateString(date: now) != DateUtils.toDateString(date: referenceDate) else { return }
+        referenceDate = now
+        selectedDate = nil
+        dragOffset = 0
     }
 
     @ViewBuilder
