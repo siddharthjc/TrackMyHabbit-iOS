@@ -97,4 +97,27 @@ struct TrackMyHabbitTests {
         #expect(persistedSecondData == secondData)
     }
 
+    @Test func walletDaysAdvanceAtDayRollover() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        let beforeRollover = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 22, hour: 12))
+        )
+        let afterRollover = try #require(
+            calendar.date(byAdding: .day, value: 1, to: beforeRollover)
+        )
+
+        let beforeDays = HabitWalletStack.orderedDateStrings(
+            referenceDate: beforeRollover,
+            calendar: calendar
+        )
+        let afterDays = HabitWalletStack.orderedDateStrings(
+            referenceDate: afterRollover,
+            calendar: calendar
+        )
+
+        #expect(beforeDays.dropLast() == afterDays.dropFirst())
+        #expect(beforeDays.last != afterDays.last)
+    }
+
 }
