@@ -10,15 +10,30 @@ import UIKit
 @Observable
 final class PhotoSourceController {
     var isPresented: Bool = false
-    var onImagePicked: ((Data) -> Void)?
+    private(set) var activeSessionID: UUID?
+    private var onImagePicked: ((Data) -> Void)?
 
-    func present(onImagePicked: @escaping (Data) -> Void) {
+    @discardableResult
+    func present(onImagePicked: @escaping (Data) -> Void) -> UUID {
+        let sessionID = UUID()
+        activeSessionID = sessionID
         self.onImagePicked = onImagePicked
         isPresented = true
+        return sessionID
     }
 
-    func imagePicked(_ data: Data) {
-        onImagePicked?(data)
+    func imagePicked(_ data: Data, for sessionID: UUID) {
+        guard sessionID == activeSessionID else { return }
+        let callback = onImagePicked
+        activeSessionID = nil
+        onImagePicked = nil
+        callback?(data)
+    }
+
+    func cancelSession(_ sessionID: UUID) {
+        guard sessionID == activeSessionID else { return }
+        activeSessionID = nil
+        onImagePicked = nil
     }
 }
 
@@ -33,22 +48,36 @@ struct PhotoSourcePickerRootModifier: ViewModifier {
     @State private var selectedPhoto: PhotosPickerItem?
     @State private var showPhotoPicker = false
     @State private var showCamera = false
+    @State private var gallerySessionID: UUID?
+    @State private var cameraSessionID: UUID?
 
     func body(content: Content) -> some View {
         content
             .photosPicker(isPresented: $showPhotoPicker, selection: $selectedPhoto, matching: .images)
             .task(id: selectedPhoto) {
-                guard let selectedPhoto else { return }
-                defer { self.selectedPhoto = nil }
+                guard let selectedPhoto, let sessionID = gallerySessionID else { return }
+                defer {
+                    if gallerySessionID == sessionID {
+                        self.selectedPhoto = nil
+                        gallerySessionID = nil
+                    }
+                }
                 if let data = try? await selectedPhoto.loadTransferable(type: Data.self) {
-                    controller.imagePicked(data)
+                    controller.imagePicked(data, for: sessionID)
+                } else {
+                    controller.cancelSession(sessionID)
                 }
             }
             .fullScreenCover(isPresented: $showCamera) {
+                let sessionID = cameraSessionID
                 CameraPicker { data in
                     showCamera = false
+                    cameraSessionID = nil
+                    guard let sessionID else { return }
                     if let data {
-                        controller.imagePicked(data)
+                        controller.imagePicked(data, for: sessionID)
+                    } else {
+                        controller.cancelSession(sessionID)
                     }
                 }
                 .ignoresSafeArea()
@@ -56,8 +85,16 @@ struct PhotoSourcePickerRootModifier: ViewModifier {
             .overlay {
                 PhotoSourceBottomSheet(
                     isPresented: $controller.isPresented,
-                    onSelectGallery: { showPhotoPicker = true },
-                    onSelectCamera: { showCamera = true }
+                    onSelectGallery: {
+                        guard let sessionID = controller.activeSessionID else { return }
+                        gallerySessionID = sessionID
+                        showPhotoPicker = true
+                    },
+                    onSelectCamera: {
+                        guard let sessionID = controller.activeSessionID else { return }
+                        cameraSessionID = sessionID
+                        showCamera = true
+                    }
                 )
             }
     }
