@@ -97,4 +97,25 @@ struct TrackMyHabbitTests {
         #expect(persistedSecondData == secondData)
     }
 
+    @Test func photoSourceControllerRejectsStaleSessionCompletionAndCancellation() {
+        let controller = PhotoSourceController()
+        let firstData = Data("first".utf8)
+        let secondData = Data("second".utf8)
+        var receivedData: [Data] = []
+
+        let firstSession = controller.present { receivedData.append($0) }
+        let secondSession = controller.present { receivedData.append($0) }
+
+        controller.imagePicked(firstData, for: firstSession)
+        controller.cancelSession(firstSession)
+        #expect(receivedData.isEmpty)
+        #expect(controller.activeSessionID == secondSession)
+
+        controller.imagePicked(secondData, for: secondSession)
+        controller.imagePicked(firstData, for: secondSession)
+
+        #expect(receivedData == [secondData])
+        #expect(controller.activeSessionID == nil)
+    }
+
 }
