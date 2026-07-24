@@ -327,6 +327,8 @@ struct CalendarTabView: View {
     }
 
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
+        guard calendar.startOfDay(for: date) <= effectiveToday else { return }
+
         let dateString = DateUtils.toDateString(date: date)
         let existing = resolveEntry(habit: habit, dateString: dateString)
 
@@ -345,6 +347,7 @@ struct CalendarTabView: View {
                 }
                 try modelContext.save()
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
             }
         } catch {

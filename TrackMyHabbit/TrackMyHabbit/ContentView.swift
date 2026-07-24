@@ -158,12 +158,18 @@ struct ContentView: View {
                 try? FileManager.default.removeItem(at: url)
             }
         } catch {
+            modelContext.rollback()
             print("Failed to delete entry for \(habit.name) on \(dateStr): \(error.localizedDescription)")
         }
     }
 
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
+        guard !DateUtils.isFutureDateString(dateString) else {
+            print("Ignoring photo save for future date \(dateString) on \(habit.name)")
+            return
+        }
+
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(
                 data: data,
@@ -195,6 +201,7 @@ struct ContentView: View {
                     try? FileManager.default.removeItem(at: url)
                 }
             } catch {
+                modelContext.rollback()
                 if !fileWasAlreadyReferenced {
                     try? FileManager.default.removeItem(at: fileURL)
                 }

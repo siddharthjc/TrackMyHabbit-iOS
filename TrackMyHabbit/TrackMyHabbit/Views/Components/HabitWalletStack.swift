@@ -71,6 +71,7 @@ struct HabitWalletStack: View {
             habit: habit,
             dateStr: dateStr,
             isPinned: isCurrent,
+            isPhotoEditable: dateStr == DateUtils.getTodayString(),
             onPickPhoto: { onPickPhoto(dateStr) }
         )
         .onTapGesture {
@@ -159,6 +160,7 @@ private struct WalletDayCard: View {
     let habit: Habit
     let dateStr: String
     var isPinned: Bool = false
+    var isPhotoEditable: Bool = true
     let onPickPhoto: () -> Void
 
     private var dayNumber: Int {
@@ -246,8 +248,9 @@ private struct WalletDayCard: View {
 
     private var hasPhoto: Bool { entry?.imageUri != nil }
 
+    @ViewBuilder
     private var photoFrame: some View {
-        photoFrameContent
+        let frame = photoFrameContent
             .frame(maxWidth: .infinity)
             .frame(height: AppTheme.Layout.calendarPhotoFrameHeight)
             .background(
@@ -267,7 +270,12 @@ private struct WalletDayCard: View {
             .appShadow(AppTheme.Elevation.walletPhotoFrame)
             .padding(.horizontal, AppTheme.Spacing.sm3)
             .contentShape(RoundedRectangle(cornerRadius: AppTheme.Radius.xl, style: .continuous))
-            .onTapGesture { onPickPhoto() }
+
+        if isPhotoEditable {
+            frame.onTapGesture { onPickPhoto() }
+        } else {
+            frame.accessibilityHint(Text("Photos can be added on today's card"))
+        }
     }
 
     @ViewBuilder
