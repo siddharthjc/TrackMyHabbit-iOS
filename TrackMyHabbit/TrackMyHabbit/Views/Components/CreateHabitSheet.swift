@@ -408,6 +408,7 @@ struct CreateHabitSheet: View {
             try modelContext.save()
             dismiss()
         } catch {
+            modelContext.rollback()
             persistenceErrorMessage = error.localizedDescription
             showPersistenceErrorAlert = true
         }
@@ -415,11 +416,14 @@ struct CreateHabitSheet: View {
     
     private func deleteHabit() {
         guard let habit = editingHabit else { return }
+        let deletedHabitID = habit.id
         modelContext.delete(habit)
         do {
             try modelContext.save()
+            try? HabitPhotoFileStore.deleteAllPhotos(for: deletedHabitID)
             dismiss()
         } catch {
+            modelContext.rollback()
             persistenceErrorMessage = error.localizedDescription
             showPersistenceErrorAlert = true
         }
