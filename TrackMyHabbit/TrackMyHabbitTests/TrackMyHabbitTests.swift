@@ -97,4 +97,86 @@ struct TrackMyHabbitTests {
         #expect(persistedSecondData == secondData)
     }
 
+    @Test func isFutureDateStringDetectsDaysAfterToday() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        let today = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 24, hour: 15))
+        )
+        let tomorrow = try #require(calendar.date(byAdding: .day, value: 1, to: today))
+        let yesterday = try #require(calendar.date(byAdding: .day, value: -1, to: today))
+
+        #expect(DateUtils.isFutureDateString(DateUtils.toDateString(date: tomorrow), today: today))
+        #expect(!DateUtils.isFutureDateString(DateUtils.toDateString(date: today), today: today))
+        #expect(!DateUtils.isFutureDateString(DateUtils.toDateString(date: yesterday), today: today))
+    }
+
+    @Test func deleteAllPhotosRemovesHabitPhotoDirectory() throws {
+        let habitID = UUID()
+        let fileURL = try HabitPhotoFileStore.persistJPEG(
+            data: Data("habit photo".utf8),
+            habitID: habitID,
+            dateString: "2026-07-24"
+        )
+        let photoDirectory = fileURL.deletingLastPathComponent()
+        #expect(FileManager.default.fileExists(atPath: photoDirectory.path))
+
+        try HabitPhotoFileStore.deleteAllPhotos(for: habitID)
+
+        #expect(!FileManager.default.fileExists(atPath: photoDirectory.path))
+    }
+
+    @Test func rollbackRestoresPendingHabitDeletion() throws {
+        let container = try ModelContainer(
+            for: Habit.self,
+            HabitEntry.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let modelContext = ModelContext(container)
+        let habit = Habit(name: "Read", frequency: "Daily")
+        modelContext.insert(habit)
+        try modelContext.save()
+
+        modelContext.delete(habit)
+        modelContext.rollback()
+
+        let habits = try modelContext.fetch(FetchDescriptor<Habit>())
+        #expect(habits.count == 1)
+        #expect(habits.first?.name == "Read")
+    }
+
+    @Test func rollbackRestoresPhotoMutationAndPendingDuplicateDeletion() throws {
+        let container = try ModelContainer(
+            for: Habit.self,
+            HabitEntry.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let modelContext = ModelContext(container)
+        let habit = Habit(name: "Read", frequency: "Daily")
+        let retainedEntry = HabitEntry(
+            dateString: "2026-04-11",
+            imageUri: "file:///committed.jpg",
+            habit: habit
+        )
+        let duplicateEntry = HabitEntry(dateString: "2026-04-11", habit: habit)
+
+        modelContext.insert(habit)
+        modelContext.insert(retainedEntry)
+        modelContext.insert(duplicateEntry)
+        try modelContext.save()
+
+        retainedEntry.imageUri = "file:///failed-attempt.jpg"
+        modelContext.delete(duplicateEntry)
+        modelContext.rollback()
+
+        let restoredEntries = try HabitEntry.entries(
+            for: habit,
+            dateString: "2026-04-11",
+            in: modelContext
+        )
+
+        #expect(restoredEntries.count == 2)
+        #expect(restoredEntries.contains { $0.imageUri == "file:///committed.jpg" })
+    }
+
 }
