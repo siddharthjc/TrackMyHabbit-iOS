@@ -97,4 +97,31 @@ struct TrackMyHabbitTests {
         #expect(persistedSecondData == secondData)
     }
 
+    @Test func calendarTodayAdvancesAtDayRollover() throws {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = try #require(TimeZone(secondsFromGMT: 0))
+        let beforeRollover = try #require(
+            calendar.date(from: DateComponents(year: 2026, month: 7, day: 26, hour: 23, minute: 30))
+        )
+        let afterRollover = try #require(
+            calendar.date(byAdding: .hour, value: 1, to: beforeRollover)
+        )
+
+        #expect(CalendarTabView.shouldAdvanceReferenceDate(from: beforeRollover, to: afterRollover))
+        #expect(!CalendarTabView.shouldAdvanceReferenceDate(from: beforeRollover, to: beforeRollover))
+
+        let beforeToday = CalendarTabView.effectiveTodayDate(
+            referenceDate: beforeRollover,
+            calendar: calendar
+        )
+        let afterToday = CalendarTabView.effectiveTodayDate(
+            referenceDate: afterRollover,
+            calendar: calendar
+        )
+
+        #expect(DateUtils.toDateString(date: beforeToday) == "2026-07-26")
+        #expect(DateUtils.toDateString(date: afterToday) == "2026-07-27")
+        #expect(beforeToday != afterToday)
+    }
+
 }

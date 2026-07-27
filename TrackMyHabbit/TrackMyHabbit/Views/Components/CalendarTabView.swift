@@ -6,6 +6,7 @@ import UIKit
 struct CalendarTabView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var colorScheme
+    @Environment(\.scenePhase) private var scenePhase
 
     let habits: [Habit]
     /// Currently selected habit; mirrors home tab so switching in one place updates the other.
@@ -19,6 +20,10 @@ struct CalendarTabView: View {
     var onEditHabit: (() -> Void)? = nil
 
     @State private var selectedDate: Date
+    /// Local "now" used for today-ring / future-day gating. Must be state-backed so
+    /// midnight rollover can invalidate the view (plain `Date()` in a computed
+    /// property will not refresh while the calendar stays mounted).
+    @State private var referenceDate: Date
     @State private var showDateSheet = false
     /// Non-nil when a day cell has been tapped — drives the full-screen cover.
     @State private var tappedDate: Date?
@@ -40,8 +45,10 @@ struct CalendarTabView: View {
         self.todayOverride = todayOverride
         self.onCreateHabit = onCreateHabit
         self.onEditHabit = onEditHabit
-        let seed = initialSelectedDate ?? todayOverride ?? Date()
+        let now = Date()
+        let seed = initialSelectedDate ?? todayOverride ?? now
         _selectedDate = State(initialValue: seed)
+        _referenceDate = State(initialValue: todayOverride ?? now)
     }
 
     private var resolvedHabit: Habit? {
@@ -56,7 +63,30 @@ struct CalendarTabView: View {
     }
 
     private var effectiveToday: Date {
-        calendar.startOfDay(for: todayOverride ?? Date())
+        Self.effectiveTodayDate(
+            referenceDate: referenceDate,
+            todayOverride: todayOverride,
+            calendar: calendar
+        )
+    }
+
+    /// Start-of-day used for today-ring / future gating given a reference clock.
+    static func effectiveTodayDate(
+        referenceDate: Date,
+        todayOverride: Date? = nil,
+        calendar: Calendar = {
+            var c = Calendar(identifier: .gregorian)
+            c.timeZone = .current
+            c.locale = .current
+            return c
+        }()
+    ) -> Date {
+        calendar.startOfDay(for: todayOverride ?? referenceDate)
+    }
+
+    /// Whether the calendar's live reference clock should advance to `now`.
+    static func shouldAdvanceReferenceDate(from referenceDate: Date, to now: Date) -> Bool {
+        DateUtils.toDateString(date: now) != DateUtils.toDateString(date: referenceDate)
     }
 
     private var selectedDayStart: Date {
@@ -242,6 +272,37 @@ struct CalendarTabView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + AppTheme.Motion.durationNormal) {
                 onEditHabit?()
             }
+        }
+        .onAppear {
+            refreshDateIfNeeded()
+        }
+        .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in
+            refreshDateIfNeeded()
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            guard newPhase == .active else { return }
+            refreshDateIfNeeded()
+        }
+    }
+
+    /// Advances the calendar's today/future gating after midnight while the tab
+    /// stays mounted. Without this, yesterday keeps the today ring and real
+    /// today stays disabled, so a photo save lands on the wrong day key.
+    private func refreshDateIfNeeded(now: Date = Date()) {
+        guard todayOverride == nil else { return }
+        guard Self.shouldAdvanceReferenceDate(from: referenceDate, to: now) else { return }
+
+        let previousToday = calendar.startOfDay(for: referenceDate)
+        let newToday = calendar.startOfDay(for: now)
+        referenceDate = now
+
+        if calendar.isDate(selectedDate, inSameDayAs: previousToday) {
+            selectedDate = newToday
+        }
+        if let tapped = tappedDate, calendar.isDate(tapped, inSameDayAs: previousToday) {
+            // Dismiss so an open "today" overlay cannot keep saving under yesterday.
+            tappedDate = nil
+            pendingEditAfterDismiss = false
         }
     }
 
