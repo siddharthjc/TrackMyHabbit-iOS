@@ -329,6 +329,7 @@ struct CalendarTabView: View {
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
         let dateString = DateUtils.toDateString(date: date)
         let existing = resolveEntry(habit: habit, dateString: dateString)
+        let replacedPhotoURL = existing?.imageUri.flatMap { URL(string: $0) }
 
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
@@ -344,8 +345,13 @@ struct CalendarTabView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                if let replacedPhotoURL, replacedPhotoURL != fileURL {
+                    try? FileManager.default.removeItem(at: replacedPhotoURL)
+                }
             } catch {
+                modelContext.rollback()
                 try? FileManager.default.removeItem(at: fileURL)
+                throw error
             }
         } catch {
             print("Failed to save calendar photo: \(error.localizedDescription)")
