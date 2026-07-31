@@ -328,13 +328,21 @@ struct CalendarTabView: View {
 
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
         let dateString = DateUtils.toDateString(date: date)
-        let existing = resolveEntry(habit: habit, dateString: dateString)
 
         do {
             let fileURL = try HabitPhotoFileStore.persistJPEG(data: data, habitID: habit.id, dateString: dateString)
+            let matchingEntries = entries(for: habit, dateString: dateString)
+            let existing = HabitEntry.preferredEntry(in: matchingEntries)
+            let fileWasAlreadyReferenced = matchingEntries.contains { $0.imageUri == fileURL.absoluteString }
+            let orphanedPhotoURLs = Set(matchingEntries.compactMap { entry -> URL? in
+                guard let uri = entry.imageUri, uri != fileURL.absoluteString else { return nil }
+                return URL(string: uri)
+            })
+
             do {
                 if let existing {
                     existing.imageUri = fileURL.absoluteString
+                    HabitEntry.deleteDuplicates(in: matchingEntries, keeping: existing, from: modelContext)
                 } else {
                     let newEntry = HabitEntry(
                         dateString: dateString,
@@ -344,16 +352,26 @@ struct CalendarTabView: View {
                     modelContext.insert(newEntry)
                 }
                 try modelContext.save()
+                for url in orphanedPhotoURLs {
+                    try? FileManager.default.removeItem(at: url)
+                }
             } catch {
-                try? FileManager.default.removeItem(at: fileURL)
+                if !fileWasAlreadyReferenced {
+                    try? FileManager.default.removeItem(at: fileURL)
+                }
+                throw error
             }
         } catch {
             print("Failed to save calendar photo: \(error.localizedDescription)")
         }
     }
 
-    private func resolveEntry(habit: Habit, dateString: String) -> HabitEntry? {
-        HabitEntry.resolvedEntry(for: habit, dateString: dateString, in: modelContext)
+    private func entries(for habit: Habit, dateString: String) -> [HabitEntry] {
+        do {
+            return try HabitEntry.entries(for: habit, dateString: dateString, in: modelContext)
+        } catch {
+            return HabitEntry.entries(for: dateString, in: habit.entries)
+        }
     }
 }
 
