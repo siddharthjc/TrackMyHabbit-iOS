@@ -97,4 +97,20 @@ struct TrackMyHabbitTests {
         #expect(persistedSecondData == secondData)
     }
 
+    @Test func calendarOverlayKeepsPinnedHabitWhenActiveHabitChanges() {
+        let reading = Habit(name: "Read", frequency: "Daily")
+        let jogging = Habit(name: "Jog", frequency: "Daily")
+        let habits = [reading, jogging]
+
+        // Overlay opened against "Read"; later Home switch makes "Jog" active.
+        let pinned = CalendarOverlaySelection.habit(in: habits, pinnedHabitId: reading.id)
+        let activeAfterSwitch = habits.first(where: { $0.id == jogging.id })
+
+        #expect(pinned === reading)
+        #expect(activeAfterSwitch === jogging)
+        #expect(pinned?.id != activeAfterSwitch?.id)
+        #expect(CalendarOverlaySelection.habit(in: habits, pinnedHabitId: nil) == nil)
+        #expect(CalendarOverlaySelection.habit(in: [jogging], pinnedHabitId: reading.id) == nil)
+    }
+
 }

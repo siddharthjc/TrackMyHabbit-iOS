@@ -3,6 +3,15 @@ import SwiftData
 import SwiftUI
 import UIKit
 
+/// Resolves the habit pinned to an open calendar day overlay.
+/// Exposed for regression tests covering active-habit switches while the overlay is open.
+enum CalendarOverlaySelection {
+    static func habit(in habits: [Habit], pinnedHabitId: UUID?) -> Habit? {
+        guard let pinnedHabitId else { return nil }
+        return habits.first(where: { $0.id == pinnedHabitId })
+    }
+}
+
 struct CalendarTabView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.colorScheme) private var colorScheme
@@ -22,6 +31,10 @@ struct CalendarTabView: View {
     @State private var showDateSheet = false
     /// Non-nil when a day cell has been tapped — drives the full-screen cover.
     @State private var tappedDate: Date?
+    /// Habit pinned when the day overlay opened. Kept separate from
+    /// `activeHabitId` so a Home-tab habit switch cannot retarget an open
+    /// overlay and save the photo under the wrong habit.
+    @State private var tappedHabitId: UUID?
     /// Set when the 3-dot menu is tapped so the edit sheet fires after the
     /// full-screen cover finishes dismissing (prevents modal-on-modal conflicts).
     @State private var pendingEditAfterDismiss = false
@@ -46,6 +59,11 @@ struct CalendarTabView: View {
 
     private var resolvedHabit: Habit? {
         habits.first(where: { $0.id == activeHabitId }) ?? habits.first
+    }
+
+    /// Habit shown/saved by the day overlay — frozen at open time.
+    private var overlayHabit: Habit? {
+        CalendarOverlaySelection.habit(in: habits, pinnedHabitId: tappedHabitId)
     }
 
     private var calendar: Calendar {
@@ -131,6 +149,7 @@ struct CalendarTabView: View {
                                     let dayStart = calendar.startOfDay(for: date)
                                     guard dayStart <= effectiveToday else { return }
                                     selectedDate = dayStart
+                                    tappedHabitId = habit.id
                                     withAnimation(AppTheme.Motion.springSheetOverlay) {
                                         tappedDate = dayStart
                                     }
@@ -161,7 +180,7 @@ struct CalendarTabView: View {
                 }
                 .scrollClipDisabled()
                 .overlay {
-                    if let tapped = tappedDate, let habit = resolvedHabit {
+                    if let tapped = tappedDate, let habit = overlayHabit {
                         CalendarCardOverlay(
                             habit: habit,
                             selectedDate: tapped,
@@ -283,6 +302,7 @@ struct CalendarTabView: View {
     private func dismissOverlay() {
         withAnimation(AppTheme.Motion.springSheetOverlay) {
             tappedDate = nil
+            tappedHabitId = nil
         }
     }
 
