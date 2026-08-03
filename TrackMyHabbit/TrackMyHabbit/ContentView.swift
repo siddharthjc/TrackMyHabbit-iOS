@@ -162,6 +162,14 @@ struct ContentView: View {
         }
     }
 
+    private func savePhoto(forHabitID habitID: UUID, dateStr: String, data: Data) {
+        guard let habit = Habit.fetch(id: habitID, in: modelContext) else {
+            print("Ignoring photo save for deleted habit \(habitID)")
+            return
+        }
+        savePhoto(for: habit, dateStr: dateStr, data: data)
+    }
+
     private func savePhoto(for habit: Habit, dateStr: String, data: Data) {
         let dateString = dateStr
         do {
@@ -270,8 +278,9 @@ struct ContentView: View {
                         habit: habit,
                         selectedDate: $selectedHabitDate,
                         onPickPhoto: { dateStr in
+                            let habitID = habit.id
                             photoSourceController.present { data in
-                                savePhoto(for: habit, dateStr: dateStr, data: data)
+                                savePhoto(forHabitID: habitID, dateStr: dateStr, data: data)
                             }
                         }
                     )

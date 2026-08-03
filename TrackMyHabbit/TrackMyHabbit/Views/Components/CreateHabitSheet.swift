@@ -4,6 +4,7 @@ import SwiftData
 struct CreateHabitSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.modelContext) private var modelContext
+    @Environment(PhotoSourceController.self) private var photoSourceController
     
     // Optional: when non-nil, the sheet is in "edit" mode
     var editingHabit: Habit? = nil
@@ -418,6 +419,8 @@ struct CreateHabitSheet: View {
         modelContext.delete(habit)
         do {
             try modelContext.save()
+            // Drop any gallery/camera callback that still targets this habit.
+            photoSourceController.cancelActive()
             dismiss()
         } catch {
             persistenceErrorMessage = error.localizedDescription
@@ -462,4 +465,5 @@ struct CreateHabitSheet: View {
 #Preview {
     CreateHabitSheet()
         .modelContainer(for: Habit.self, inMemory: true)
+        .environment(PhotoSourceController())
 }

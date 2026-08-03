@@ -20,6 +20,13 @@ final class PhotoSourceController {
     func imagePicked(_ data: Data) {
         onImagePicked?(data)
     }
+
+    /// Drops any in-flight gallery/camera callback so a completion cannot land
+    /// on a habit that was deleted while `loadTransferable` was still running.
+    func cancelActive() {
+        onImagePicked = nil
+        isPresented = false
+    }
 }
 
 // MARK: - Root modifier
