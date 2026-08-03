@@ -465,4 +465,5 @@ struct CreateHabitSheet: View {
 #Preview {
     CreateHabitSheet()
         .modelContainer(for: Habit.self, inMemory: true)
+        .environment(PhotoSourceController())
 }
