@@ -97,4 +97,38 @@ struct TrackMyHabbitTests {
         #expect(persistedSecondData == secondData)
     }
 
+    @Test func fetchHabitReturnsNilAfterDeletion() throws {
+        let container = try ModelContainer(
+            for: Habit.self,
+            HabitEntry.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        let modelContext = ModelContext(container)
+        let habit = Habit(name: "Read", frequency: "Daily")
+        let habitID = habit.id
+
+        modelContext.insert(habit)
+        try modelContext.save()
+        #expect(Habit.fetch(id: habitID, in: modelContext) != nil)
+
+        modelContext.delete(habit)
+        try modelContext.save()
+
+        #expect(Habit.fetch(id: habitID, in: modelContext) == nil)
+    }
+
+    @Test func photoSourceControllerCancelActiveDropsPendingCallback() {
+        let controller = PhotoSourceController()
+        var didReceiveImage = false
+
+        controller.present { _ in
+            didReceiveImage = true
+        }
+        controller.cancelActive()
+        controller.imagePicked(Data("stale".utf8))
+
+        #expect(!didReceiveImage)
+        #expect(!controller.isPresented)
+    }
+
 }

@@ -52,6 +52,17 @@ extension Habit {
             result[entry.dateString] = entry
         }
     }
+
+    /// Re-fetches a habit by stable ID so async photo callbacks can avoid
+    /// touching a SwiftData instance invalidated by a concurrent delete.
+    static func fetch(id: UUID, in modelContext: ModelContext) -> Habit? {
+        let habitID = id
+        let predicate = #Predicate<Habit> { habit in
+            habit.id == habitID
+        }
+        let descriptor = FetchDescriptor<Habit>(predicate: predicate)
+        return try? modelContext.fetch(descriptor).first
+    }
 }
 
 extension HabitEntry {

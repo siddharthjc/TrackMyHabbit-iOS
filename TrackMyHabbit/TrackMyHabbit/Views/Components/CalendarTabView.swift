@@ -162,6 +162,7 @@ struct CalendarTabView: View {
                 .scrollClipDisabled()
                 .overlay {
                     if let tapped = tappedDate, let habit = resolvedHabit {
+                        let overlayHabitID = habit.id
                         CalendarCardOverlay(
                             habit: habit,
                             selectedDate: tapped,
@@ -169,7 +170,7 @@ struct CalendarTabView: View {
                             calendar: calendar,
                             effectiveToday: effectiveToday,
                             onImagePicked: { data in
-                                saveEntryImage(data, habit: habit, date: tapped)
+                                saveEntryImage(data, habitID: overlayHabitID, date: tapped)
                             },
                             onDismiss: dismissOverlay,
                             onMenu: onEditHabit.map { _ in
@@ -324,6 +325,14 @@ struct CalendarTabView: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.top, AppTheme.Spacing.touch)
+    }
+
+    private func saveEntryImage(_ data: Data, habitID: UUID, date: Date) {
+        guard let habit = Habit.fetch(id: habitID, in: modelContext) else {
+            print("Ignoring calendar photo save for deleted habit \(habitID)")
+            return
+        }
+        saveEntryImage(data, habit: habit, date: date)
     }
 
     private func saveEntryImage(_ data: Data, habit: Habit, date: Date) {
@@ -829,7 +838,11 @@ private struct CalendarHabitDayCard: View {
         .appShadow(AppTheme.Elevation.calendarPhotoFrame)
         .contentShape(Rectangle())
         .onTapGesture {
-            photoSource.present(onImagePicked: onImagePicked)
+            // Capture the callback at tap time so a later body refresh (habit
+            // switch / delete) cannot replace the in-flight target identity
+            // after `present` has already stored it.
+            let completion = onImagePicked
+            photoSource.present(onImagePicked: completion)
         }
     }
 
