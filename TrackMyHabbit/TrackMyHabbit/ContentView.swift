@@ -157,6 +157,9 @@ struct ContentView: View {
             for url in photoURLs {
                 try? FileManager.default.removeItem(at: url)
             }
+            // An in-flight gallery/camera pick for this day must not recreate
+            // the entry the user just deleted.
+            photoSourceController.cancelActive()
         } catch {
             print("Failed to delete entry for \(habit.name) on \(dateStr): \(error.localizedDescription)")
         }

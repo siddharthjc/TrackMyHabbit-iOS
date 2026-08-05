@@ -66,6 +66,23 @@ struct TrackMyHabbitTests {
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
     }
 
+    @Test func cancelActiveAfterEntryDeleteDropsInFlightPhotoCallback() {
+        // Mirrors ContentView.deleteEntry: after a successful delete, clear the
+        // shared picker callback so a slow loadTransferable completion cannot
+        // recreate the entry the user just removed.
+        let controller = PhotoSourceController()
+        var didReceiveImage = false
+
+        controller.present { _ in
+            didReceiveImage = true
+        }
+        controller.cancelActive()
+        controller.imagePicked(Data("stale".utf8))
+
+        #expect(!didReceiveImage)
+        #expect(!controller.isPresented)
+    }
+
     @Test func persistJPEGCreatesUniqueFilesForSameHabitAndDate() throws {
         let habitID = UUID()
         let dateString = "2026-04-11"
