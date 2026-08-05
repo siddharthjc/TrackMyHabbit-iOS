@@ -66,6 +66,20 @@ struct TrackMyHabbitTests {
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
     }
 
+    @Test func photoSourceControllerCancelActiveDropsPendingCallback() {
+        let controller = PhotoSourceController()
+        var didReceiveImage = false
+
+        controller.present { _ in
+            didReceiveImage = true
+        }
+        controller.cancelActive()
+        controller.imagePicked(Data("stale".utf8))
+
+        #expect(!didReceiveImage)
+        #expect(!controller.isPresented)
+    }
+
     @Test func persistJPEGCreatesUniqueFilesForSameHabitAndDate() throws {
         let habitID = UUID()
         let dateString = "2026-04-11"
