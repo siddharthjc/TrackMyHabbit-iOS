@@ -66,7 +66,10 @@ struct TrackMyHabbitTests {
         #expect(remainingEntries.first?.imageUri == "file:///photo.jpg")
     }
 
-    @Test func photoSourceControllerCancelActiveDropsPendingCallback() {
+    @Test func cancelActiveAfterEntryDeleteDropsInFlightPhotoCallback() {
+        // Mirrors ContentView.deleteEntry: after a successful delete, clear the
+        // shared picker callback so a slow loadTransferable completion cannot
+        // recreate the entry the user just removed.
         let controller = PhotoSourceController()
         var didReceiveImage = false
 
