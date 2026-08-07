@@ -4,6 +4,8 @@
 <dict>
 	<key>NSCameraUsageDescription</key>
 	<string>TrackMyHabbit uses the camera so you can capture today's habit photo.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>TrackMyHabbit uses your photo library so you can choose an existing habit photo when the camera is unavailable.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>SeasonMix-SemiBold-TRIAL.ttf</string>
